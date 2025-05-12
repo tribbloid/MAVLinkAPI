@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using HMD.Scripts.Pickle;
 using MAVLinkAPI.Scripts.API;
+using MAVLinkAPI.Scripts.Streaming;
 using SFB;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -16,9 +16,44 @@ namespace MAVLinkAPI.Scripts.Pose
 {
     public class MAVPoseProvider : BasePoseProvider
     {
+        private static readonly Yaml Pickler = new();
         private MAVPoseFeed? _feed;
 
-        private static readonly Yaml Pickler = new();
+        // private async void testProcess()
+        // {
+        //     // TODO: remove, only used for a spike
+        //     var cmd = "ls";
+        //     var mgr = new ExternalProcessManager("bash", $"-c '{cmd}'");
+        //
+        //     var task = mgr.StartAndMonitorAsync();
+        //
+        //     var result = await task;
+        //
+        //     Debug.Log($"Result is {result}");
+        // }
+
+        public MAVPoseFeed.UpdaterD? UpdaterDaemon
+        {
+            get
+            {
+                if (_feed == null) return null;
+                if (_feed!.UpdaterDaemon == null) return null;
+                return _feed.UpdaterDaemon;
+            }
+        }
+
+        private void Start()
+        {
+            // open all LocalSerial
+
+            var arg = Routing.ArgsT.Com5;
+            Open(arg);
+        }
+
+        private void OnDestroy()
+        {
+            TryDisconnect();
+        }
 
         public void PromptUserFilePicker()
         {
@@ -69,8 +104,7 @@ namespace MAVLinkAPI.Scripts.Pose
                 if (_feed == null) _feed = new MAVPoseFeed(args);
             }
 
-            Task.Run(
-                () =>
+            Task.Run(() =>
                 {
                     try
                     {
@@ -90,42 +124,6 @@ namespace MAVLinkAPI.Scripts.Pose
             {
                 _feed?.Dispose();
                 _feed = null;
-            }
-        }
-
-        private void OnDestroy()
-        {
-            TryDisconnect();
-        }
-
-        private void Start()
-        {
-            // open all LocalSerial
-
-            var arg = Routing.ArgsT.Com5;
-            Open(arg);
-        }
-
-        // private async void testProcess()
-        // {
-        //     // TODO: remove, only used for a spike
-        //     var cmd = "ls";
-        //     var mgr = new ExternalProcessManager("bash", $"-c '{cmd}'");
-        //
-        //     var task = mgr.StartAndMonitorAsync();
-        //
-        //     var result = await task;
-        //
-        //     Debug.Log($"Result is {result}");
-        // }
-
-        public MAVPoseFeed.UpdaterD? UpdaterDaemon
-        {
-            get
-            {
-                if (_feed == null) return null;
-                if (_feed!.UpdaterDaemon == null) return null;
-                return _feed.UpdaterDaemon;
             }
         }
 

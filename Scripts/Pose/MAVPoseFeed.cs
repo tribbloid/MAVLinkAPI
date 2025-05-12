@@ -7,6 +7,20 @@ using MAVLinkAPI.Scripts.API;
 using MAVLinkAPI.Scripts.API.Minimal;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
+using System.ComponentModel;
+
+namespace System.Runtime.CompilerServices
+{
+    /// <summary>
+    /// Reserved to be used by the compiler for tracking metadata.
+    /// This class should not be used by developers in source code.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal static class IsExternalInit
+    {
+    }
+}
+
 
 namespace MAVLinkAPI.Scripts.Pose
 {
@@ -57,8 +71,7 @@ namespace MAVLinkAPI.Scripts.Pose
 
             var readers = discovered
                 .AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                .SelectMany(
-                    connection =>
+                .SelectMany(connection =>
                     {
                         // Debug.Log("parallel filtering started for " + connection.Port.PortName);
 
@@ -135,8 +148,7 @@ namespace MAVLinkAPI.Scripts.Pose
                 );
             }
 
-            var only = readers.Where(
-                (v, i) =>
+            var only = readers.Where((v, i) =>
                 {
                     if (i != 0)
                     {
