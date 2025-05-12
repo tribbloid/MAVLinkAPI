@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Editor.Util
+namespace MAVLinkAPI.Tests.Util
 {
     public class DictionaryExtensionsSpec
     {

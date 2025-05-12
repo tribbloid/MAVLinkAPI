@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MAVLinkAPI.Editor.Util
+namespace MAVLinkAPI.Tests.Util
 {
     [TestFixture]
     [TestOf(typeof(UnityQuaternionExtensions))]

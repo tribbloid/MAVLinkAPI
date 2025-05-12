@@ -4,7 +4,7 @@ using System.Linq;
 using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Editor.Util
+namespace MAVLinkAPI.Tests.Util
 {
     [TestFixture]
     [TestOf(typeof(EnumerableExtensions))]

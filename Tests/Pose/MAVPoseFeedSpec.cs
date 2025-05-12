@@ -6,7 +6,7 @@ using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MAVLinkAPI.Editor.Pose
+namespace MAVLinkAPI.Tests.Pose
 {
     [Ignore("need SITL")]
     public class MAVPoseFeedSpec

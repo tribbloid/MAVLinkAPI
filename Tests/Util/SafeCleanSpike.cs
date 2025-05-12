@@ -3,7 +3,7 @@ using MAVLinkAPI.Scripts.Util;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Editor.Util
+namespace MAVLinkAPI.Tests.Util
 {
     public class SafeCleanSpike
     {

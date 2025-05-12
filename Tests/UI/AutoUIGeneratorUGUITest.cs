@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace MAVLinkAPI.Editor.UI
+namespace MAVLinkAPI.Tests.UI
 {
     [Serializable]
     public struct PlayerData

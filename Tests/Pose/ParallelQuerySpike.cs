@@ -4,7 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MAVLinkAPI.Editor.Pose
+namespace MAVLinkAPI.Tests.Pose
 {
     public class ParallelQuerySpike
     {
@@ -15,8 +15,7 @@ namespace MAVLinkAPI.Editor.Pose
 
             var numbers = Enumerable.Range(1, 10);
 
-            var n2 = numbers.Select(
-                v =>
+            var n2 = numbers.Select(v =>
                 {
                     Debug.Log(v);
                     // some long operation
@@ -43,8 +42,7 @@ namespace MAVLinkAPI.Editor.Pose
                 .WithExecutionMode(ParallelExecutionMode.ForceParallelism);
 
             var p1 = candidates.AsParallel()
-                .SelectMany(
-                    ii =>
+                .SelectMany(ii =>
                     {
                         Debug.Log(">>>>> " + ii);
 
@@ -54,8 +52,7 @@ namespace MAVLinkAPI.Editor.Pose
                     }
                 );
 
-            var p2 = p1.Select(
-                (v, i) => v);
+            var p2 = p1.Select((v, i) => v);
 
             var chosen = p2.FirstOrDefault();
         }
