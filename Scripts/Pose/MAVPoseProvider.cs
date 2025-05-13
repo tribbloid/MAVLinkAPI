@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.API;
+using MAVLinkAPI.Scripts.Routing;
 using MAVLinkAPI.Scripts.Streaming;
 using SFB;
 using Unity.VisualScripting;
@@ -46,7 +47,7 @@ namespace MAVLinkAPI.Scripts.Pose
         {
             // open all LocalSerial
 
-            var arg = Routing.ArgsT.Com5;
+            var arg = DataStream.ArgsT.Com5;
             Open(arg);
         }
 
@@ -92,12 +93,12 @@ namespace MAVLinkAPI.Scripts.Pose
             // if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
             var selectorStr = string.Join("\n", lines);
-            var selector = Pickler.Rev<Routing.ArgsT>(selectorStr);
+            var selector = Pickler.Rev<DataStream.ArgsT>(selectorStr);
 
             Open(selector);
         }
 
-        public void Open(Routing.ArgsT args)
+        public void Open(DataStream.ArgsT args)
         {
             lock (this)
             {

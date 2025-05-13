@@ -1,5 +1,6 @@
 ﻿using System;
 using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Scripts.Util.Lifetime;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
@@ -27,14 +28,14 @@ namespace MAVLinkAPI.Tests.Util
         [Test]
         public void Real()
         {
-            var i1 = CleanExample.Counter;
-            using (var obj = new CleanExample())
+            var i1 = TestCleanable.Counter;
+            using (var obj = new TestCleanable())
             {
-                Assert.AreEqual(i1, CleanExample.Counter);
+                Assert.AreEqual(i1, TestCleanable.Counter);
                 // do things
             }
 
-            Assert.AreEqual(i1 + 1, CleanExample.Counter);
+            Assert.AreEqual(i1 + 1, TestCleanable.Counter);
         }
     }
 
@@ -61,15 +62,14 @@ namespace MAVLinkAPI.Tests.Util
         }
     }
 
-    public class CleanExample : SafeClean
+    public class TestCleanable : Cleanable
     {
         public static volatile int Counter;
 
 
-        protected override bool DoClean()
+        protected override void DoClean()
         {
             Counter += 1;
-            return true;
         }
     }
 }

@@ -8,6 +8,7 @@ using MAVLinkAPI.Scripts.API.Minimal;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 using System.ComponentModel;
+using MAVLinkAPI.Scripts.Routing;
 
 namespace System.Runtime.CompilerServices
 {
@@ -24,7 +25,7 @@ namespace System.Runtime.CompilerServices
 
 namespace MAVLinkAPI.Scripts.Pose
 {
-    public record MAVPoseFeed(Routing.ArgsT Args) : IDisposable
+    public record MAVPoseFeed(DataStream.ArgsT Args) : IDisposable
     {
         // public ;
 
@@ -63,7 +64,7 @@ namespace MAVLinkAPI.Scripts.Pose
 
         private Reader<Quaternion> Reader_Mk()
         {
-            var discovered = MAVConnection.Discover(Args.className, Args.portName).ToList();
+            var discovered = MAVConnection.Discover(Args.typeName, Args.portName).ToList();
 
             _candidates.Set(discovered);
 
