@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.Util.Lifetime
+namespace MAVLinkAPI.Scripts.Util.Resource
 {
     public class Lifetime : SafeHandleMinusOneIsInvalid
     {
+        // TODO: need lifetime semilattice algebra:
+        // - earlier of two (<'a, 'b>)
+        // - later of two (<'a, 'b, 'c> where 'a: 'c, 'b: 'c)
+
         private static readonly IntPtr ValidHandle = new(0);
         // private static readonly IntPtr InvalidHandle = new(-1);
 
         // Using HashSet with a lock for thread safety
         private readonly ConcurrentDictionary<int, Cleanable> _managed = new();
         private readonly object _managedLock = new();
-
 
         public Lifetime(
             IntPtr? handle = null,

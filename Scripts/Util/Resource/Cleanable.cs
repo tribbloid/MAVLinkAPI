@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MAVLinkAPI.Scripts.Util.Lifetime
+namespace MAVLinkAPI.Scripts.Util.Resource
 {
     public abstract class Cleanable : IDisposable
     {
