@@ -1,10 +1,12 @@
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.Util.Lifetime
+namespace MAVLinkAPI.Scripts.Util.Resource
 {
     public class LifetimeController : MonoBehaviour
     {
         public Lifetime lifetime = new();
+
+        public Lifetime ManagedLifetime => lifetime;
 
         // OnDestroy will dispose lifetime
         private void OnDestroy()

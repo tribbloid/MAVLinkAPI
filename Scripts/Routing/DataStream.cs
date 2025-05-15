@@ -6,7 +6,7 @@ using MAVLinkAPI.Scripts.API;
 using MAVLinkAPI.Scripts.Comms;
 using MAVLinkAPI.Scripts.Ext;
 using MAVLinkAPI.Scripts.Util;
-using MAVLinkAPI.Scripts.Util.Lifetime;
+using MAVLinkAPI.Scripts.Util.Resource;
 using UnityEngine;
 
 namespace MAVLinkAPI.Scripts.Routing

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace log4net
+namespace MAVLinkAPI.Scripts.log4net
 {
     internal class LogManager
     {

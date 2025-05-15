@@ -1,12 +1,10 @@
 ﻿using System;
-using MAVLinkAPI.Scripts.Util;
-using MAVLinkAPI.Scripts.Util.Lifetime;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Tests.Util
+namespace MAVLinkAPI.Tests.Util.Resource
 {
-    public class SafeCleanSpike
+    public class UsingSyntaxSpike
     {
         [Test]
         public void Fake()
@@ -28,14 +26,14 @@ namespace MAVLinkAPI.Tests.Util
         [Test]
         public void Real()
         {
-            var i1 = TestCleanable.Counter;
-            using (var obj = new TestCleanable())
+            var i1 = CleanableExample.Counter;
+            using (var obj = new CleanableExample())
             {
-                Assert.AreEqual(i1, TestCleanable.Counter);
+                Assert.AreEqual(i1, CleanableExample.Counter);
                 // do things
             }
 
-            Assert.AreEqual(i1 + 1, TestCleanable.Counter);
+            Assert.AreEqual(i1 + 1, CleanableExample.Counter);
         }
     }
 
@@ -59,17 +57,6 @@ namespace MAVLinkAPI.Tests.Util
         {
             Counter += 1;
             return true;
-        }
-    }
-
-    public class TestCleanable : Cleanable
-    {
-        public static volatile int Counter;
-
-
-        protected override void DoClean()
-        {
-            Counter += 1;
         }
     }
 }
