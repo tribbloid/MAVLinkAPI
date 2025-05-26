@@ -1,0 +1,21 @@
+{
+  "name": "ca.hpvdt.mavlinkapi.Runtime",
+  "rootNamespace": "MAVLinkAPI",
+  "references": [
+    "Unity.TextMeshPro",
+    "YamlDotNet",
+    "StandaloneFileBrowser",
+    "UnityEngine.SpatialTracking",
+    "Unity.VisualScripting.Core",
+    "Autofill.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

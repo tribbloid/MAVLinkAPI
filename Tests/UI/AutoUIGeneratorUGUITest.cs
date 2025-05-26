@@ -1,6 +1,7 @@
+#nullable enable
 using System;
 using System.Linq;
-using MAVLinkAPI.Scripts.UI;
+using MAVLinkAPI.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,7 @@ namespace MAVLinkAPI.Tests.UI
     [Serializable]
     public struct PlayerData
     {
-        public string name;
+        public string? name;
         public int level;
         public float health;
     }

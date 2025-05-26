@@ -1,0 +1,22 @@
+/* TODO: useless at the moment*/
+
+.cleanable-item {
+    flex-direction: row;
+    padding: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.cleanable-item:hover {
+    background-color: rgba(44, 93, 135, 0.1);
+}
+
+.cleanable-label {
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+    color: rgb(32, 32, 32);
+}
+
+#cleanable-list-view {
+    background-color: rgb(238, 238, 238);
+}

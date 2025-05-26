@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 using NUnit.Framework;
 
 namespace MAVLinkAPI.Tests.Util
