@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MAVLinkAPI.Scripts.Ext;
 using MAVLinkAPI.Scripts.Util;
 
 namespace MAVLinkAPI.Scripts.API
@@ -62,9 +63,10 @@ namespace MAVLinkAPI.Scripts.API
                     Right.Topics.Index,
                     (ll, rr) => input =>
                     {
-                        var before = (ll(input), rr(input));
+                        var before = new List<List<T>?> { ll(input), rr(input) };
 
-                        return before.NullableReduce((l, r) => l.Union(r).ToList());
+                        return before.Where(x => x != null)
+                            .Aggregate((l, r) => l.Union(r).ToList());
                     }
                 );
 
@@ -89,9 +91,9 @@ namespace MAVLinkAPI.Scripts.API
                     Right.Topics.Index,
                     (ll, rr) => input =>
                     {
-                        var result = ll(input) ?? rr(input);
+                        var before = (ll(input), rr(input));
 
-                        return result;
+                        return before.Item1 ?? before.Item2;
                     }
                 );
 

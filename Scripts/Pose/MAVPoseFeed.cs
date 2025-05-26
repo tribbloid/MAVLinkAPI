@@ -8,6 +8,7 @@ using MAVLinkAPI.Scripts.API.Minimal;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 using System.ComponentModel;
+using MAVLinkAPI.Scripts.Ext;
 using MAVLinkAPI.Scripts.Routing;
 
 namespace System.Runtime.CompilerServices
