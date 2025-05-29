@@ -13,7 +13,7 @@ namespace MAVLinkAPI.Scripts.API
     {
         public MAVConnection Active;
 
-        public Subscriber<T> Subscriber;
+        public MAVFunction<T> MAVFunction;
 
         private IEnumerable<List<T>>? _byMessage;
 
@@ -25,7 +25,7 @@ namespace MAVLinkAPI.Scripts.API
         {
             foreach (var message in Active.RawReadSource)
             {
-                var values = Subscriber.Process(message);
+                var values = MAVFunction.Process(message);
 
                 if (values != null) yield return values;
             }

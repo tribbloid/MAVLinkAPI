@@ -4,7 +4,7 @@ namespace MAVLinkAPI.Scripts.Util.Lifetime
 {
     public class LifetimeController : MonoBehaviour
     {
-        private Lifetime lifetime = new();
+        public Lifetime lifetime = new();
 
         // OnDestroy will dispose lifetime
         private void OnDestroy()

@@ -7,9 +7,9 @@ using MAVLinkAPI.Scripts.Util;
 
 namespace MAVLinkAPI.Scripts.API
 {
-    public static class Subscriber
+    public static class MAVFunction
     {
-        public class OnT<T> : Subscriber<Message<T>> where T : struct
+        public class OnT<T> : MAVFunction<Message<T>> where T : struct
         {
             protected override Indexed<Topic> Topics_Mk()
             {
@@ -29,7 +29,7 @@ namespace MAVLinkAPI.Scripts.API
     }
 
 
-    public abstract class Subscriber<T>
+    public abstract class MAVFunction<T>
     {
         public delegate List<T>? Topic(MAVLink.MAVLinkMessage message);
 
@@ -44,15 +44,20 @@ namespace MAVLinkAPI.Scripts.API
         protected abstract Indexed<Topic> Topics_Mk();
 
 
-        public List<T>? Process(MAVLink.MAVLinkMessage message)
+        public List<T> Process(MAVLink.MAVLinkMessage message)
         {
             return Topics.Get(message.msgid).ValueOr(TopicMissing)(message);
         }
 
-        public abstract class BothT : Subscriber<T>
+        public static implicit operator Func<MAVLink.MAVLinkMessage, List<T>?>(MAVFunction<T> function)
         {
-            public Subscriber<T> Left = null!; // TODO: T in left and right can have different subtypes
-            public Subscriber<T> Right = null!;
+            return function.Process;
+        }
+
+        public abstract class BothT : MAVFunction<T>
+        {
+            public MAVFunction<T> Left = null!; // TODO: T in left and right can have different subtypes
+            public MAVFunction<T> Right = null!;
         }
 
         public class UnionT : BothT
@@ -74,7 +79,7 @@ namespace MAVLinkAPI.Scripts.API
             }
         }
 
-        public UnionT Union(Subscriber<T> that)
+        public UnionT Union(MAVFunction<T> that)
         {
             return new UnionT
             {
@@ -101,7 +106,7 @@ namespace MAVLinkAPI.Scripts.API
             }
         }
 
-        public OrElseT OrElse(Subscriber<T> that)
+        public OrElseT OrElse(MAVFunction<T> that)
         {
             return new OrElseT
             {
@@ -110,9 +115,9 @@ namespace MAVLinkAPI.Scripts.API
             };
         }
 
-        public class CutElimination<T2> : Subscriber<T2>
+        public class CutElimination<T2> : MAVFunction<T2>
         {
-            public Subscriber<T> Prev = null!;
+            public MAVFunction<T> Prev = null!;
             public Func<MAVLink.MAVLinkMessage, T, List<T2>> Fn = null!;
 
             protected override Indexed<Topic> Topics_Mk()

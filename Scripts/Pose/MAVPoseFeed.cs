@@ -90,7 +90,7 @@ namespace MAVLinkAPI.Scripts.Pose
                                 {
                                     var monitoring = cc.Monitor<Quaternion>();
 
-                                    var getQuaternion = Subscriber.On<MAVLink.mavlink_attitude_quaternion_t>()
+                                    var getQuaternion = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_t>()
                                         .Select((raw, msg) =>
                                         {
                                             var data = msg.Data;
@@ -113,7 +113,7 @@ namespace MAVLinkAPI.Scripts.Pose
                                             return q;
                                         });
 
-                                    var union = monitoring.Subscriber.Union(getQuaternion).LatchOn(cc);
+                                    var union = monitoring.MAVFunction.Union(getQuaternion).LatchOn(cc);
                                     return union;
                                 },
                                 Args.preferredBaudRate

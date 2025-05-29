@@ -12,8 +12,8 @@ namespace MAVLinkAPI.Scripts.Util.Lifetime
         // private static readonly IntPtr InvalidHandle = new(-1);
 
         // Using HashSet with a lock for thread safety
-        private readonly ConcurrentDictionary<int, Cleanable> _managed = new();
-        private readonly object _managedLock = new();
+        public readonly ConcurrentDictionary<int, Cleanable> Managed = new();
+        // private readonly object _accessLock = new();
 
 
         public Lifetime(
@@ -30,9 +30,9 @@ namespace MAVLinkAPI.Scripts.Util.Lifetime
         {
             var noError = true;
 
-            lock (_managedLock)
+            lock (Managed)
             {
-                foreach (var cleanable in _managed.Values)
+                foreach (var cleanable in Managed.Values)
                     try
                     {
                         cleanable.Dispose();
@@ -52,17 +52,17 @@ namespace MAVLinkAPI.Scripts.Util.Lifetime
         // Methods to add and remove Cleanable objects with thread safety
         public void Register(Cleanable cleanable)
         {
-            lock (_managedLock)
+            lock (Managed)
             {
-                _managed.GetOrAdd(cleanable.ID, cleanable);
+                Managed.GetOrAdd(cleanable.ID, cleanable);
             }
         }
 
         public void Deregister(Cleanable cleanable)
         {
-            lock (_managedLock)
+            lock (Managed)
             {
-                _managed.Remove(cleanable.ID, out _);
+                Managed.Remove(cleanable.ID, out _);
             }
         }
 

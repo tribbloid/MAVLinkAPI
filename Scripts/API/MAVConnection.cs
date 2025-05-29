@@ -258,9 +258,9 @@ namespace MAVLinkAPI.Scripts.API
                 }
             );
 
-        public Reader<T> Read<T>(Subscriber<T> subscriber)
+        public Reader<T> Read<T>(MAVFunction<T> mavFunction)
         {
-            return new Reader<T> { Active = this, Subscriber = subscriber };
+            return new Reader<T> { Active = this, MAVFunction = mavFunction };
         }
 
         public StatsAPI Stats = new() { Counters = Indexed<AtomicLong>.Global() };

@@ -27,10 +27,9 @@ namespace MAVLinkAPI.Scripts.API.Minimal
             // this will return an empty builder that respond to heartbeat and request target to send all data
             // will fail if heartbeat is not received within 2 seconds
 
-            var subscriber = Subscriber
+            var subscriber = MAVFunction
                 .On<MAVLink.mavlink_heartbeat_t>()
-                .SelectMany(
-                    (raw, msg) =>
+                .SelectMany((raw, msg) =>
                     {
                         var sender = msg.Sender;
 
@@ -38,7 +37,7 @@ namespace MAVLinkAPI.Scripts.API.Minimal
                         var heartbeatBack = HeartbeatFromHere;
 
                         // TODO: may be too frequent, should only send once
-                        var requestAll = new MAVLink.mavlink_request_data_stream_t()
+                        var requestAll = new MAVLink.mavlink_request_data_stream_t
                         {
                             req_message_rate = 2,
                             req_stream_id = (byte)MAVLink.MAV_DATA_STREAM.ALL,
@@ -57,8 +56,7 @@ namespace MAVLinkAPI.Scripts.API.Minimal
             var sub = connection.Read(subscriber);
 
             Retry.UpTo(12).With(TimeSpan.Zero).FixedInterval
-                .Run(
-                    (_, tt) =>
+                .Run((_, tt) =>
                     {
                         connection.WriteData(HeartbeatFromHere);
 
