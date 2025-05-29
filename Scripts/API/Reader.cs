@@ -27,7 +27,7 @@ namespace MAVLinkAPI.Scripts.API
             {
                 var values = MAVFunction.Process(message);
 
-                if (values != null) yield return values;
+                yield return values;
             }
         }
 
@@ -46,11 +46,11 @@ namespace MAVLinkAPI.Scripts.API
         {
             var list = new List<T>();
 
-            using (var rator = ByMessage.GetEnumerator())
+            using (var itr = ByMessage.GetEnumerator())
             {
-                while (Active.IO.BytesToRead > leftover && rator.MoveNext())
+                while (Active.IO.BytesToRead > leftover && itr.MoveNext())
                 {
-                    var current = rator.Current;
+                    var current = itr.Current;
                     if (current != null)
                         // Debug.Log("Draining, " + Active.Port.BytesToRead + " bytes left");
                         list.AddRange(current);
