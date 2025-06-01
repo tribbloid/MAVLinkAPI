@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 using Unity.VisualScripting;
 
-namespace MAVLinkAPI.Scripts.API.Minimal
+namespace MAVLinkAPI.API.Minimal
 {
     public static class MinimalDialect
     {

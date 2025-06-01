@@ -1,6 +1,6 @@
-﻿// using MAVLinkAPI.Scripts.Util.Lifetime;
+﻿// using MAVLinkAPI.Util.Lifetime;
 //
-// namespace MAVLinkAPI.Scripts.Util
+// namespace MAVLinkAPI.Util
 // {
 //     using System;
 //     using System.Diagnostics;

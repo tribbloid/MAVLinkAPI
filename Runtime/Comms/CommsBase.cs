@@ -1,6 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 
-namespace MAVLinkAPI.Scripts.Comms
+namespace MAVLinkAPI.Comms
 {
     public delegate string SettingsOption(string name, string value, bool set = false);
 

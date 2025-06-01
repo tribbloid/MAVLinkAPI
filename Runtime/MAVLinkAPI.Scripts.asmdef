@@ -1,11 +1,8 @@
 {
-  "name": "MAVLinkAPI.Scripts",
-  "rootNamespace": "",
+  "name": "ca.hpvdt.mavlinkapi",
+  "rootNamespace": "MAVLinkAPI",
   "references": [
-    "Unity.ResourceManager",
-    "Unity.InputSystem",
     "Unity.TextMeshPro",
-    "Unity.ugui",
     "YamlDotNet",
     "StandaloneFileBrowser",
     "UnityEngine.SpatialTracking",

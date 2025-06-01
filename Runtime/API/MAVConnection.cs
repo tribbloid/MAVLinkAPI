@@ -3,15 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using MAVLinkAPI.Scripts.Comms;
-using MAVLinkAPI.Scripts.Routing;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Comms;
+using MAVLinkAPI.Routing;
+using MAVLinkAPI.Util;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.API
+namespace MAVLinkAPI.API
 {
     public class MAVConnection : IDisposable
     {

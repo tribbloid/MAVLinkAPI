@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 
-namespace MAVLinkAPI.Scripts.API
+namespace MAVLinkAPI.API
 {
     /**
      * A.k.a subscription

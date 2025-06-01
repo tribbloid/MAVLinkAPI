@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     public abstract class Daemon : IDisposable
     {

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     // TODO: theoretically it is faster than Box<T>?, but difficult to use
     // TODO: should extend IEnumerable<T>

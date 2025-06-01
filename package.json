@@ -1,0 +1,21 @@
+{
+  "name": "ca.hpvdt.mavlinkapi",
+  "version": "0.1.0",
+  "displayName": "Mavlink API",
+  "description": "A Unity package providing an API for Mavlink communication.",
+  "unity": "2022.3",
+  "documentationUrl": "",
+  "changelogUrl": "https://github.com/your-username/your-repository/blob/main/Packages/ca.hpvdt.mavlinkapi/CHANGELOG.md",
+  "licensesUrl": "https://github.com/your-username/your-repository/blob/main/Packages/ca.hpvdt.mavlinkapi/LICENSE",
+  "dependencies": {},
+  "keywords": [
+    "mavlink",
+    "communication",
+    "api"
+  ],
+  "author": {
+    "name": "HPVDT.ca",
+    "email": "hpvdt@gmail.com",
+    "url": "https://github.com/hpvdt"
+  }
+}

@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MAVLinkAPI.Scripts.Ext;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Ext;
+using MAVLinkAPI.Util;
 
-namespace MAVLinkAPI.Scripts.API
+namespace MAVLinkAPI.API
 {
     public static class MAVFunction
     {

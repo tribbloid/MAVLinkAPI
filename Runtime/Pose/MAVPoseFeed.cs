@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.API.Minimal;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.API;
+using MAVLinkAPI.API.Minimal;
+using MAVLinkAPI.Util;
 using UnityEngine;
 using System.ComponentModel;
-using MAVLinkAPI.Scripts.Ext;
-using MAVLinkAPI.Scripts.Routing;
+using MAVLinkAPI.Ext;
+using MAVLinkAPI.Routing;
 
 namespace System.Runtime.CompilerServices
 {
@@ -24,7 +24,7 @@ namespace System.Runtime.CompilerServices
 }
 
 
-namespace MAVLinkAPI.Scripts.Pose
+namespace MAVLinkAPI.Pose
 {
     public record MAVPoseFeed(DataStream.ArgsT Args) : IDisposable
     {

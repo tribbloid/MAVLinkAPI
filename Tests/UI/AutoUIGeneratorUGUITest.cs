@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using MAVLinkAPI.Scripts.UI;
+using MAVLinkAPI.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;

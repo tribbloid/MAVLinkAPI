@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MAVLinkAPI.Scripts.API
+namespace MAVLinkAPI.API
 {
     public class TypeLookup
     {

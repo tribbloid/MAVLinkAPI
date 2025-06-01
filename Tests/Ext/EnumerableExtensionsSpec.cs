@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MAVLinkAPI.Scripts.Ext;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Ext;
+using MAVLinkAPI.Util;
 using NUnit.Framework;
 
 namespace MAVLinkAPI.Tests.Ext

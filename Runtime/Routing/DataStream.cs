@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.Comms;
-using MAVLinkAPI.Scripts.Ext;
-using MAVLinkAPI.Scripts.Util;
-using MAVLinkAPI.Scripts.Util.Resource;
+using MAVLinkAPI.API;
+using MAVLinkAPI.Comms;
+using MAVLinkAPI.Ext;
+using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.Routing
+namespace MAVLinkAPI.Routing
 {
     public class DataStream : Cleanable
     {

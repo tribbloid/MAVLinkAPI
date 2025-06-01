@@ -1,7 +1,7 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Generic;
 
-namespace MAVLinkAPI.Scripts.Ext
+namespace MAVLinkAPI.Ext
 {
     public static class NullableExtensions
     {

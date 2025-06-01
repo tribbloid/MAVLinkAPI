@@ -5,10 +5,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using MAVLinkAPI.Scripts.log4net;
+using MAVLinkAPI.log4net;
 using Microsoft.Win32.SafeHandles;
 
-namespace MAVLinkAPI.Scripts.Comms
+namespace MAVLinkAPI.Comms
 {
     public class SerialPort : ICommsSerial
     {

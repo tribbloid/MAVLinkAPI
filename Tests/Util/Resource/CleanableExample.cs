@@ -1,5 +1,5 @@
 #nullable enable
-using MAVLinkAPI.Scripts.Util.Resource;
+using MAVLinkAPI.Util.Resource;
 
 namespace MAVLinkAPI.Tests.Util.Resource
 {

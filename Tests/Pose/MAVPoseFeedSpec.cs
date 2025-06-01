@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Threading;
-using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.Pose;
-using MAVLinkAPI.Scripts.Routing;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Pose;
+using MAVLinkAPI.Routing;
+using MAVLinkAPI.Util;
 using NUnit.Framework;
 using UnityEngine;
 

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     /**
      * pure function

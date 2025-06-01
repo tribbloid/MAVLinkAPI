@@ -8,7 +8,7 @@
 // // ReSharper disable UnusedMember.Local
 // // ReSharper disable MemberCanBePrivate.Local
 //
-// namespace MAVLinkAPI.Scripts.Process
+// namespace MAVLinkAPI.Process
 // {
 //     public static class StartExternalProcess
 //     {

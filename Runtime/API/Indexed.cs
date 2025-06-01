@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 
-namespace MAVLinkAPI.Scripts.API
+namespace MAVLinkAPI.API
 {
     public struct Indexed<T>
     {

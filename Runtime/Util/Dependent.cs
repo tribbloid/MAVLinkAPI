@@ -1,4 +1,4 @@
-﻿namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     public abstract class Dependent<T>
     {

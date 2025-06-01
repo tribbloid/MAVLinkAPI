@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Text;
-using MAVLinkAPI.Scripts.Util;
 
-namespace MAVLinkAPI.Scripts.Ext
+namespace MAVLinkAPI.Ext
 {
     internal static class ExceptionExtensions
     {

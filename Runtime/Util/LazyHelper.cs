@@ -1,8 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     // TODO: ideally it should work on `ref Maybe<T> sym` for better performance
     //  only blocked by existing LazyInitializer.EnsureInitialized signature

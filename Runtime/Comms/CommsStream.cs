@@ -1,6 +1,6 @@
-﻿using System.IO;
+using System.IO;
 
-namespace MAVLinkAPI.Scripts.Comms
+namespace MAVLinkAPI.Comms
 {
     public class CommsStream : Stream
     {

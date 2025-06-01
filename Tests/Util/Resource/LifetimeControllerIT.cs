@@ -1,5 +1,5 @@
 using System.Collections;
-using MAVLinkAPI.Scripts.Util.Resource;
+using MAVLinkAPI.Util.Resource;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

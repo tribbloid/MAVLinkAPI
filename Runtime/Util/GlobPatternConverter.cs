@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     public static class GlobPatternConverter
     {

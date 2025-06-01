@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MAVLinkAPI.Scripts.Ext;
+using MAVLinkAPI.Ext;
 using NUnit.Framework;
 
 namespace MAVLinkAPI.Tests.Ext

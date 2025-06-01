@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 
-namespace MAVLinkAPI.Scripts.Comms
+namespace MAVLinkAPI.Comms
 {
     public class CommsFile : CommsBase, ICommsSerial, IDisposable
     {

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MAVLinkAPI.Scripts.Util
+namespace MAVLinkAPI.Util
 {
     // TODO: use it to create multiple subscriber to a mavlink stream
     public class ForkedStream : Stream

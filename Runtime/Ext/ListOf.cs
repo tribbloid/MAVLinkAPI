@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MAVLinkAPI.Scripts.Ext
+namespace MAVLinkAPI.Ext
 {
     public class ListOf<T>
     {

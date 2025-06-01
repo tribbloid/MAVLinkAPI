@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 using NUnit.Framework;
 
 namespace MAVLinkAPI.Tests.Util

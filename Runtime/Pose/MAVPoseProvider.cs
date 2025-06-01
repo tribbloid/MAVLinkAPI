@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.Routing;
-using MAVLinkAPI.Scripts.Streaming;
+using MAVLinkAPI.Routing;
+using MAVLinkAPI.Streaming;
 using SFB;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
 using UnityEngine.SpatialTracking;
 
-namespace MAVLinkAPI.Scripts.Pose
+namespace MAVLinkAPI.Pose
 {
     public class MAVPoseProvider : BasePoseProvider
     {

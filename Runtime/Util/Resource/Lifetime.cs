@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.Util.Resource
+namespace MAVLinkAPI.Util.Resource
 {
     public class Lifetime : SafeHandleMinusOneIsInvalid
     {
