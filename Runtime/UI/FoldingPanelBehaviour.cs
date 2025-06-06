@@ -10,7 +10,6 @@ namespace MAVLinkAPI.UI
 {
     public class FoldingPanelBehaviour : MonoBehaviour
     {
-        [Autofill(AutofillType.Parent)] public 
         
         [Autofill(AutofillType.Parent)] public TableLayout table;
 
