@@ -77,4 +77,4 @@ crashlytics-build.properties
 
 # Package specific ignores
 /Scenes~/
-/__module/
+/__module/**/target

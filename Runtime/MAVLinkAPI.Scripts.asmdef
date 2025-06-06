@@ -6,7 +6,9 @@
     "YamlDotNet",
     "StandaloneFileBrowser",
     "UnityEngine.SpatialTracking",
-    "Unity.VisualScripting.Core"
+    "Unity.VisualScripting.Core",
+    "repack.ui.tablelayout.Runtime",
+    "Autofill.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

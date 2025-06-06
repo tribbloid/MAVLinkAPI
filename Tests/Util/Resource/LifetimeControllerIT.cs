@@ -13,7 +13,7 @@ namespace MAVLinkAPI.Tests.Util.Resource
         {
             // Arrange
             var gameObject = new GameObject("TestGameObjectWithLifetimeController");
-            var ctr = gameObject.AddComponent<LifetimeController>();
+            var ctr = gameObject.AddComponent<LifetimeInScene>();
 
             var cl = new CleanableExample(ctr.ManagedLifetime);
 

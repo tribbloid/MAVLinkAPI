@@ -15,5 +15,17 @@
     "name": "HPVDT.ca",
     "email": "hpvdt@gmail.com",
     "url": "https://github.com/hpvdt"
+  },
+  "samples": [
+    {
+      "displayName": "Scenes",
+      "description": "Optional sample scene.",
+      "path": "Samples~/Scenes"
+    }
+  ],
+  "dependencies": {
+    "repack.ui.tablelayout": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6"
   }
+
 }

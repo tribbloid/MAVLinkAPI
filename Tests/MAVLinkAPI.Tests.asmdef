@@ -4,7 +4,8 @@
   "references": [
     "ca.hpvdt.mavlinkapi",
     "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner"
+    "UnityEditor.TestRunner",
+    "repack.ui.tablelayout.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
