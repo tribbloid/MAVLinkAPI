@@ -40,9 +40,12 @@ namespace MAVLinkAPI.Util.Resource
             //     Debug.LogException(new IOException("INTERNAL ERROR!"));
         }
 
+        public bool IsDisposed = false;
+
         public void Dispose()
         {
             DoClean();
+            IsDisposed = true;
             _lifetime.Deregister(this);
         }
 

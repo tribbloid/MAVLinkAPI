@@ -31,6 +31,29 @@ namespace MAVLinkAPI.Util.Resource
 
         protected sealed override bool ReleaseHandle()
         {
+            return DeregisterAll();
+        }
+
+
+        // Methods to add and remove Cleanable objects with thread safety
+        public virtual void Register(Cleanable cleanable)
+        {
+            lock (Managed)
+            {
+                Managed.GetOrAdd(cleanable.ID, cleanable);
+            }
+        }
+
+        public virtual void Deregister(Cleanable cleanable)
+        {
+            lock (Managed)
+            {
+                Managed.Remove(cleanable.ID, out _);
+            }
+        }
+
+        public bool DeregisterAll()
+        {
             var noError = true;
 
             lock (Managed)
@@ -52,23 +75,6 @@ namespace MAVLinkAPI.Util.Resource
             return noError;
         }
 
-        // Methods to add and remove Cleanable objects with thread safety
-        public void Register(Cleanable cleanable)
-        {
-            lock (Managed)
-            {
-                Managed.GetOrAdd(cleanable.ID, cleanable);
-            }
-        }
-
-        public void Deregister(Cleanable cleanable)
-        {
-            lock (Managed)
-            {
-                Managed.Remove(cleanable.ID, out _);
-            }
-        }
-
         // Operator overloads for += and -= syntax
         public static Lifetime operator +(Lifetime lifetime, Cleanable cleanable)
         {
@@ -83,19 +89,14 @@ namespace MAVLinkAPI.Util.Resource
         }
 
         // Static lifetime that can be used application-wide
-        public static readonly Lifetime Static = new StaticLifetime();
+        public static readonly Lifetime Static = new TStatic();
 
         // Internal implementation for the static lifetime
-        private class StaticLifetime : Lifetime
+        private class TStatic : Lifetime
         {
-            public StaticLifetime() : base()
+            public TStatic() : base()
             {
             }
         }
     }
-
-
-    // public class Fallback : Lifetime
-    // {
-    // }
 }

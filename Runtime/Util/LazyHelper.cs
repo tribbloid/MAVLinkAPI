@@ -4,10 +4,10 @@ using System.Threading;
 
 namespace MAVLinkAPI.Util
 {
-    // TODO: ideally it should work on `ref Maybe<T> sym` for better performance
-    //  only blocked by existing LazyInitializer.EnsureInitialized signature
     public static class LazyHelper
     {
+        // TODO: too verbose, should move to Maybe<T>.Lazy after testing
+
         public static T EnsureInitialized<T>(ref T? sym, Func<T> fn) where T : class
         {
             var result = LazyInitializer.EnsureInitialized(ref sym, fn);
@@ -23,16 +23,16 @@ namespace MAVLinkAPI.Util
         }
     }
 
-    public static class LazyExtensions
-    {
-        public static T BindAsLazy<T>(this Func<T> fn, ref T? sym) where T : class
-        {
-            return LazyHelper.EnsureInitialized(ref sym!, fn);
-        }
-
-        public static T BindAsLazy<T>(this Func<T> fn, ref Box<T>? sym) where T : struct
-        {
-            return LazyHelper.EnsureInitialized(ref sym!, fn);
-        }
-    }
+    // public static class LazyExtensions
+    // {
+    //     public static T BindAsLazy<T>(this Func<T> fn, ref T? sym) where T : class
+    //     {
+    //         return LazyHelper.EnsureInitialized(ref sym!, fn);
+    //     }
+    //
+    //     public static T BindAsLazy<T>(this Func<T> fn, ref Box<T>? sym) where T : struct
+    //     {
+    //         return LazyHelper.EnsureInitialized(ref sym!, fn);
+    //     }
+    // }
 }

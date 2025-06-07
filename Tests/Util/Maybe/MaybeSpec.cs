@@ -1,11 +1,11 @@
 ﻿using System;
-using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.NullSafety;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Tests.Util
+namespace MAVLinkAPI.Tests.Util.Maybe
 {
     [TestFixture]
-    public class MaybeTests
+    public class MaybeSpec
     {
         [Test]
         public void Some_CreatesValueWithContent()
@@ -44,52 +44,10 @@ namespace MAVLinkAPI.Tests.Util
         }
 
         [Test]
-        public void Match_ExecutesSomeActionWhenSome()
-        {
-            var maybe = Maybe<int>.Some(42);
-            maybe.Match(
-                value => Assert.That(value, Is.EqualTo(42)),
-                () => Assert.Fail("Should not execute none action")
-            );
-        }
-
-        [Test]
-        public void Match_ExecutesNoneActionWhenNone()
-        {
-            var maybe = Maybe<int>.None();
-            maybe.Match(
-                _ => Assert.Fail("Should not execute some action"),
-                () => Assert.Pass()
-            );
-        }
-
-        [Test]
-        public void Match_ReturnsCorrectResultWhenSome()
-        {
-            var maybe = Maybe<int>.Some(42);
-            var result = maybe.Match(
-                value => value * 2,
-                () => 0
-            );
-            Assert.That(result, Is.EqualTo(84));
-        }
-
-        [Test]
-        public void Match_ReturnsCorrectResultWhenNone()
-        {
-            var maybe = Maybe<int>.None();
-            var result = maybe.Match(
-                value => value * 2,
-                () => 0
-            );
-            Assert.That(result, Is.EqualTo(0));
-        }
-
-        [Test]
         public void Map_TransformsValueWhenSome()
         {
             var maybe = Maybe<int>.Some(42);
-            var result = maybe.Map(x => x.ToString());
+            var result = maybe.Select(x => x.ToString());
             Assert.That(result.HasValue, Is.True);
             Assert.That(result.Value, Is.EqualTo("42"));
         }
@@ -98,7 +56,7 @@ namespace MAVLinkAPI.Tests.Util
         public void Map_ReturnsNoneWhenNone()
         {
             var maybe = Maybe<int>.None();
-            var result = maybe.Map(x => x.ToString());
+            var result = maybe.Select(x => x.ToString());
             Assert.That(result.HasValue, Is.False);
         }
 
@@ -106,7 +64,7 @@ namespace MAVLinkAPI.Tests.Util
         public void Bind_TransformsValueWhenSome()
         {
             var maybe = Maybe<int>.Some(42);
-            var result = maybe.Bind(x => Maybe<string>.Some(x.ToString()));
+            var result = maybe.SelectMany(x => Maybe<string>.Some(x.ToString()));
             Assert.That(result.HasValue, Is.True);
             Assert.That(result.Value, Is.EqualTo("42"));
         }
@@ -115,7 +73,7 @@ namespace MAVLinkAPI.Tests.Util
         public void Bind_ReturnsNoneWhenNone()
         {
             var maybe = Maybe<int>.None();
-            var result = maybe.Bind(x => Maybe<string>.Some(x.ToString()));
+            var result = maybe.SelectMany(x => Maybe<string>.Some(x.ToString()));
             Assert.That(result.HasValue, Is.False);
         }
 

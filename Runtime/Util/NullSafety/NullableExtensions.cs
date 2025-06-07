@@ -1,10 +1,11 @@
 #nullable enable
 using System.Collections.Generic;
 
-namespace MAVLinkAPI.Ext
+namespace MAVLinkAPI.Util.NullSafety
 {
     public static class NullableExtensions
     {
+        // TODO: how to remove this duplicate?
         public static IEnumerable<T> Wrap<T>(this T? nullable) where T : struct
         {
             if (nullable.HasValue)
@@ -17,7 +18,6 @@ namespace MAVLinkAPI.Ext
 
         public static IEnumerable<T> Wrap<T>(this T? nullable) where T : class
         {
-            // TODO: how to remove this?
             if (nullable != null) yield return nullable;
         }
     }

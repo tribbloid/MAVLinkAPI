@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace MAVLinkAPI.Util.Maybe
+namespace MAVLinkAPI.Util.NullSafety
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
     // [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)] TODO: enable this

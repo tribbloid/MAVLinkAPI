@@ -6,16 +6,16 @@ using UnityEngine.TestTools;
 
 namespace MAVLinkAPI.Tests.Util.Resource
 {
-    public class LifetimeControllerIt
+    public class LifetimeIt
     {
         [UnityTest]
         public IEnumerator LifetimeController_GameObjectDestroyed_DisposesLifetime()
         {
             // Arrange
             var gameObject = new GameObject("TestGameObjectWithLifetimeController");
-            var ctr = gameObject.AddComponent<LifetimeInScene>();
+            var ctr = gameObject.AddComponent<LifetimeBinding>();
 
-            var cl = new CleanableExample(ctr.ManagedLifetime);
+            var cl = new CleanableExample(ctr.Lifetime);
 
             var v1 = CleanableExample.Counter;
 
@@ -30,7 +30,9 @@ namespace MAVLinkAPI.Tests.Util.Resource
             // NUnit's Is.Null assertion works correctly for destroyed Unity Objects.
             Assert.IsTrue(gameObject == null, "GameObject was not destroyed.");
 
-            Assert.IsTrue(CleanableExample.Counter == v1 + 1);
+            Assert.AreEqual(CleanableExample.Counter, v1 + 1, "lifetime callback is not triggered");
+
+            Assert.IsTrue(ctr.Lifetime.IsClosed, "lifetime is not clean");
             // Implicitly, if no errors occurred, Lifetime.Dispose was called successfully during OnDestroy.
         }
     }

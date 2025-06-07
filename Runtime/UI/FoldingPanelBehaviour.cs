@@ -1,16 +1,17 @@
 #nullable enable
+using System;
 using System.Collections;
 using Autofill;
-using MAVLinkAPI.Util.Maybe;
+using MAVLinkAPI.Util.NullSafety;
 using UI.Tables;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MAVLinkAPI.UI
 {
+    [RequireComponent(typeof(ContentSizeFitter))]
     public class FoldingPanelBehaviour : MonoBehaviour
     {
-        
         [Autofill(AutofillType.Parent)] public TableLayout table;
 
         [Autofill(AutofillType.Parent)] public TableRow row;
@@ -18,8 +19,12 @@ namespace MAVLinkAPI.UI
         [Required] public Button toggle;
         public MonoBehaviour? detail;
 
+        private float minHeight = -1;
+
         public void Start()
         {
+            minHeight = row.preferredHeight;
+
             StartCoroutine(UpdateHeightsAfterLayout());
             toggle.onClick.AddListener(() =>
             {
@@ -35,7 +40,10 @@ namespace MAVLinkAPI.UI
             yield return new WaitForEndOfFrame();
 
             // Now get the updated height
-            row.preferredHeight = GetComponent<RectTransform>()!.rect.height + 10;
+            row.preferredHeight = Math.Max(
+                GetComponent<RectTransform>()!.rect.height + 10,
+                minHeight
+            );
 
             // row.UpdateLayout(); // Update the layout.CellCount
             table.UpdateLayout();
