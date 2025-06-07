@@ -1,0 +1,31 @@
+{
+  "name": "ca.hpvdt.mavlinkapi",
+  "version": "1.0.0",
+  "displayName": "MAVLink API",
+  "description": "A Unity package providing an API for Mavlink communication.",
+  "documentationUrl": "",
+  "changelogUrl": "https://github.com/your-username/your-repository/blob/main/Packages/ca.hpvdt.mavlinkapi/CHANGELOG.md",
+  "licensesUrl": "https://github.com/your-username/your-repository/blob/main/Packages/ca.hpvdt.mavlinkapi/LICENSE",
+  "keywords": [
+    "mavlink",
+    "communication",
+    "api"
+  ],
+  "author": {
+    "name": "HPVDT.ca",
+    "email": "contact@hpvdt.ca",
+    "url": "https://hpvdt.ca"
+  },
+  "samples": [
+    {
+      "displayName": "Scenes",
+      "description": "Optional sample scene.",
+      "path": "Samples~/Scenes"
+    }
+  ],
+  "dependencies": {
+    "ca.hpvdt.repack.tablelayout": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6"
+  }
+
+}
