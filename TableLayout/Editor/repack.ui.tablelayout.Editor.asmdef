@@ -1,8 +1,8 @@
 {
-  "name": "repack.ui.tablelayout.Editor",
+  "name": "ca.hpvdt.repack.tablelayout.Editor",
   "rootNamespace": "UI.Tables",
   "references": [
-    "repack.ui.tablelayout.Runtime"
+    "ca.hpvdt.repack.tablelayout.Runtime"
   ],
   "includePlatforms": [
     "Editor"
