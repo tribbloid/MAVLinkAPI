@@ -5,7 +5,7 @@
     "ca.hpvdt.mavlinkapi",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
-    "repack.ui.tablelayout.Runtime"
+    "ca.hpvdt.repack.tablelayout.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

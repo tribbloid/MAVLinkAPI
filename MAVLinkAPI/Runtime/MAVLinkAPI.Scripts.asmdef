@@ -7,7 +7,7 @@
     "StandaloneFileBrowser",
     "UnityEngine.SpatialTracking",
     "Unity.VisualScripting.Core",
-    "repack.ui.tablelayout.Runtime",
+    "ca.hpvdt.repack.tablelayout.Runtime",
     "Autofill.Runtime"
   ],
   "includePlatforms": [],

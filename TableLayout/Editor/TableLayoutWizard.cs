@@ -58,9 +58,7 @@ namespace UI.Tables.Editor
 
         private void CreateTable(int rows, int columns)
         {
-            var gameObject = TableLayoutUtilities.InstantiatePrefab(
-                "TableLayout/TableLayout"
-                );
+            var gameObject = TableLayoutUtilities.InstantiatePrefab("TableLayout/TableLayout");
             gameObject.name = "TableLayout";
 
             var tableLayout = gameObject.GetComponent<TableLayout>();
