@@ -1,9 +1,7 @@
 #nullable enable
-using System.Collections.Generic;
 using UI.Tables;
 using Autofill;
 using MAVLinkAPI.Util.NullSafety;
-using UnityEngine;
 
 namespace MAVLinkAPI.Util.Resource
 {
@@ -27,11 +25,19 @@ namespace MAVLinkAPI.Util.Resource
             {
                 base.Register(cleanable);
                 // Instantiate the new row using the controller's context
-                var row = Instantiate(_controller.templateRow);
-                // row._controller.table.AddRow(row);
+                var binding = Instantiate(_controller.template);
+                binding.gameObject.SetActive(true);
+                binding.Bind(cleanable);
+                
+                _controller.table.AddRow(binding.row);
             }
         }
 
-        public override Lifetime? Lifetime => _lifetime.Lazy(() => new LifetimeWithSync(this));
+        public override Lifetime Lifetime => _lifetime.Lazy(() => new LifetimeWithSync(this))!;
+
+        public void AddDummy()
+        {
+            var dummy = new Cleanable.Dummy(Lifetime);
+        }
     }
 }

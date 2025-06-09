@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Autofill;
 using MAVLinkAPI.Util.NullSafety;
 using TMPro;
@@ -25,22 +26,26 @@ namespace MAVLinkAPI.Util.Resource
         [Required] public Toggle terminate1;
         [Required] public Toggle terminate2;
 
-        [Serialize] private float updateFreqSec = 1f;
+        [Serialize] private float updateFreqSec = 0.5f;
 
-        [DoNotSerialize] public Cleanable? value;
+        [DoNotSerialize] private Cleanable? underlying;
 
-        private void Start()
+
+        public void Bind(Cleanable cleanable)
         {
+            underlying = cleanable;
+            
             terminate1.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
             terminate2.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
-
+            
+            UpdateStatus(true); // Sync once if frequency is zero or negative.
+            
             if (updateFreqSec > 0)
             {
-                InvokeRepeating(nameof(SyncStatus), 0f, updateFreqSec);
+                InvokeRepeating(nameof(UpdateStatusFn), 0f, updateFreqSec);
             }
             else
             {
-                SyncStatus(); // Sync once if frequency is zero or negative.
                 enabled = false; // Disable component to stop further updates, matching previous behavior.
             }
         }
@@ -52,7 +57,7 @@ namespace MAVLinkAPI.Util.Resource
 
             if (left && right)
             {
-                value?.Dispose();
+                underlying?.Dispose();
 
                 PostClean();
             }
@@ -67,19 +72,42 @@ namespace MAVLinkAPI.Util.Resource
         }
 
 
-        public virtual void SyncStatus()
+        public virtual void UpdateStatus(bool force = false)
         {
-            if (value == null) return;
+            if (underlying == null) return;
 
-            if (value.IsDisposed)
+            if (underlying.IsDisposed)
             {
                 PostClean();
                 return;
             }
 
-            var vType = value.GetType();
-            summary.text = vType.FullName;
-            if (detail.isActiveAndEnabled) detail.text = value.ToString();
+            summary.text = GetSummary(underlying);
+            if (detail.isActiveAndEnabled || force) detail.text = GetDetail(underlying);
+        }
+
+        public void UpdateStatusFn()
+        {
+            UpdateStatus();
+        }
+        
+        public virtual string GetSummary(Cleanable cleanable)
+        {
+            var vType = underlying.GetType();
+            var text = vType.Name;
+            return text;
+        }
+
+        public virtual string GetDetail(Cleanable cleanable)
+        {
+            if (cleanable == null) return "Cleanable is null";
+
+            var lifespan = DateTime.UtcNow - cleanable.CreatedAt;
+            
+            return $@"
+Object: {cleanable.ToString()}
+- ID: {cleanable.ID}
+- Lifespan: {lifespan.TotalSeconds}";
         }
     }
 }

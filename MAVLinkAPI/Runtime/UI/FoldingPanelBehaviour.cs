@@ -9,9 +9,11 @@ using UnityEngine.UI;
 
 namespace MAVLinkAPI.UI
 {
-    [RequireComponent(typeof(ContentSizeFitter))]
+    [RequireComponent(typeof(RectTransform))]
     public class FoldingPanelBehaviour : MonoBehaviour
     {
+        [Autofill] public RectTransform rectT;
+        
         [Autofill(AutofillType.Parent)] public TableLayout table;
 
         [Autofill(AutofillType.Parent)] public TableRow row;
@@ -29,6 +31,7 @@ namespace MAVLinkAPI.UI
             toggle.onClick.AddListener(() =>
             {
                 detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectT);
                 StartCoroutine(UpdateHeightsAfterLayout());
             });
         }
@@ -49,11 +52,4 @@ namespace MAVLinkAPI.UI
             table.UpdateLayout();
         }
     }
-
-    // public class TableController : MonoBehaviour
-    // {
-    //     [Autofill] public TableLayout table;
-    //
-    //     [Required] public TableRow rowTemplate;
-    // }
 }

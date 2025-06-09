@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MAVLinkAPI.log4net;
+using UnityEngine;
+using Random = System.Random;
 
 namespace MAVLinkAPI.Util.Resource
 {
@@ -18,8 +21,10 @@ namespace MAVLinkAPI.Util.Resource
         public static readonly object GlobalAccessLock = new();
 
         public int ID = new Random().Next();
+        public DateTime CreatedAt = DateTime.UtcNow;
 
         private readonly Lifetime _lifetime;
+
 
         public Cleanable(Lifetime? lifetime = null)
         {
@@ -44,13 +49,36 @@ namespace MAVLinkAPI.Util.Resource
 
         public void Dispose()
         {
-            DoClean();
-            IsDisposed = true;
-            _lifetime.Deregister(this);
+            try
+            {
+                DoClean();
+                IsDisposed = true;
+                _lifetime.Deregister(this);
+                LogManager.GetLogger(GetType()).Info("disposing " + GetType().Name);
+                Debug.Log("disposing " + GetType().Name);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(GetType()).Error(e);
+            }
         }
 
 
         protected abstract void DoClean();
+        
+        
+        public class Dummy : Cleanable
+        {
+
+            public Dummy(Lifetime? lifetime = null) : base(lifetime)
+            {
+            } 
+            
+            protected override void DoClean()
+            {
+                
+            }
+        }
     }
 
 
@@ -86,5 +114,6 @@ namespace MAVLinkAPI.Util.Resource
             var peers = self.SelfAndPeers<T>();
             return peers.Where(v => !ReferenceEquals(v, self));
         }
+        
     }
 }
