@@ -1,5 +1,5 @@
 {
-  "name": "ca.hpvdt.mavlinkapi",
+  "name": "ca.hpvdt.mavlinkapi.Runtime",
   "rootNamespace": "MAVLinkAPI",
   "references": [
     "Unity.TextMeshPro",

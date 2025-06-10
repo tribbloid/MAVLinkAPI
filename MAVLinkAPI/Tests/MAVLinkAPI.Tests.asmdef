@@ -1,6 +1,6 @@
 {
   "name": "ca.hpvdt.mavlinkapi.Tests",
-  "rootNamespace": "MAVLinkAPI",
+  "rootNamespace": "MAVLinkAPI.Tests",
   "references": [
     "ca.hpvdt.mavlinkapi",
     "UnityEngine.TestRunner",
