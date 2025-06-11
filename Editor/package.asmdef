@@ -1,0 +1,20 @@
+{
+  "name": "ca.hpvdt.mavlinkapi.Editor",
+  "rootNamespace": "MAVLinkAPI",
+  "references": [
+    "ca.hpvdt.mavlinkapi.Runtime",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
