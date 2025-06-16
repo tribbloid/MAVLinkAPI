@@ -1,13 +1,7 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using MAVLinkAPI.Routing;
-using MAVLinkAPI.Streaming;
-using SFB;
-using Unity.VisualScripting;
+using MAVLinkAPI.API.Feature;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
 using UnityEngine.SpatialTracking;
@@ -16,99 +10,25 @@ namespace MAVLinkAPI.Pose
 {
     public class MAVPoseProvider : BasePoseProvider
     {
-        private static readonly Yaml Pickler = new();
-        private MAVPoseFeed? _feed;
-
-        // private async void testProcess()
-        // {
-        //     // TODO: remove, only used for a spike
-        //     var cmd = "ls";
-        //     var mgr = new ExternalProcessManager("bash", $"-c '{cmd}'");
-        //
-        //     var task = mgr.StartAndMonitorAsync();
-        //
-        //     var result = await task;
-        //
-        //     Debug.Log($"Result is {result}");
-        // }
-
-        public MAVPoseFeed.UpdaterD? UpdaterDaemon
-        {
-            get
-            {
-                if (_feed == null) return null;
-                if (_feed!.UpdaterDaemon == null) return null;
-                return _feed.UpdaterDaemon;
-            }
-        }
-
-        private void Start()
-        {
-            // open all LocalSerial
-
-            var arg = DataStream.ArgsT.Com5;
-            Open(arg);
-        }
+        private Ahrs.Daemon? _feed;
 
         private void OnDestroy()
         {
-            TryDisconnect();
+            Unbind();
         }
 
-        public void PromptUserFilePicker()
-        {
-            var yaml = new List<string>
-            {
-                "yaml", "yml"
-            };
-
-            // Open file with filter
-            var fileTypes = new[]
-            {
-                new ExtensionFilter("Video Capture Device YAML descriptor", yaml.ToArray()),
-                new ExtensionFilter("Any", "*")
-            };
-            var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
-            var path = paths.FirstOrDefault();
-
-            if (path.NullIfEmpty() == null)
-            {
-                Debug.Log("Operation cancelled");
-            }
-            else
-            {
-                Debug.Log("Picked file: " + path);
-
-                Open(path!);
-            }
-        }
-
-        public void Open(string path)
-        {
-            var urlContent = File.ReadAllText(path);
-            var lines = urlContent.Split('\n').ToList();
-            lines.RemoveAll(string.IsNullOrEmpty);
-
-            // if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
-
-            var selectorStr = string.Join("\n", lines);
-            var selector = Pickler.Rev<DataStream.ArgsT>(selectorStr);
-
-            Open(selector);
-        }
-
-        public void Open(DataStream.ArgsT args)
+        public void Bind(Ahrs.Daemon daemon)
         {
             lock (this)
             {
-                if (_feed == null) _feed = new MAVPoseFeed(args);
+                _feed = daemon;
             }
 
             Task.Run(() =>
                 {
                     try
                     {
-                        _feed.StartUpdate();
+                        _feed.Start();
                     }
                     catch (Exception ex)
                     {
@@ -118,7 +38,7 @@ namespace MAVLinkAPI.Pose
             );
         }
 
-        public void TryDisconnect()
+        public void Unbind()
         {
             lock (this)
             {
@@ -130,7 +50,7 @@ namespace MAVLinkAPI.Pose
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out UnityEngine.Pose output)
         {
-            var d = UpdaterDaemon;
+            var d = _feed;
             if (d != null)
             {
                 output = new UnityEngine.Pose(new Vector3(0, 0, 0), d.Attitude);

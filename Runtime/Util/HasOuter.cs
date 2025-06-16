@@ -1,6 +1,6 @@
 namespace MAVLinkAPI.Util
 {
-    public abstract class Dependent<T>
+    public abstract class HasOuter<T>
     {
         public T Outer;
     }

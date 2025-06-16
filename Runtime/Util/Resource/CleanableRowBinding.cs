@@ -1,6 +1,9 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofill;
+using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using TMPro;
@@ -12,12 +15,7 @@ namespace MAVLinkAPI.Util.Resource
 {
     public class CleanableRowBinding : MonoBehaviour
     {
-        // public class Schema
-        //
-        // [Required] public Cleanable Cleanable;
         [Autofill] public TableRow row;
-
-        [Autofill] public Image icon;
 
         [Required] public TextMeshProUGUI summary;
         [Required] public TextMeshProUGUI detail;
@@ -28,18 +26,25 @@ namespace MAVLinkAPI.Util.Resource
 
         [Serialize] private float updateFreqSec = 0.5f;
 
+        [Tooltip("The default icon to display when no specific icon is found for the cleanable's type.")] [Required]
+        public MutableComponent<Graphic> icon;
+
+        [SerializeField] public SerializedLookup<string, Graphic> iconTemplates = new();
+
         [DoNotSerialize] private Cleanable? underlying;
 
 
         public void Bind(Cleanable cleanable)
         {
             underlying = cleanable;
-            
+
+            UpdateIcon(cleanable);
+
             terminate1.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
             terminate2.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
-            
+
             UpdateStatus(true); // Sync once if frequency is zero or negative.
-            
+
             if (updateFreqSec > 0)
             {
                 InvokeRepeating(nameof(UpdateStatusFn), 0f, updateFreqSec);
@@ -47,6 +52,17 @@ namespace MAVLinkAPI.Util.Resource
             else
             {
                 enabled = false; // Disable component to stop further updates, matching previous behavior.
+            }
+        }
+
+
+        private void UpdateIcon(Cleanable cleanable)
+        {
+            var typeName = cleanable.GetType().Name;
+
+            if (iconTemplates.Dictionary?.TryGetValue(typeName, out var template) == true && template != null)
+            {
+                icon.CopyToReplace(template);
             }
         }
 
@@ -90,7 +106,8 @@ namespace MAVLinkAPI.Util.Resource
         {
             UpdateStatus();
         }
-        
+
+
         public virtual string GetSummary(Cleanable cleanable)
         {
             var vType = underlying.GetType();
@@ -100,10 +117,8 @@ namespace MAVLinkAPI.Util.Resource
 
         public virtual string GetDetail(Cleanable cleanable)
         {
-            if (cleanable == null) return "Cleanable is null";
-
             var lifespan = DateTime.UtcNow - cleanable.CreatedAt;
-            
+
             return $@"
 Object: {cleanable.ToString()}
 - ID: {cleanable.ID}

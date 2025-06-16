@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util;
 using Unity.VisualScripting;
 
-namespace MAVLinkAPI.API.Minimal
+namespace MAVLinkAPI.API.Feature
 {
-    public static class MinimalDialect
+    public static class Minimal
     {
         public static MAVLink.mavlink_heartbeat_t HeartbeatFromHere =>
             new() // this should be sent regardless of received heartbeat
@@ -18,25 +19,25 @@ namespace MAVLinkAPI.API.Minimal
                 base_mode = 0
             };
 
-        public static Reader<T> Monitor<T>(
-            this MAVConnection connection,
+        public static Reader<object> WatchDog(
+            this Uplink uplink,
             bool requireReceivedBytes = true,
             bool requireHeartbeat = true
         )
         {
-            // this will return an empty builder that respond to heartbeat and request target to send all data
+            // this will return an empty reader that respond to heartbeat and request target to send all data
             // will fail if heartbeat is not received within 2 seconds
 
-            var subscriber = MAVFunction
+            var fn = MAVFunction
                 .On<MAVLink.mavlink_heartbeat_t>()
-                .SelectMany((raw, msg) =>
+                .SelectMany((_, msg) =>
                     {
                         var sender = msg.Sender;
 
                         // var heartbeatBack = ctx.Msg.Data;
-                        var heartbeatBack = HeartbeatFromHere;
+                        var ack = HeartbeatFromHere;
 
-                        // TODO: may be too frequent, should only send once
+                        // TODO: too frequent, should only send once
                         var requestAll = new MAVLink.mavlink_request_data_stream_t
                         {
                             req_message_rate = 2,
@@ -46,19 +47,20 @@ namespace MAVLinkAPI.API.Minimal
                             target_system = sender.SystemID
                         };
 
-                        connection.WriteData(heartbeatBack);
-                        connection.WriteData(requestAll);
+                        uplink.WriteData(ack);
+                        uplink.WriteData(requestAll);
 
-                        return new List<T>();
+
+                        return new List<object>();
                     }
                 );
 
-            var sub = connection.Read(subscriber);
+            var reader = uplink.Read(fn);
 
             Retry.UpTo(12).With(TimeSpan.Zero).FixedInterval
-                .Run((_, tt) =>
+                .Run((_, _) =>
                     {
-                        connection.WriteData(HeartbeatFromHere);
+                        uplink.WriteData(HeartbeatFromHere);
 
                         Thread.Sleep(200); // wait for a while before collecting
 
@@ -70,7 +72,7 @@ namespace MAVLinkAPI.API.Minimal
                             Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval
                                 .Run((_, tt) =>
                                     {
-                                        if (connection.IO.BytesToRead >= minReadBytes)
+                                        if (uplink.IO.BytesToRead >= minReadBytes)
                                         {
                                             // Debug.Log(
                                             //     $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
@@ -78,7 +80,7 @@ namespace MAVLinkAPI.API.Minimal
                                         else
                                         {
                                             throw new TimeoutException(
-                                                $"{connection.IO.Key} only received {connection.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
+                                                $"{uplink.IO.Args.URIString} only received {uplink.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
                                                 + $" Expecting at least {minReadBytes} bytes");
                                         }
                                     }
@@ -87,16 +89,18 @@ namespace MAVLinkAPI.API.Minimal
 
                         if (requireHeartbeat)
                         {
-                            sub.Drain();
+                            reader.Drain();
 
-                            if (sub.Active.Stats.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value <= 0)
+                            if (reader.Uplink.Metrics.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault
+                                    .Value <=
+                                0)
                                 throw new InvalidConnectionException(
                                     $"No heartbeat received");
                         }
                     }
                 );
 
-            return sub;
+            return reader;
         }
     }
 }

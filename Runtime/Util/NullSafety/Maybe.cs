@@ -38,8 +38,11 @@ namespace MAVLinkAPI.Util.NullSafety
 
         public T? ValueOrNull => (T?)_value;
 
-        public T Value =>
-            _value != null ? (T)_value! : throw new InvalidOperationException("Maybe does not have a value");
+        public T Value
+        {
+            get => _value != null ? (T)_value! : throw new InvalidOperationException("Maybe does not have a value");
+            set => _value = value;
+        }
 
         public T ValueOrDefault(T defaultValue)
         {

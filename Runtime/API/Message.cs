@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace MAVLinkAPI.API
 {
-    public class TypeLookup
+    public class IDLookup
     {
         public readonly Dictionary<uint, MAVLink.message_info> ByID = new();
         public readonly Dictionary<Type, MAVLink.message_info> ByType = new();
 
-        public static readonly TypeLookup Global = new();
+        public static readonly IDLookup Global = new();
 
         // constructor
-        private TypeLookup()
+        private IDLookup()
         {
             Compile();
         }
@@ -72,7 +72,7 @@ namespace MAVLinkAPI.API
         {
             get
             {
-                var id1 = TypeLookup.Global.ByType[typeof(T)];
+                var id1 = IDLookup.Global.ByType[typeof(T)];
 
                 return id1;
                 // TODO: add verified info that also run the lookup by 

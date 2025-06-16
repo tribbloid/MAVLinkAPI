@@ -30,11 +30,13 @@ namespace MAVLinkAPI.UI
 
         void Awake()
         {
-            LoadHistory();
+            // LoadHistory() is called in Start() to ensure persistenceID is set.
         }
 
         void Start()
         {
+            LoadHistory();
+            
             if (input != null)
             {
                 input.onEndEdit.AddListener(OnInputSubmit);

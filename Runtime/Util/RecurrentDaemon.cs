@@ -1,45 +1,55 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 
 namespace MAVLinkAPI.Util
 {
-    public abstract class Daemon : IDisposable
+    public abstract class Daemon : Cleanable
     {
         // Can only be canceled once, as a result, it can only be started once
         public CancellationTokenSource Cancel = new();
 
-        private readonly CancellationToken _cancelSignal;
+        private CancellationToken? _cancelSignal;
 
-        public Daemon()
+        public Daemon(Lifetime lifetime) : base(lifetime)
         {
-            _cancelSignal = Cancel.Token;
         }
 
-        ~Daemon()
+        // ~Daemon()
+        // {
+        //     Dispose();
+        // }
+
+        public readonly int GraceTimeMillis = 5000;
+
+        public void Stop()
         {
-            Dispose();
+            Cancel.CancelAfter(GraceTimeMillis); // Execute() should drop out of the loop first
+            _cancelSignal = null;
         }
 
-        public void Dispose()
+        protected override void DoClean()
         {
-            Cancel.CancelAfter(5000);
+            Stop();
         }
 
         public async void Start()
         {
+            var cancelSignal = Cancel.Token;
+            _cancelSignal = cancelSignal;
             await Task.Run(() =>
                 {
                     try
                     {
-                        Execute(_cancelSignal);
+                        Execute(cancelSignal);
                     }
                     catch (Exception e)
                     {
                         Debug.LogException(e);
                     }
-                }, _cancelSignal // hard cancel after 5 seconds
+                }, cancelSignal // hard cancel after 5 seconds
             );
         }
 
@@ -51,10 +61,15 @@ namespace MAVLinkAPI.Util
     {
         public readonly AtomicLong Counter = new();
 
+        protected RecurrentDaemon(Lifetime lifetime) : base(lifetime)
+        {
+        }
+
         public override void Execute(CancellationToken cancelSignal)
         {
             while (!cancelSignal.IsCancellationRequested) // soft cancel immediately
             {
+                // TODO: need to control frequency
                 Counter.Increment();
                 Iterate();
             }

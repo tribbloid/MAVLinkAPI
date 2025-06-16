@@ -63,20 +63,24 @@ namespace MAVLinkAPI.Util.Resource
             }
         }
 
+        ~Cleanable()
+        {
+            Dispose();
+        }
 
         protected abstract void DoClean();
-        
-        
+
+
         public class Dummy : Cleanable
         {
-
-            public Dummy(Lifetime? lifetime = null) : base(lifetime)
+            public Dummy(
+                Lifetime? lifetime = null
+            ) : base(lifetime)
             {
-            } 
-            
+            }
+
             protected override void DoClean()
             {
-                
             }
         }
     }
@@ -114,6 +118,5 @@ namespace MAVLinkAPI.Util.Resource
             var peers = self.SelfAndPeers<T>();
             return peers.Where(v => !ReferenceEquals(v, self));
         }
-        
     }
 }

@@ -11,9 +11,9 @@ namespace MAVLinkAPI.API
     {
         public class OnT<T> : MAVFunction<Message<T>> where T : struct
         {
-            protected override Indexed<Topic> Topics_Mk()
+            protected override IDIndexed<Topic> Topics_Mk()
             {
-                Indexed<Topic?> result = Indexed<Topic>.Global();
+                IDIndexed<Topic> result = IDIndexed<Topic>.Global();
                 result.Get<T>().Value = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)
@@ -35,13 +35,13 @@ namespace MAVLinkAPI.API
 
         public static readonly Topic? TopicMissing = _ => null;
 
-        private Box<Indexed<Topic>>? _topics;
+        private Box<IDIndexed<Topic>>? _topics;
 
-        private Indexed<Topic> Topics =>
+        private IDIndexed<Topic> Topics =>
             // Topics_Mk.BindToLazy(ref _topics); // TODO: oops, eta-expansion does't work.
             LazyHelper.EnsureInitialized(ref _topics, Topics_Mk);
 
-        protected abstract Indexed<Topic> Topics_Mk();
+        protected abstract IDIndexed<Topic> Topics_Mk();
 
 
         public List<T> Process(MAVLink.MAVLinkMessage message)
@@ -62,7 +62,7 @@ namespace MAVLinkAPI.API
 
         public class UnionT : BothT
         {
-            protected override Indexed<Topic> Topics_Mk()
+            protected override IDIndexed<Topic> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
@@ -75,7 +75,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return Indexed<Topic>.Global(merged);
+                return IDIndexed<Topic>.Global(merged);
             }
         }
 
@@ -90,7 +90,7 @@ namespace MAVLinkAPI.API
 
         public class OrElseT : BothT
         {
-            protected override Indexed<Topic> Topics_Mk()
+            protected override IDIndexed<Topic> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
@@ -102,7 +102,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return Indexed<Topic>.Global(merged);
+                return IDIndexed<Topic>.Global(merged);
             }
         }
 
@@ -120,7 +120,7 @@ namespace MAVLinkAPI.API
             public MAVFunction<T> Prev = null!;
             public Func<MAVLink.MAVLinkMessage, T, List<T2>> Fn = null!;
 
-            protected override Indexed<Topic> Topics_Mk()
+            protected override IDIndexed<Topic> Topics_Mk()
             {
                 var oldTopics = Prev.Topics.Index;
 
@@ -143,7 +143,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return Indexed<Topic>.Global(newTopics);
+                return IDIndexed<Topic>.Global(newTopics);
             }
         }
 
@@ -160,31 +160,13 @@ namespace MAVLinkAPI.API
         {
             return SelectMany((ii, x) => new List<T2> { fn(ii, x) });
         }
-
-        public Reader<T> LatchOn(MAVConnection mav)
-        {
-            return mav.Read(this);
-        }
     }
 
-    // public static class ProcessorExtensions
-    // {
-    //     public static Subscriber<T>? Add<T>(this Subscriber<T>? left, Subscriber<T>? right)
-    //     {
-    //         var result = (left, right).NullableReduce(
-    //             (x, y) => new Subscriber<T>.UnionT { Left = x, Right = y }
-    //         );
-    //
-    //         return result;
-    //     }
-    //
-    //     public static Subscriber<T>? OrElse<T>(this Subscriber<T>? left, Subscriber<T>? right)
-    //     {
-    //         var result = (left, right).NullableReduce(
-    //             (x, y) => new Subscriber<T>.OrElseT { Left = x, Right = y }
-    //         );
-    //
-    //         return result;
-    //     }
-    // }
+    public static class ProcessorExtensions
+    {
+        public static MAVFunction<T> Upcast<T, T1>(this MAVFunction<T1> left) where T1 : T
+        {
+            return left.Select((_, t) => (T)t);
+        }
+    }
 }

@@ -5,16 +5,16 @@ using MAVLinkAPI.Util;
 
 namespace MAVLinkAPI.API
 {
-    public struct Indexed<T>
+    public struct IDIndexed<T>
     {
         // TODO: do I need to index by systemID and componentID?
-        public TypeLookup Lookup;
+        public IDLookup Lookup;
 
         public Dictionary<uint, T?> Index;
 
         // default constructor
 
-        public class Accessor : Dependent<Indexed<T>>
+        public class Accessor : HasOuter<IDIndexed<T>>
         {
             public uint ID;
 
@@ -60,16 +60,16 @@ namespace MAVLinkAPI.API
 
         public readonly Accessor Get<TMav>() where TMav : struct
         {
-            var id = TypeLookup.Global.ByType[typeof(TMav)].msgid;
+            var id = IDLookup.Global.ByType[typeof(TMav)].msgid;
             return Get(id);
         }
 
         // do we need by systemID and componentID?
 
-        public static Indexed<T> Global(Dictionary<uint, T>? index = null)
+        public static IDIndexed<T> Global(Dictionary<uint, T>? index = null)
         {
             var ii = index ?? new Dictionary<uint, T>();
-            return new Indexed<T> { Lookup = TypeLookup.Global, Index = ii };
+            return new IDIndexed<T> { Lookup = IDLookup.Global, Index = ii };
         }
     }
 }

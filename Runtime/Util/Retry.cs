@@ -56,7 +56,7 @@ namespace MAVLinkAPI.Util
             public bool LogException;
         }
 
-        public class FixedIntervalT : Dependent<Retry<TI>>
+        public class FixedIntervalT : HasOuter<Retry<TI>>
         {
             public T Run<T>(Func<TI, TimeSpan, T> operation)
             {
