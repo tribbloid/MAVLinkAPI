@@ -13,8 +13,16 @@ namespace MAVLinkAPI.API
      */
     public struct Reader<T>
     {
-        public Uplink Uplink;
-        public MAVFunction<T> MAVFunction;
+        public readonly Uplink Uplink;
+        public readonly MAVFunction<T> MAVFunction;
+
+        public Reader(Uplink uplink, MAVFunction<T> mavFunction)
+        {
+            Uplink = uplink;
+            MAVFunction = mavFunction;
+            _byMessage = null;
+            _byOutput = null;
+        }
 
         private IEnumerable<List<T>>? _byMessage;
 
@@ -45,7 +53,7 @@ namespace MAVLinkAPI.API
         public Reader<T2> Discard<T2>()
         {
             var newFn = MAVFunction.SelectMany<T2>((m, v) => new List<T2>());
-            return new Reader<T2> { Uplink = Uplink, MAVFunction = newFn };
+            return new Reader<T2>(Uplink, newFn);
         }
 
         public int BytesToRead => Uplink.IO.BytesToRead;
@@ -72,26 +80,26 @@ namespace MAVLinkAPI.API
         public Reader<T2> SelectMany<T2>(Func<MAVLink.MAVLinkMessage, T, List<T2>> fn)
         {
             var newFn = MAVFunction.SelectMany(fn);
-            return new Reader<T2> { Uplink = Uplink, MAVFunction = newFn };
+            return new Reader<T2>(Uplink, newFn);
         }
 
         public Reader<T2> Select<T2>(Func<MAVLink.MAVLinkMessage, T, T2> fn)
         {
             var newFn = MAVFunction.Select(fn);
-            return new Reader<T2> { Uplink = Uplink, MAVFunction = newFn };
+            return new Reader<T2>(Uplink, newFn);
         }
 
 
         public Reader<T> OrElse(Reader<T> that)
         {
             var newFn = MAVFunction.OrElse(that.MAVFunction);
-            return new Reader<T> { Uplink = Uplink, MAVFunction = newFn };
+            return new Reader<T>(Uplink, newFn);
         }
 
         public Reader<T> Union(Reader<T> that)
         {
             var newFn = MAVFunction.Union(that.MAVFunction);
-            return new Reader<T> { Uplink = Uplink, MAVFunction = newFn };
+            return new Reader<T>(Uplink, newFn);
         }
     }
 
@@ -101,7 +109,7 @@ namespace MAVLinkAPI.API
         public static Reader<T> Upcast<T, T1>(this Reader<T1> reader) where T1 : T
         {
             var newFn = reader.MAVFunction.Upcast<T, T1>();
-            return new Reader<T> { Uplink = reader.Uplink, MAVFunction = newFn };
+            return new Reader<T>(reader.Uplink, newFn);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace MAVLinkAPI.API
 
         public static Component Gcs0 = Gcs();
 
-        public Message<T> Send<T>(T data) where T : struct
+        public Message<T> ToMessage<T>(T data) where T : struct
         {
             return new Message<T>
             {

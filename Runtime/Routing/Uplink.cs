@@ -11,24 +11,33 @@ using Component = MAVLinkAPI.API.Component;
 
 namespace MAVLinkAPI.Routing
 {
-    public class Uplink : IDisposable
+    public interface IUplink : IDisposable
+    {
+        // only has 1 impl, so this interface is optional
+        public void WriteData<T>(T data) where T : struct;
+
+        public IEnumerable<MAVLink.MAVLinkMessage> RawReadSource { get; }
+    }
+    
+    public class Uplink : IUplink
     {
         public readonly IOStream IO;
-
+        public readonly Component ThisComponent;
+        
         public readonly MAVLink.MavlinkParse Mavlink = new();
-        public readonly Component ThisComponent = Component.Gcs0;
 
-        private Uplink(IOStream io)
+        private Uplink(IOStream io, Component? thisComponent = null)
         {
             IO = io;
+            ThisComponent = thisComponent ?? Component.Gcs0;
         }
-
-        public Uplink(
-            IOStream.ArgsT args,
-            Lifetime? lifetime = null
-        ) : this(new IOStream(args, lifetime))
-        {
-        }
+        //
+        // public Uplink(
+        //     IOStream.ArgsT args,
+        //     Lifetime? lifetime = null
+        // ) : this(new IOStream(args, lifetime))
+        // {
+        // }
 
         public void Dispose()
         {
@@ -60,7 +69,7 @@ namespace MAVLinkAPI.Routing
 
         public void WriteData<T>(T data) where T : struct
         {
-            var msg = ThisComponent.Send(data);
+            var msg = ThisComponent.ToMessage(data);
 
             Write(msg);
         }
@@ -108,7 +117,7 @@ namespace MAVLinkAPI.Routing
 
         public Reader<T> Read<T>(MAVFunction<T> mavFunction)
         {
-            var reader = new Reader<T> { Uplink = this, MAVFunction = mavFunction };
+            var reader = new Reader<T>(this, mavFunction);
             ExistingReaders.Add(reader);
             return reader;
         }
@@ -118,10 +127,7 @@ namespace MAVLinkAPI.Routing
         {
             public IDIndexed<AtomicLong?> Counters;
 
-            public int BufferPressure; // pending data in the buffer
-            public int LatencyMillis;
-
-            // public double Health => // this will be computed from data
+            public int BufferPressure; // pending data size in the buffer
         }
 
         public MetricsT Metrics = new()
