@@ -100,7 +100,7 @@ namespace MAVLinkAPI.Routing
                     Thread.Sleep(1000);
                 }
             }
-            
+
             ICommsSerial MkCommRaw()
             {
                 var parts = Args.address.Split(':');

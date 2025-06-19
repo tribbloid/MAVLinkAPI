@@ -10,7 +10,7 @@ namespace MAVLinkAPI.API.Feature
     public static class Ahrs
     {
         public static Reader<Quaternion> Attitude(
-            this Uplink uplink
+            this Routing.Uplink uplink
         )
         {
             var getAttitudeQ = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_t>()
@@ -45,11 +45,11 @@ namespace MAVLinkAPI.API.Feature
             public Reader<object> WatchDog;
             public Reader<Quaternion> AttitudeReader;
 
-            public Uplink Uplink;
+            public Routing.Uplink Uplink;
 
             private Maybe<Reader<object>> _compoundReader = new();
 
-            public Daemon(Lifetime lifetime, Uplink uplink) : base(lifetime)
+            public Daemon(Lifetime lifetime, Routing.Uplink uplink) : base(lifetime)
             {
                 Uplink = uplink;
                 WatchDog = Minimal.WatchDog(uplink);

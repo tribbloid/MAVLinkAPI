@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using MAVLinkAPI.Util;
@@ -8,10 +8,15 @@ namespace MAVLinkAPI.API
     public struct IDIndexed<T>
     {
         // TODO: do I need to index by systemID and componentID?
-        public IDLookup Lookup;
+        public readonly IDLookup Lookup;
+        public readonly Dictionary<uint, T> Index;
 
-        public Dictionary<uint, T?> Index;
-
+        public IDIndexed( Dictionary<uint, T>? index = null, IDLookup? lookup = null)
+        {
+            Lookup = lookup ?? IDLookup.Global;
+            Index = index ?? new Dictionary<uint, T>();
+        }
+        
         // default constructor
 
         public class Accessor : HasOuter<IDIndexed<T>>
@@ -31,7 +36,7 @@ namespace MAVLinkAPI.API
                 return Outer.Index.GetValueOrDefault(ID, fallback);
             }
 
-            public T ValueOrInsert(Func<T> fallback)
+            public T ValueOrInsert(Func<T?> fallback)
             {
                 var index = Outer.Index;
                 if (index.TryGetValue(ID, out var existing)) return existing;
@@ -66,10 +71,5 @@ namespace MAVLinkAPI.API
 
         // do we need by systemID and componentID?
 
-        public static IDIndexed<T> Global(Dictionary<uint, T>? index = null)
-        {
-            var ii = index ?? new Dictionary<uint, T>();
-            return new IDIndexed<T> { Lookup = IDLookup.Global, Index = ii };
-        }
     }
 }

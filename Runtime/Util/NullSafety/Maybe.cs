@@ -9,13 +9,13 @@ namespace MAVLinkAPI.Util.NullSafety
         private object? _value;
 
 
-        public T? Lazy(Func<T> fn)
+        public T Lazy(Func<T> fn)
         {
             if (fn == null) throw new ArgumentNullException(nameof(fn));
             // Ensure fn() result is boxed for LazyInitializer if T is a value type.
             Func<object?> objectFactory = () => fn();
             var result = LazyInitializer.EnsureInitialized(ref _value, objectFactory);
-            return (T?)result;
+            return (T)result!;
         }
 
         private Maybe(T value)

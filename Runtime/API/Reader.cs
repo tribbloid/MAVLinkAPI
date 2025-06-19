@@ -2,48 +2,41 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using MAVLinkAPI.Routing;
-using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.NullSafety;
 
 namespace MAVLinkAPI.API
 {
     /**
      * A.k.a subscription
      */
-    public struct Reader<T>
+    public class Reader<T>
     {
-        public readonly Uplink Uplink;
-        public readonly MAVFunction<T> MAVFunction;
+        public readonly IDictionary<Uplink, MAVFunction<T>> Sources;
 
-        public Reader(Uplink uplink, MAVFunction<T> mavFunction)
+        public Reader(IDictionary<Uplink, MAVFunction<T>> sources)
         {
-            Uplink = uplink;
-            MAVFunction = mavFunction;
-            _byMessage = null;
-            _byOutput = null;
+            Sources = sources;
         }
 
-        private IEnumerable<List<T>>? _byMessage;
+        public Reader(Routing.Uplink uplink, MAVFunction<T> mavFunction) : this(
+            new Dictionary<Routing.Uplink, MAVFunction<T>> { { uplink, mavFunction } })
+        {
+        }
 
-        public IEnumerable<List<T>> ByMessage =>
-            LazyHelper.EnsureInitialized(ref _byMessage, MkByMessage);
+        private Maybe<IEnumerable<List<T>>> _byMessage;
+        public IEnumerable<List<T>> ByMessage => _byMessage.Lazy(MkByMessage);
 
         private IEnumerable<List<T>> MkByMessage()
         {
-            foreach (var message in Uplink.RawReadSource)
-            {
-                var values = MAVFunction.Process(message);
-
-                yield return values;
-            }
+            return Sources.SelectMany(pair =>
+                pair.Key.RawReadSource.Select(message => pair.Value.Process(message)));
         }
 
         public bool HasMore => ByMessage.Any();
 
-        private IEnumerable<T> _byOutput;
-
-        public IEnumerable<T> ByOutput => LazyInitializer.EnsureInitialized(ref _byOutput, MkByOutput);
+        private Maybe<IEnumerable<T>> _byOutput;
+        public IEnumerable<T> ByOutput => _byOutput.Lazy(MkByOutput);
 
         private IEnumerable<T> MkByOutput()
         {
@@ -52,11 +45,13 @@ namespace MAVLinkAPI.API
 
         public Reader<T2> Discard<T2>()
         {
-            var newFn = MAVFunction.SelectMany<T2>((m, v) => new List<T2>());
-            return new Reader<T2>(Uplink, newFn);
+            var newSources = Sources.ToDictionary(
+                pair => pair.Key,
+                pair => (MAVFunction<T2>)pair.Value.SelectMany<T2>((m, v) => new List<T2>()));
+            return new Reader<T2>(newSources);
         }
 
-        public int BytesToRead => Uplink.IO.BytesToRead;
+        public int BytesToRead => Sources.Keys.Sum(u => u.BytesToRead);
 
         public List<T> Drain(int leftover = 8)
         {
@@ -79,27 +74,47 @@ namespace MAVLinkAPI.API
 
         public Reader<T2> SelectMany<T2>(Func<MAVLink.MAVLinkMessage, T, List<T2>> fn)
         {
-            var newFn = MAVFunction.SelectMany(fn);
-            return new Reader<T2>(Uplink, newFn);
+            var newSources = Sources.ToDictionary(
+                pair => pair.Key,
+                pair => (MAVFunction<T2>)pair.Value.SelectMany(fn));
+            return new Reader<T2>(newSources);
         }
 
         public Reader<T2> Select<T2>(Func<MAVLink.MAVLinkMessage, T, T2> fn)
         {
-            var newFn = MAVFunction.Select(fn);
-            return new Reader<T2>(Uplink, newFn);
+            var newSources = Sources.ToDictionary(
+                pair => pair.Key,
+                pair => (MAVFunction<T2>)pair.Value.Select(fn));
+            return new Reader<T2>(newSources);
         }
 
 
         public Reader<T> OrElse(Reader<T> that)
         {
-            var newFn = MAVFunction.OrElse(that.MAVFunction);
-            return new Reader<T>(Uplink, newFn);
+            return Combine(that, (f1, f2) => f1.OrElse(f2));
         }
 
         public Reader<T> Union(Reader<T> that)
         {
-            var newFn = MAVFunction.Union(that.MAVFunction);
-            return new Reader<T>(Uplink, newFn);
+            return Combine(that, (f1, f2) => f1.Union(f2));
+        }
+
+        private Reader<T> Combine(Reader<T> that, Func<MAVFunction<T>, MAVFunction<T>, MAVFunction<T>> combineFn)
+        {
+            var newSources = new Dictionary<Routing.Uplink, MAVFunction<T>>(this.Sources);
+            foreach (var (uplink, mavFunction) in that.Sources)
+            {
+                if (newSources.TryGetValue(uplink, out var existingMavFunction))
+                {
+                    newSources[uplink] = combineFn(existingMavFunction, mavFunction);
+                }
+                else
+                {
+                    newSources[uplink] = mavFunction;
+                }
+            }
+
+            return new Reader<T>(newSources);
         }
     }
 
@@ -108,8 +123,10 @@ namespace MAVLinkAPI.API
     {
         public static Reader<T> Upcast<T, T1>(this Reader<T1> reader) where T1 : T
         {
-            var newFn = reader.MAVFunction.Upcast<T, T1>();
-            return new Reader<T>(reader.Uplink, newFn);
+            var newSources = reader.Sources.ToDictionary(
+                pair => pair.Key,
+                pair => (MAVFunction<T>)pair.Value.Upcast<T, T1>());
+            return new Reader<T>(newSources);
         }
     }
 }

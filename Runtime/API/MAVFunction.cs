@@ -13,7 +13,7 @@ namespace MAVLinkAPI.API
         {
             protected override IDIndexed<Topic> Topics_Mk()
             {
-                IDIndexed<Topic> result = IDIndexed<Topic>.Global();
+                IDIndexed<Topic> result = new IDIndexed<Topic>();
                 result.Get<T>().Value = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)
@@ -75,7 +75,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return IDIndexed<Topic>.Global(merged);
+                return new IDIndexed<Topic>(merged);
             }
         }
 
@@ -102,7 +102,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return IDIndexed<Topic>.Global(merged);
+                return new IDIndexed<Topic>(merged);
             }
         }
 
@@ -143,7 +143,7 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return IDIndexed<Topic>.Global(newTopics);
+                return new IDIndexed<Topic>(newTopics);
             }
         }
 

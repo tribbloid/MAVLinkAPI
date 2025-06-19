@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util;
@@ -20,7 +21,7 @@ namespace MAVLinkAPI.API.Feature
             };
 
         public static Reader<object> WatchDog(
-            this Uplink uplink,
+            this Routing.Uplink uplink,
             bool requireReceivedBytes = true,
             bool requireHeartbeat = true
         )
@@ -72,7 +73,7 @@ namespace MAVLinkAPI.API.Feature
                             Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval
                                 .Run((_, tt) =>
                                     {
-                                        if (uplink.IO.BytesToRead >= minReadBytes)
+                                        if (uplink.BytesToRead >= minReadBytes)
                                         {
                                             // Debug.Log(
                                             //     $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
@@ -80,7 +81,7 @@ namespace MAVLinkAPI.API.Feature
                                         else
                                         {
                                             throw new TimeoutException(
-                                                $"{uplink.IO.Args.URIString} only received {uplink.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
+                                                $"{uplink} only received {uplink.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
                                                 + $" Expecting at least {minReadBytes} bytes");
                                         }
                                     }
@@ -91,8 +92,8 @@ namespace MAVLinkAPI.API.Feature
                         {
                             reader.Drain();
 
-                            if (reader.Uplink.Metrics.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault
-                                    .Value <=
+                            if (reader.Sources.Keys.Sum(uplink =>
+                                    uplink.Metrics.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value) <=
                                 0)
                                 throw new InvalidConnectionException(
                                     $"No heartbeat received");

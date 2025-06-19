@@ -1,7 +1,7 @@
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace MAVLinkAPI.Streaming
+namespace MAVLinkAPI.Routing
 {
     public class Yaml
     {
