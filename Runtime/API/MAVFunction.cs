@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.Ext;
 using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.NullSafety;
 
 namespace MAVLinkAPI.API
 {
@@ -14,10 +15,11 @@ namespace MAVLinkAPI.API
             protected override IDIndexed<Topic> Topics_Mk()
             {
                 IDIndexed<Topic> result = new IDIndexed<Topic>();
-                result.Get<T>().Value = message => new List<Message<T>>
+                Topic topic = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)
                 };
+                result.Get<T>().Value = topic;
                 return result;
             }
         }
@@ -31,15 +33,14 @@ namespace MAVLinkAPI.API
 
     public abstract class MAVFunction<T>
     {
-        public delegate List<T>? Topic(MAVLink.MAVLinkMessage message);
+        public delegate List<T> Topic(MAVLink.MAVLinkMessage message);
 
-        public static readonly Topic? TopicMissing = _ => null;
+        public static readonly Topic TopicMissing = _ => new List<T>();
 
-        private Box<IDIndexed<Topic>>? _topics;
+        private Maybe<IDIndexed<Topic>> _topics;
 
         private IDIndexed<Topic> Topics =>
-            // Topics_Mk.BindToLazy(ref _topics); // TODO: oops, eta-expansion does't work.
-            LazyHelper.EnsureInitialized(ref _topics, Topics_Mk);
+            _topics.Lazy(Topics_Mk);
 
         protected abstract IDIndexed<Topic> Topics_Mk();
 
@@ -128,7 +129,7 @@ namespace MAVLinkAPI.API
                     kv => kv.Key,
                     kv =>
                     {
-                        Topic topic = (ii) =>
+                        Topic topic = ii =>
                         {
                             var prevV = kv.Value(ii);
 

@@ -5,28 +5,41 @@ using MAVLinkAPI.Util;
 
 namespace MAVLinkAPI.API
 {
-    public struct IDIndexed<T>
+    public record IDIndexed<T>
     {
         // TODO: do I need to index by systemID and componentID?
-        public readonly IDLookup Lookup;
-        public readonly Dictionary<uint, T> Index;
+        public IDLookup Lookup { get; init; }
+        public Dictionary<uint, T> Index { get; init; }
 
-        public IDIndexed( Dictionary<uint, T>? index = null, IDLookup? lookup = null)
+        public IDIndexed(Dictionary<uint, T>? index = null, IDLookup? lookup = null)
         {
             Lookup = lookup ?? IDLookup.Global;
             Index = index ?? new Dictionary<uint, T>();
         }
-        
-        // default constructor
 
         public class Accessor : HasOuter<IDIndexed<T>>
         {
-            public uint ID;
+            public readonly uint ID;
+
+            public Accessor(IDIndexed<T> outer, uint id) : base(outer)
+            {
+                ID = id;
+            }
 
             public T? Value
             {
-                get => Outer.Index[ID];
-                set => Outer.Index[ID] = value;
+                get => Outer.Index.GetValueOrDefault(ID);
+                set
+                {
+                    if (value is not null)
+                    {
+                        Outer.Index[ID] = value;
+                    }
+                    else
+                    {
+                        Outer.Index.Remove(ID);
+                    }
+                }
             }
 
             public T? ValueOrDefault => Outer.Index.GetValueOrDefault(ID);
@@ -41,7 +54,7 @@ namespace MAVLinkAPI.API
                 var index = Outer.Index;
                 if (index.TryGetValue(ID, out var existing)) return existing;
 
-                index[ID] = fallback();
+                index[ID] = fallback()!;
                 return index[ID];
             }
 
@@ -58,18 +71,17 @@ namespace MAVLinkAPI.API
             public MAVLink.message_info Info => Outer.Lookup.ByID[ID];
         }
 
-        public readonly Accessor Get(uint id)
+        public Accessor Get(uint id)
         {
-            return new Accessor { Outer = this, ID = id };
+            return new Accessor(this, id);
         }
 
-        public readonly Accessor Get<TMav>() where TMav : struct
+        public Accessor Get<TMav>() where TMav : struct
         {
             var id = IDLookup.Global.ByType[typeof(TMav)].msgid;
             return Get(id);
         }
 
         // do we need by systemID and componentID?
-
     }
 }

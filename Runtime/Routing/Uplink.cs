@@ -46,9 +46,9 @@ namespace MAVLinkAPI.Routing
         // Mock Uplink that can provide a stream of messages for testing
         public class Dummy : Uplink
         {
-            private readonly List<MAVLink.MAVLinkMessage> _messages;
+            private readonly IEnumerable<MAVLink.MAVLinkMessage> _messages;
 
-            public Dummy(List<MAVLink.MAVLinkMessage> messages)
+            public Dummy(IEnumerable<MAVLink.MAVLinkMessage> messages)
             {
                 _messages = messages;
             }
@@ -58,7 +58,7 @@ namespace MAVLinkAPI.Routing
             {
             }
 
-            public override int BytesToRead => _messages.Any() ? 1 : 0;
+            public override int BytesToRead => _messages.Any() ? 100 : 0;
 
             public override IEnumerable<MAVLink.MAVLinkMessage> RawReadSource => _messages;
 

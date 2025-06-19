@@ -21,7 +21,7 @@ namespace MAVLinkAPI.API.Feature
             };
 
         public static Reader<object> WatchDog(
-            this Routing.Uplink uplink,
+            this Uplink uplink,
             bool requireReceivedBytes = true,
             bool requireHeartbeat = true
         )

@@ -58,6 +58,10 @@ namespace MAVLinkAPI.Util
 
         public class FixedIntervalT : HasOuter<Retry<TI>>
         {
+            public FixedIntervalT(Retry<TI> outer) : base(outer)
+            {
+            }
+
             public T Run<T>(Func<TI, TimeSpan, T> operation)
             {
                 if (operation == null)
@@ -133,10 +137,7 @@ namespace MAVLinkAPI.Util
             }
         }
 
-        public FixedIntervalT FixedInterval => new()
-        {
-            Outer = this
-        };
+        public FixedIntervalT FixedInterval => new(this);
     }
 
     public static class Retry

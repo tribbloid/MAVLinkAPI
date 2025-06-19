@@ -24,21 +24,46 @@ namespace MAVLinkAPI.API
         {
         }
 
-        private Maybe<IEnumerable<List<T>>> _byMessage;
-        public IEnumerable<List<T>> ByMessage => _byMessage.Lazy(MkByMessage);
-
-        private IEnumerable<List<T>> MkByMessage()
+        record SubReader(KeyValuePair<Uplink, MAVFunction<T>> Pair)
         {
-            return Sources.SelectMany(pair =>
-                pair.Key.RawReadSource.Select(message => pair.Value.Process(message)));
+            public IEnumerable<List<T>> ByMessage_Mk()
+            {
+                return Pair.Key.RawReadSource.Select(message => Pair.Value.Process(message));
+            }
+
+
+            public int BytesToRead => Pair.Key.BytesToRead;
+
+            public List<T> Drain(int leftover = 8)
+            {
+                var list = new List<T>();
+
+                using (var itr = ByMessage_Mk().GetEnumerator())
+                {
+                    while (BytesToRead > leftover && itr.MoveNext())
+                    {
+                        var current = itr.Current;
+                        if (current != null)
+                            list.AddRange(current);
+                    }
+                }
+
+                return list;
+            }
         }
 
-        public bool HasMore => ByMessage.Any();
+        private Maybe<IEnumerable<List<T>>> _byMessage;
+        public IEnumerable<List<T>> ByMessage => _byMessage.Lazy(ByMessage_Mk);
+
+        private IEnumerable<List<T>> ByMessage_Mk()
+        {
+            return Sources.SelectMany(pair => new SubReader(pair).ByMessage_Mk());
+        }
 
         private Maybe<IEnumerable<T>> _byOutput;
-        public IEnumerable<T> ByOutput => _byOutput.Lazy(MkByOutput);
+        public IEnumerable<T> ByOutput => _byOutput.Lazy(ByOutput_Mk);
 
-        private IEnumerable<T> MkByOutput()
+        private IEnumerable<T> ByOutput_Mk()
         {
             return ByMessage.SelectMany(vs => vs);
         }
@@ -55,19 +80,7 @@ namespace MAVLinkAPI.API
 
         public List<T> Drain(int leftover = 8)
         {
-            var list = new List<T>();
-
-            using (var itr = ByMessage.GetEnumerator())
-            {
-                while (BytesToRead > leftover && itr.MoveNext())
-                {
-                    var current = itr.Current;
-                    if (current != null)
-                        list.AddRange(current);
-                }
-            }
-
-            return list;
+            return Sources.SelectMany(pair => new SubReader(pair).Drain()).ToList();
         }
 
         // TODO: do we need ChunkSelectMany<T>: List<T> => List<T2>?

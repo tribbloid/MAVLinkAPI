@@ -76,7 +76,10 @@ namespace MAVLinkAPI.Routing
         // private readonly ICommsSerial comm;
 
 
-        public ICommsSerial MkComm()
+        private Maybe<ICommsSerial> _comm; // can only be initialised once, will be closed at the end of lifetime
+        public ICommsSerial Comm => _comm.Lazy(() => Comm_Mk());
+
+        public ICommsSerial Comm_Mk()
         {
             lock (GlobalAccessLock)
             {
@@ -101,7 +104,7 @@ namespace MAVLinkAPI.Routing
                 }
             }
 
-            ICommsSerial MkCommRaw()
+            ICommsSerial GetRawComm()
             {
                 var parts = Args.address.Split(':');
 
@@ -137,16 +140,13 @@ namespace MAVLinkAPI.Routing
                 }
             }
 
-            var result = MkCommRaw();
+            var result = GetRawComm();
             result.DtrEnable = Args.dtrEnabled;
             result.RtsEnable = Args.rtsEnabled;
 
             result.BaudRate = Defaults.baudRate;
             return result;
         }
-
-        private Maybe<ICommsSerial> _comm; // can only be initialised once, will be closed at the end of lifetime
-        public ICommsSerial Comm => _comm.Lazy(() => MkComm());
 
         public TimeSpan MinReopenInterval = TimeSpan.FromSeconds(1);
 

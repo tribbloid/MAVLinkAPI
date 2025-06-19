@@ -8,23 +8,69 @@ namespace MAVLinkAPI.Tests.API
 {
     public class ReaderSpec
     {
-        private MAVLink.MAVLinkMessage CreateTestMessage()
+        private MAVLink.MAVLinkMessage MockHeartbeat()
         {
-            return new MAVLink.MAVLinkMessage();
+            // Create a new heartbeat message
+            var heartbeat = new MAVLink.mavlink_heartbeat_t
+            {
+                type = (byte)MAVLink.MAV_TYPE.QUADROTOR,
+                autopilot = (byte)MAVLink.MAV_AUTOPILOT.GENERIC,
+                base_mode = (byte)MAVLink.MAV_MODE_FLAG.MANUAL_INPUT_ENABLED,
+                custom_mode = 0,
+                system_status = (byte)MAVLink.MAV_STATE.STANDBY,
+                mavlink_version = 3
+            };
+
+            var parser = new MAVLink.MavlinkParse();
+            var packetBytes = parser.GenerateMAVLinkPacket20(MAVLink.MAVLINK_MSG_ID.HEARTBEAT, heartbeat);
+            return new MAVLink.MAVLinkMessage(packetBytes);
+        }
+
+
+        [Test]
+        public void RawReadSource_EmitsCorrectMessage()
+        {
+            // Arrange
+            var message = MockHeartbeat();
+            var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
+
+            // Act
+            var result = uplink.RawReadSource.ToList();
+
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(message.msgid, result[0].msgid);
+        }
+
+
+        [Test]
+        public void DirectOutput()
+        {
+            // Arrange
+            var message = MockHeartbeat();
+            var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
+            var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
+            var reader = uplink.Read(mavFunction);
+
+            var result = reader.Drain();
+
+            // Assert
+            Assert.AreEqual(1, result.Count);
+            // Assert.AreEqual("Transformed", result[0]);
         }
 
         [Test]
         public void Select_TransformsOutput()
         {
             // Arrange
-            var message = CreateTestMessage();
+            var message = MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var reader = new Reader<int>(uplink, mavFunction);
+            var reader = uplink.Read(mavFunction);
 
             // Act
             var stringReader = reader.Select((m, i) => "Transformed");
-            var result = stringReader.ByOutput.ToList();
+            var result = stringReader.Drain();
 
             // Assert
             Assert.AreEqual(1, result.Count);
@@ -35,14 +81,14 @@ namespace MAVLinkAPI.Tests.API
         public void SelectMany_TransformsAndFlattensOutput()
         {
             // Arrange
-            var message = CreateTestMessage();
+            var message = MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var reader = new Reader<int>(uplink, mavFunction);
+            var reader = (uplink.Read(mavFunction));
 
             // Act
             var listReader = reader.SelectMany((m, i) => new List<string> { "A", "B" });
-            var result = listReader.ByOutput.ToList();
+            var result = listReader.Drain();
 
             // Assert
             Assert.AreEqual(2, result.Count);
