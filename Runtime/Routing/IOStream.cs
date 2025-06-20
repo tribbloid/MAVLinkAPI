@@ -33,19 +33,19 @@ namespace MAVLinkAPI.Routing
         }
 
         [Serializable]
-        public struct ArgsT
-        {
-            public Protocol protocol;
-            public string address; // IP address + port number
-            public bool dtrEnabled;
-            public bool rtsEnabled;
+        public record ArgsT(
+            Protocol protocol,
+            string address, // IP address + port number
+            bool dtrEnabled = false,
+            bool rtsEnabled = false
+        )
 
-            public static ArgsT UDPLocalDefault = new()
-            {
+        {
+            public static ArgsT UDPLocalDefault = new(
                 // default QGroundControl MAVLink forwarding target
-                protocol = Protocol.Udp,
-                address = "localhost:14445",
-            };
+                Protocol.Udp,
+                "localhost:14445"
+            );
 
             public string URIString => $"{protocol}://{address}";
 
@@ -62,11 +62,10 @@ namespace MAVLinkAPI.Routing
                     throw new ArgumentException($"Invalid protocol: {parts[0]}");
                 }
 
-                return new ArgsT
-                {
-                    protocol = protocol,
-                    address = parts[1]
-                };
+                return new ArgsT(
+                    protocol,
+                    parts[1]
+                );
             }
         }
 
@@ -164,7 +163,8 @@ namespace MAVLinkAPI.Routing
             set => Comm.BaudRate = value;
         }
 
-        public IOStream(ArgsT args, Lifetime? lifetime = null) : base(lifetime)
+        public IOStream(ArgsT args, Lifetime? lifetime = null) :
+            base(lifetime)
         {
             Args = args;
         }

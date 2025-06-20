@@ -9,7 +9,7 @@ namespace MAVLinkAPI.UI
     {
         [Required] public volatile T mutable;
 
-        public struct OldLocation
+        struct OldLocation
         {
             public Transform parent;
             public int siblingIndex;
@@ -17,7 +17,7 @@ namespace MAVLinkAPI.UI
 
         private Maybe<OldLocation> _stats;
 
-        public OldLocation Stats => _stats.Lazy(() => new OldLocation
+        private OldLocation Stats => _stats.Lazy(() => new OldLocation
         {
             parent = mutable.gameObject.transform.parent,
             siblingIndex = mutable.gameObject.transform.GetSiblingIndex()

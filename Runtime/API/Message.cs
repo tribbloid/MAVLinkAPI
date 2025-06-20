@@ -4,42 +4,34 @@ using System.Collections.Generic;
 
 namespace MAVLinkAPI.API
 {
-    public struct Component
-    {
+    public record Component(
         // our target sysid
-        public byte SystemID;
-
+        byte SystemID,
         // our target compid
-        public byte ComponentID;
-
+        byte ComponentID)
+    {
         public static Component Gcs(byte compid = 0)
         {
-            return new Component
-            {
-                SystemID = 255,
-                ComponentID = compid
-            };
+            return new Component(255, compid);
         }
 
         public static Component Gcs0 = Gcs();
 
         public Message<T> ToMessage<T>(T data) where T : struct
         {
-            return new Message<T>
-            {
-                Data = data,
-                Sender = this
-            };
+            return new Message<T>(data, this);
         }
     }
 
 
     // mavlink msg id is automatically inferred by reflection
-    public struct Message<T> where T : struct
+    public record Message<T>(
+        T Data,
+        Component Sender,
+        DateTime? RxTimeOrNull = null
+    )
     {
-        public T Data;
-        public Component Sender;
-        public DateTime RxTime;
+        public DateTime RxTime => RxTimeOrNull ?? DateTime.UtcNow;
 
         public MAVLink.message_info Info
         {
@@ -56,18 +48,9 @@ namespace MAVLinkAPI.API
 
         public static Message<T> FromRaw(MAVLink.MAVLinkMessage msg)
         {
-            var sender = new Component
-            {
-                SystemID = msg.sysid,
-                ComponentID = msg.compid
-            };
+            var sender = new Component(msg.sysid, msg.compid);
 
-            return new Message<T>
-            {
-                Data = (T)msg.data,
-                Sender = sender,
-                RxTime = msg.rxtime
-            };
+            return new Message<T>((T)msg.data, sender, msg.rxtime);
         }
     }
 

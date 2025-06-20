@@ -9,12 +9,7 @@ using Object = UnityEngine.Object;
 namespace MAVLinkAPI.Tests.UI
 {
     [Serializable]
-    public struct PlayerData
-    {
-        public string name;
-        public int level;
-        public float health;
-    }
+    public record PlayerData(string Name, int Level, float Health);
 
     public class PlayerUIGen : AutoUIGeneratorUGUI<PlayerData>
     {
@@ -23,27 +18,27 @@ namespace MAVLinkAPI.Tests.UI
     [TestFixture]
     public class AutoUIGeneratorUGUITests
     {
-        private GameObject canvasGO;
+        private GameObject _canvasGo;
         private PlayerUIGen _generatorUGUI;
 
         [SetUp]
         public void SetUp()
         {
-            canvasGO = new GameObject("Canvas");
-            var canvas = canvasGO.AddComponent<Canvas>();
+            _canvasGo = new GameObject("Canvas");
+            var canvas = _canvasGo.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
             var uiRoot = new GameObject("UIRoot").AddComponent<RectTransform>();
             uiRoot.SetParent(canvas.transform, false);
 
-            _generatorUGUI = canvasGO.AddComponent<PlayerUIGen>();
+            _generatorUGUI = _canvasGo.AddComponent<PlayerUIGen>();
             _generatorUGUI.uiRoot = uiRoot;
         }
 
         [TearDown]
         public void TearDown()
         {
-            Object.DestroyImmediate(canvasGO);
+            Object.DestroyImmediate(_canvasGo);
         }
 
         // [Test] // this will not pass,
@@ -51,25 +46,20 @@ namespace MAVLinkAPI.Tests.UI
         public void SetValueSpike()
         {
             // Arrange
-            var playerData = new PlayerData
-            {
-                name = "Test Player",
-                level = 1,
-                health = 100f
-            };
+            var playerData = new PlayerData("Test Player", 1, 100f);
 
             // Act
             var healthField = typeof(PlayerData).GetField("health");
             healthField.SetValue(playerData, 75.5f);
 
             // Assert
-            Assert.AreEqual(75.5f, playerData.health);
+            Assert.AreEqual(75.5f, playerData.Health);
         }
 
         [Test]
         public void GenerateUIForStruct_CreatesCorrectElements()
         {
-            _generatorUGUI.Value = new PlayerData { name = "Test", level = 5, health = 100f };
+            _generatorUGUI.Value = new PlayerData("Test", 5, 100f);
             _generatorUGUI.Start();
 
             var uiElements = _generatorUGUI.uiRoot.GetComponentsInChildren<InputField>();
@@ -93,7 +83,7 @@ namespace MAVLinkAPI.Tests.UI
         {
             var uiRoot = new GameObject("UIRoot").AddComponent<RectTransform>();
             var autoUIGenerator = uiRoot.gameObject.AddComponent<PlayerUIGen>();
-            autoUIGenerator.Value = new PlayerData();
+            autoUIGenerator.Value = new PlayerData(string.Empty, 0, 0f);
             autoUIGenerator.uiRoot = uiRoot;
 
             autoUIGenerator.GenerateUIForStruct(uiRoot);
@@ -110,9 +100,9 @@ namespace MAVLinkAPI.Tests.UI
             healthField.text = "75.5";
             healthField.onValueChanged.Invoke("75.5");
 
-            Assert.AreEqual("NewPlayer", autoUIGenerator.Value.name);
-            Assert.AreEqual(10, autoUIGenerator.Value.level);
-            Assert.AreEqual(75.5f, autoUIGenerator.Value.health);
+            Assert.AreEqual("NewPlayer", autoUIGenerator.Value.Name);
+            Assert.AreEqual(10, autoUIGenerator.Value.Level);
+            Assert.AreEqual(75.5f, autoUIGenerator.Value.Health);
 
             Object.DestroyImmediate(uiRoot.gameObject);
         }

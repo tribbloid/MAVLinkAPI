@@ -24,11 +24,10 @@ namespace MAVLinkAPI.Util
             return true;
         }
 
-        private static readonly ArgsT DefaultArgs = new()
-        {
-            Interval = TimeSpan.FromSeconds(1),
-            ShouldContinue = DefaultShouldContinue
-        };
+        private static readonly ArgsT DefaultArgs = new(
+            TimeSpan.FromSeconds(1),
+            DefaultShouldContinue
+        );
 
         public Retry<TI> With(
             TimeSpan? interval = null,
@@ -38,23 +37,21 @@ namespace MAVLinkAPI.Util
         )
 
         {
-            _args = new ArgsT
-            {
-                Interval = interval ?? DefaultArgs.Interval,
-                ShouldContinue = shouldContinue ?? DefaultArgs.ShouldContinue,
-                LogException = logException
-            };
+            _args = new ArgsT(
+                interval ?? DefaultArgs.Interval,
+                shouldContinue ?? DefaultArgs.ShouldContinue,
+                logException
+            );
 
             if (name != null) Name = name;
             return this;
         }
 
-        public struct ArgsT
-        {
-            public TimeSpan Interval;
-            public Func<Exception, TI, bool> ShouldContinue;
-            public bool LogException;
-        }
+        public record ArgsT(
+            TimeSpan Interval,
+            Func<Exception, TI, bool> ShouldContinue,
+            bool LogException = false
+        );
 
         public class FixedIntervalT : HasOuter<Retry<TI>>
         {
