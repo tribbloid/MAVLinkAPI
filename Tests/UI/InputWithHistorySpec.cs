@@ -53,7 +53,7 @@ namespace MAVLinkAPI.Tests.UI
             _historyDropDown = _testHost.AddComponent<InputWithHistory>();
             _historyDropDown.input = _inputField;
             _historyDropDown.dropdown = _dropdown;
-            _historyDropDown.persistenceID = MAVLINK_HISTORY_KEY; // Set key for persistence tests
+            _historyDropDown.persistedIDOvrd = MAVLINK_HISTORY_KEY; // Set key for persistence tests
 
             yield return null;
         }
@@ -85,14 +85,14 @@ namespace MAVLinkAPI.Tests.UI
         }
 
         [UnityTest]
-        public IEnumerator InputSubmission_ClearsInputField_Test()
+        public IEnumerator InputSubmission_NOTClearedAfterSubmission_Test()
         {
             string testInput = "this should be cleared";
             _inputField.text = testInput;
             _inputField.onSubmit.Invoke(testInput);
             yield return null;
 
-            Assert.AreEqual(string.Empty, _inputField.text, "Input field should be cleared after submission.");
+            Assert.AreEqual(testInput, _inputField.text, "Input field should be preserved after submission.");
         }
 
         [UnityTest]
@@ -126,7 +126,7 @@ namespace MAVLinkAPI.Tests.UI
             var newHistoryDropDown = _testHost.AddComponent<InputWithHistory>();
             newHistoryDropDown.input = _inputField;
             newHistoryDropDown.dropdown = _dropdown;
-            newHistoryDropDown.persistenceID = MAVLINK_HISTORY_KEY; // Ensure new instance also has the key
+            newHistoryDropDown.persistedIDOvrd = MAVLINK_HISTORY_KEY; // Ensure new instance also has the key
 
             yield return null; // Allow Awake/Start to run on the new component
 
@@ -161,10 +161,10 @@ namespace MAVLinkAPI.Tests.UI
         }
 
         [UnityTest]
-        public IEnumerator Persistence_IsDisabled_WhenIdIsNull_Test()
+        public IEnumerator Persistence_IsDisabled()
         {
             // 1. Ensure persistence is disabled by setting ID to null
-            _historyDropDown.persistenceID = null;
+            _historyDropDown.isPersisted = false;
 
             // 2. Submit an entry
             string testInput = "this should not be saved";
@@ -179,7 +179,7 @@ namespace MAVLinkAPI.Tests.UI
             var newHistoryDropDown = _testHost.AddComponent<InputWithHistory>();
             newHistoryDropDown.input = _inputField;
             newHistoryDropDown.dropdown = _dropdown;
-            newHistoryDropDown.persistenceID = null; // Ensure new instance also has a null ID
+            newHistoryDropDown.persistedIDOvrd = null; // Ensure new instance also has a null ID
 
             yield return null; // Allow Awake/Start
 
@@ -246,7 +246,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator ShouldMoveExistingInputToFront()
         {
-            _historyDropDown.History = new List<string> { "first", "second", "third" };
+            _historyDropDown.History.AddRange(new List<string> { "first", "second", "third" });
 
             _inputField.text = "second";
             _inputField.onSubmit.Invoke(_inputField.text);

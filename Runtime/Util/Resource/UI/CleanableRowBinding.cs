@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Autofill;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
@@ -29,7 +30,6 @@ namespace MAVLinkAPI.Util.Resource.UI
         [SerializeField] public SerializedDict<string, Graphic> iconTemplates = new();
 
         [DoNotSerialize] private Cleanable? _underlying;
-
 
         public void Bind(Cleanable cleanable)
         {
@@ -95,12 +95,19 @@ namespace MAVLinkAPI.Util.Resource.UI
                 return;
             }
 
-            summary.text = _underlying.GetStatusSummary();
+            try
+            {
+                summary.text = _underlying.GetStatusSummary();
 
-            if (detail.isActiveAndEnabled || force)
-                detail.text = string.Join(
-                    "\n", _underlying.GetStatusDetail()
-                );
+                if (detail.isActiveAndEnabled || force)
+                    detail.text = string.Join(
+                        "\n", _underlying.GetStatusDetail()
+                    );
+            }
+            catch (Exception ex)
+            {
+                // ignored
+            }
         }
 
         public void UpdateStatusFn()

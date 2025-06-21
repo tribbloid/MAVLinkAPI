@@ -25,6 +25,9 @@ namespace MAVLinkAPI.Routing
             Serial
         }
 
+
+        public static String ProtocolPrompt => string.Join(", ", Enum.GetNames(typeof(Protocol)));
+
         public static class BaudRates
         {
             public static readonly int Default = 57600;
@@ -44,10 +47,10 @@ namespace MAVLinkAPI.Routing
 
         [Serializable]
         public record ArgsT(
-            Protocol protocol,
-            string address, // IP address + port number
-            bool dtrEnabled = false,
-            bool rtsEnabled = false
+            Protocol Protocol,
+            string Address, // IP address + port number
+            bool DtrEnabled = false,
+            bool RtsEnabled = false
         )
 
         {
@@ -57,19 +60,20 @@ namespace MAVLinkAPI.Routing
                 "localhost:14445"
             );
 
-            public string URIString => $"{protocol}://{address}";
+            public string URIString => $"{Protocol}://{Address}";
 
             public static ArgsT Parse(string s)
             {
                 var parts = s.Split(new[] { "://" }, 2, StringSplitOptions.None);
                 if (parts.Length != 2)
                 {
-                    throw new ArgumentException($"Invalid format for IOStream.ArgsT: {s}");
+                    throw new ArgumentException($"Invalid format (must be <protocol>://<address>): {s}");
                 }
 
                 if (!Enum.TryParse<Protocol>(parts[0], true, out var protocol))
                 {
-                    throw new ArgumentException($"Invalid protocol: {parts[0]}");
+                    throw new ArgumentException(
+                        $"Invalid protocol (must be chosen from {ProtocolPrompt}): {parts[0]}");
                 }
 
                 return new ArgsT(
@@ -95,9 +99,9 @@ namespace MAVLinkAPI.Routing
         {
             ICommsSerial GetRawComm()
             {
-                var parts = Args.address.Split(':');
+                var parts = Args.Address.Split(':');
 
-                switch (Args.protocol)
+                switch (Args.Protocol)
                 {
                     case Protocol.Tcp:
                         var tcp = new TcpSerial();
@@ -116,13 +120,13 @@ namespace MAVLinkAPI.Routing
 
                     case Protocol.Ws:
                         var ws = new WebSocket();
-                        ws.Port = Args.address;
+                        ws.Port = Args.Address;
                         ws.autoReconnect = true;
                         return ws;
 
                     case Protocol.Serial:
                         var serial = new SerialPort();
-                        serial.PortName = Args.address;
+                        serial.PortName = Args.Address;
                         return serial;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -130,8 +134,8 @@ namespace MAVLinkAPI.Routing
             }
 
             var result = GetRawComm();
-            result.DtrEnable = Args.dtrEnabled;
-            result.RtsEnable = Args.rtsEnabled;
+            result.DtrEnable = Args.DtrEnabled;
+            result.RtsEnable = Args.RtsEnabled;
 
             result.BaudRate = BaudRates.Default;
             return result;

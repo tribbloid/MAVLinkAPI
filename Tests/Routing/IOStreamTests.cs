@@ -19,8 +19,8 @@ namespace MAVLinkAPI.Tests.Routing
             var parsedArgs = IOStream.ArgsT.Parse(text);
 
             // Assert
-            Assert.AreEqual(originalArgs.protocol, parsedArgs.protocol);
-            Assert.AreEqual(originalArgs.address, parsedArgs.address);
+            Assert.AreEqual(originalArgs.Protocol, parsedArgs.Protocol);
+            Assert.AreEqual(originalArgs.Address, parsedArgs.Address);
         }
 
         [Test]
@@ -34,8 +34,8 @@ namespace MAVLinkAPI.Tests.Routing
             var parsedArgs = IOStream.ArgsT.Parse(text);
 
             // Assert
-            Assert.AreEqual(originalArgs.protocol, parsedArgs.protocol);
-            Assert.AreEqual(originalArgs.address, parsedArgs.address);
+            Assert.AreEqual(originalArgs.Protocol, parsedArgs.Protocol);
+            Assert.AreEqual(originalArgs.Address, parsedArgs.Address);
         }
     }
 }
