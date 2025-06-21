@@ -1,10 +1,13 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using MAVLinkAPI.API;
 using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
 using MAVLinkAPI.Util.Resource;
+using UnityEngine;
 using Component = MAVLinkAPI.API.Component;
 
 namespace MAVLinkAPI.Routing
@@ -16,20 +19,41 @@ namespace MAVLinkAPI.Routing
 
         public readonly MAVLink.MavlinkParse Mavlink = new();
 
-        private DirectUplink(IOStream io, Component? thisComponent = null)
+        public DirectUplink(
+            IOStream io,
+            Component? thisComponent = null,
+            Lifetime? lifetime = null
+        ) : base(lifetime)
         {
             IO = io;
             ThisComponent = thisComponent ?? Component.Gcs0;
-        }
-        //
-        // public Uplink(
-        //     IOStream.ArgsT args,
-        //     Lifetime? lifetime = null
-        // ) : this(new IOStream(args, lifetime))
-        // {
-        // }
 
-        public override void Dispose()
+
+            lock (Registry.GlobalAccessLock)
+            {
+                var peerClosed = 0;
+
+                // close others with same name
+                var peers = this.Peers().ToList();
+                Debug.LogWarning(
+                    $"found {peers.Count} peer(s) among {Registry.Global.Managed.Count} object(s)");
+
+                foreach (var peer in peers)
+                    if (peer.IO.Args.URIString == IO.Args.URIString)
+                    {
+                        peer.Dispose();
+                        peerClosed += 1;
+                    }
+
+                if (peerClosed > 0)
+                {
+                    Debug.LogWarning($"{peerClosed} peer(s) with name {IO.Args.URIString} are closed");
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+
+        public override void DoClean()
         {
             IO.Dispose();
         }
@@ -82,7 +106,6 @@ namespace MAVLinkAPI.Routing
                             {
                                 if (!IO.IsOpen) break;
                                 result = Mavlink.ReadPacket(IO.BaseStream);
-                                Metrics.BufferPressure = IO.BytesToRead;
                             }
 
                             if (result == null)
@@ -92,7 +115,7 @@ namespace MAVLinkAPI.Routing
                             }
                             else
                             {
-                                var counter = Metrics.Counters.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
+                                var counter = Metric_MsgCounts.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
                                 counter.Increment();
 
                                 // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
@@ -102,5 +125,13 @@ namespace MAVLinkAPI.Routing
                     }
                 }
             );
+
+
+        public override List<string> GetStatusDetail()
+        {
+            var details = base.GetStatusDetail();
+            details.Add($"- buffer pressure : {IO.Metric_BufferPressure}");
+            return details;
+        }
     }
 }

@@ -1,34 +1,36 @@
 #nullable enable
 using System;
+using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
+using Autofill;
 using MAVLinkAPI.API.Feature;
+using MAVLinkAPI.Routing;
+using MAVLinkAPI.Util.NullSafety;
+using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
 using UnityEngine.SpatialTracking;
+using UnityEngine.UI;
 
-namespace MAVLinkAPI.Pose
+namespace MAVLinkAPI.API.UI
 {
-    public class MAVPoseProvider : BasePoseProvider
+    public class AhrsPoseProvider : BasePoseProvider
     {
-        private Ahrs.Daemon? _feed;
+        public Ahrs.Feed? ActiveFeed;
 
-        private void OnDestroy()
-        {
-            Unbind();
-        }
-
-        public void Bind(Ahrs.Daemon daemon)
+        public void Bind(Ahrs.Feed daemon)
         {
             lock (this)
             {
-                _feed = daemon;
+                ActiveFeed = daemon;
             }
 
             Task.Run(() =>
                 {
                     try
                     {
-                        _feed.Start();
+                        ActiveFeed.Start();
                     }
                     catch (Exception ex)
                     {
@@ -38,19 +40,26 @@ namespace MAVLinkAPI.Pose
             );
         }
 
+
         public void Unbind()
         {
             lock (this)
             {
-                _feed?.Dispose();
-                _feed = null;
+                ActiveFeed?.Dispose();
+                ActiveFeed = null;
             }
+        }
+
+
+        private void OnDestroy()
+        {
+            Unbind();
         }
 
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out UnityEngine.Pose output)
         {
-            var d = _feed;
+            var d = ActiveFeed;
             if (d != null)
             {
                 output = new UnityEngine.Pose(new Vector3(0, 0, 0), d.Attitude);

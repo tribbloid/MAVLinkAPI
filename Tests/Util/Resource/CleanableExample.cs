@@ -14,7 +14,7 @@ namespace MAVLinkAPI.Tests.Util.Resource
         {
         }
 
-        protected override void DoClean()
+        public override void DoClean()
         {
             Counter += 1;
         }

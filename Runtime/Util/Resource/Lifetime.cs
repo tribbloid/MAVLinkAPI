@@ -1,38 +1,26 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
 namespace MAVLinkAPI.Util.Resource
 {
-    public class Lifetime : SafeHandleMinusOneIsInvalid
+    public class Registry : SafeHandleMinusOneIsInvalid
     {
-        // TODO: need lifetime semilattice algebra:
-        // - earlier of two (<'a, 'b>)
-        // - later of two (<'a, 'b, 'c> where 'a: 'c, 'b: 'c)
+        public Registry(bool ownsHandle) : base(ownsHandle)
+        {
+        }
 
-        private static readonly IntPtr ValidHandle = new(0);
-        // private static readonly IntPtr InvalidHandle = new(-1);
+        protected override bool ReleaseHandle()
+        {
+            return true;
+        }
 
         // Using HashSet with a lock for thread safety
+        // also the AccessLock
         public readonly ConcurrentDictionary<int, Cleanable> Managed = new();
-        // private readonly object _accessLock = new();
-
-        public Lifetime(
-            IntPtr? handle = null,
-            bool ownsHandle = true
-        ) : base(ownsHandle)
-        {
-            handle ??= ValidHandle;
-
-            SetHandle(handle.Value);
-        }
-
-        protected sealed override bool ReleaseHandle()
-        {
-            return DeregisterAll();
-        }
 
 
         // Methods to add and remove Cleanable objects with thread safety
@@ -51,6 +39,53 @@ namespace MAVLinkAPI.Util.Resource
                 Managed.Remove(cleanable.ID, out _);
             }
         }
+
+        public List<T> CollectByType<T>() where T : class
+        {
+            lock (Managed)
+            {
+                return Managed.Values.OfType<T>().ToList();
+            }
+        }
+
+        public List<Cleanable> CollectByType(Type type)
+        {
+            lock (Managed)
+            {
+                return Managed.Values.Where(x => type.IsAssignableFrom(x.GetType())).ToList();
+            }
+        }
+
+        public static Registry Global => new Registry(false);
+
+        public static object GlobalAccessLock => Global.Managed;
+    }
+
+    public class Lifetime : Registry
+    {
+        // TODO: need lifetime semilattice algebra:
+        // - earlier of two (<'a, 'b>)
+        // - later of two (<'a, 'b, 'c> where 'a: 'c, 'b: 'c)
+
+        private static readonly IntPtr ValidHandle = new(0);
+        // private static readonly IntPtr InvalidHandle = new(-1);
+
+
+        public Lifetime(
+            IntPtr? handle = null,
+            bool ownsHandle = true
+        ) : base(ownsHandle)
+        {
+            handle ??= ValidHandle;
+
+            SetHandle(handle.Value);
+        }
+
+        protected sealed override bool ReleaseHandle()
+        {
+            return DeregisterAll();
+        }
+
 
         public bool DeregisterAll()
         {

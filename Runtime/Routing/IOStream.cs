@@ -14,22 +14,32 @@ using UnityEngine;
 
 namespace MAVLinkAPI.Routing
 {
-    public enum Protocol
+    public class IOStream : IDisposable
     {
-        Tcp,
-        Udp,
-        Ws,
-        UdpCl,
-        Serial
-    }
-
-    public class IOStream : Cleanable
-    {
-        public static class Defaults
+        public enum Protocol
         {
-            public static int baudRate = 57600;
+            Tcp,
+            Udp,
+            Ws,
+            UdpCl,
+            Serial
+        }
 
-            public static List<int> preferredBaudRates = new() { baudRate };
+        public static class BaudRates
+        {
+            public static readonly int Default = 57600;
+
+            public static List<int> preferred = new() { 38400, Default };
+
+            public static List<int> all = new()
+            {
+                4800,
+                9600,
+                19200,
+                38400,
+                Default,
+                115200
+            };
         }
 
         [Serializable]
@@ -69,40 +79,20 @@ namespace MAVLinkAPI.Routing
             }
         }
 
-        public ArgsT Args;
+        public readonly ArgsT Args;
 
-        // TODO: generalised this to read from any () => Stream
-        // private readonly ICommsSerial comm;
-
+        public IOStream(ArgsT args)
+        {
+            Args = args;
+        }
 
         private Maybe<ICommsSerial> _comm; // can only be initialised once, will be closed at the end of lifetime
+
+        // TODO: generalised this to read from any () => Stream
         public ICommsSerial Comm => _comm.Lazy(() => Comm_Mk());
 
         public ICommsSerial Comm_Mk()
         {
-            lock (GlobalAccessLock)
-            {
-                var peerClosed = 0;
-
-                // close others with same name
-                var peers = this.Peers().ToList();
-                Debug.LogWarning(
-                    $"found {peers.Count()} Serial and {GlobalRegistry.GlobalCounter.Value} SafeClean objects");
-
-                foreach (var peer in peers)
-                    if (peer.Args.URIString == Args.URIString)
-                    {
-                        peer.Dispose();
-                        peerClosed += 1;
-                    }
-
-                if (peerClosed > 0)
-                {
-                    Debug.LogWarning($"{peerClosed} peer(s) with name {Args.URIString} are disposed");
-                    Thread.Sleep(1000);
-                }
-            }
-
             ICommsSerial GetRawComm()
             {
                 var parts = Args.address.Split(':');
@@ -143,7 +133,7 @@ namespace MAVLinkAPI.Routing
             result.DtrEnable = Args.dtrEnabled;
             result.RtsEnable = Args.rtsEnabled;
 
-            result.BaudRate = Defaults.baudRate;
+            result.BaudRate = BaudRates.Default;
             return result;
         }
 
@@ -151,6 +141,9 @@ namespace MAVLinkAPI.Routing
 
         public Stream BaseStream => Comm.BaseStream;
         public int BytesToRead => Comm.BytesToRead;
+
+        public double Metric_BufferPressure => (double)BytesToRead / Comm.ReadBufferSize;
+
 
         // locking to prevent multiple reads on serial port
         public readonly object ReadLock = new();
@@ -163,14 +156,8 @@ namespace MAVLinkAPI.Routing
             set => Comm.BaudRate = value;
         }
 
-        public IOStream(ArgsT args, Lifetime? lifetime = null) :
-            base(lifetime)
-        {
-            Args = args;
-        }
 
-
-        protected override void DoClean()
+        public void Dispose()
         {
             // Close the serial port
             IsOpen = false;

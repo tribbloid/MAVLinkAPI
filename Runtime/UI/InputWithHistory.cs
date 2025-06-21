@@ -10,18 +10,20 @@ namespace MAVLinkAPI.UI
 {
     public class InputWithHistory : MonoBehaviour
     {
-        [Autofill(AutofillType.SelfAndChildren)] public TMP_InputField input;
+        [Autofill(AutofillType.SelfAndChildren)]
+        public TMP_InputField input;
 
-        [Autofill(AutofillType.SelfAndChildren)] public TMP_Dropdown dropdown;
+        [Autofill(AutofillType.SelfAndChildren)]
+        public TMP_Dropdown dropdown;
 
         [NonSerialized] public List<string> History = new();
 
         public string? persistenceID;
 
         public int maxHistorySize = 30;
-        
+
         // Wrapper class for JsonUtility to serialize/deserialize List<string>
-        [System.Serializable]
+        [Serializable]
         private class HistoryWrapper
         {
             public List<string> items;
@@ -36,10 +38,10 @@ namespace MAVLinkAPI.UI
         void Start()
         {
             LoadHistory();
-            
+
             if (input != null)
             {
-                input.onEndEdit.AddListener(OnInputSubmit);
+                input.onSubmit.AddListener(Memorize);
             }
 
             if (dropdown != null)
@@ -49,19 +51,19 @@ namespace MAVLinkAPI.UI
             }
         }
 
-        void OnInputSubmit(string text)
+        void Memorize(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
-                if (!History.Contains(text))
-                {
-                    History.Insert(0, text); // Add to the beginning for most recent
-                    // Optional: Limit history size
-                    if (History.Count > maxHistorySize) History.RemoveAt(History.Count - 1);
-                    SaveHistory();
-                    RefreshHistory();
-                }
-                input.text = ""; 
+                History.Remove(text);
+
+                History.Insert(0, text); // Add to the beginning for most recent
+                // Optional: Limit history size
+                if (History.Count > maxHistorySize) History.RemoveAt(History.Count - 1);
+                SaveHistory();
+                RefreshHistory();
+
+                input.text = "";
             }
         }
 
@@ -82,6 +84,7 @@ namespace MAVLinkAPI.UI
             {
                 dropdown.AddOptions(History);
             }
+
             dropdown.RefreshShownValue();
         }
 
@@ -92,7 +95,7 @@ namespace MAVLinkAPI.UI
                 History = new List<string>();
                 return;
             }
-            
+
             string json = PlayerPrefs.GetString(persistenceID, null);
             if (!string.IsNullOrEmpty(json))
             {

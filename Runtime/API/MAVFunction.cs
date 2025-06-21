@@ -133,8 +133,6 @@ namespace MAVLinkAPI.API
                         {
                             var prevV = kv.Value(ii);
 
-                            if (prevV == null) return null;
-
                             var result = prevV.SelectMany(x => Fn(ii, x)
                             ).ToList();
 

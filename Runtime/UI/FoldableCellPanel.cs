@@ -10,32 +10,37 @@ using UnityEngine.UI;
 namespace MAVLinkAPI.UI
 {
     [RequireComponent(typeof(RectTransform))]
-    public class FoldingPanelBehaviour : MonoBehaviour
+    public class FoldableCellPanel : MonoBehaviour
     {
-        [Autofill] public RectTransform rectT;
-        
-        [Autofill(AutofillType.Parent)] public TableLayout table;
+        [Autofill] public RectTransform rectT = null!;
 
-        [Autofill(AutofillType.Parent)] public TableRow row;
+        [Autofill(AutofillType.Parent)] public TableLayout table = null!;
 
-        [Required] public Button toggle;
+        [Autofill(AutofillType.Parent)] public TableRow row = null!;
+
+        [Required] public Button toggle = null!;
         public MonoBehaviour? detail;
 
-        private float minHeight = -1;
+        private float _minHeight = -1;
 
         public void Start()
         {
-            minHeight = row.preferredHeight;
+            _minHeight = row.preferredHeight;
 
-            StartCoroutine(UpdateHeightsAfterLayout());
+            UpdateHeights();
+
             toggle.onClick.AddListener(() =>
             {
                 detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rectT);
-                StartCoroutine(UpdateHeightsAfterLayout());
+                UpdateHeights();
             });
         }
 
+        private void UpdateHeights()
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectT);
+            StartCoroutine(UpdateHeightsAfterLayout());
+        }
 
         private IEnumerator UpdateHeightsAfterLayout()
         {
@@ -45,7 +50,7 @@ namespace MAVLinkAPI.UI
             // Now get the updated height
             row.preferredHeight = Math.Max(
                 GetComponent<RectTransform>()!.rect.height + 10,
-                minHeight
+                _minHeight
             );
 
             // row.UpdateLayout(); // Update the layout.CellCount

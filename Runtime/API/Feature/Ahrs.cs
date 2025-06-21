@@ -40,16 +40,13 @@ namespace MAVLinkAPI.API.Feature
             return uplink.Read(getAttitudeQ);
         }
 
-        public class Daemon : RecurrentDaemon
+        public class Feed : RecurrentDaemon
         {
-            public Reader<object> WatchDog;
-            public Reader<Quaternion> AttitudeReader;
+            public readonly Uplink Uplink;
+            public readonly Reader<object> WatchDog;
+            public readonly Reader<Quaternion> AttitudeReader;
 
-            public Uplink Uplink;
-
-            private Maybe<Reader<object>> _compoundReader = new();
-
-            public Daemon(Lifetime lifetime, Uplink uplink) : base(lifetime)
+            public Feed(Lifetime lifetime, Uplink uplink) : base(lifetime)
             {
                 Uplink = uplink;
                 WatchDog = Minimal.WatchDog(uplink);
@@ -58,7 +55,9 @@ namespace MAVLinkAPI.API.Feature
 
             public Quaternion Attitude = Quaternion.identity;
 
-            public Reader<object> CompoundReader => _compoundReader.Lazy(() =>
+            private Maybe<Reader<object>> _updater;
+
+            public Reader<object> Updater => _updater.Lazy(() =>
             {
                 return WatchDog.Union(
                     AttitudeReader.SelectMany((_, v) =>
@@ -72,13 +71,7 @@ namespace MAVLinkAPI.API.Feature
 
             protected override void Iterate()
             {
-                CompoundReader.Drain();
-            }
-
-            protected override void DoClean()
-            {
-                base.DoClean();
-                Uplink.Dispose();
+                Updater.Drain();
             }
         }
 

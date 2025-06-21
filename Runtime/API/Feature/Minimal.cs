@@ -92,8 +92,8 @@ namespace MAVLinkAPI.API.Feature
                         {
                             reader.Drain();
 
-                            if (reader.Sources.Keys.Sum(uplink =>
-                                    uplink.Metrics.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value) <=
+                            if (reader.Sources.Keys.Sum(ll =>
+                                    ll.Metric_MsgCounts.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value) <=
                                 0)
                                 throw new InvalidConnectionException(
                                     $"No heartbeat received");

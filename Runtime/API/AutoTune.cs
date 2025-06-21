@@ -22,17 +22,16 @@ namespace MAVLinkAPI.API
             TimeSpan? timeout = null,
             bool disconnectFirst = true)
         {
-            _preferredBaudRates = preferredBaudRates ?? IOStream.Defaults.preferredBaudRates;
+            _preferredBaudRates = preferredBaudRates ?? IOStream.BaudRates.preferred;
             _timeout = timeout ?? TimeSpan.FromSeconds(10);
             _disconnectFirst = disconnectFirst;
         }
 
-
         private CancellationTokenSource _cts = new();
 
-        public T Apply<T>(
-            Func<IOStream, T> func,
-            IOStream io
+        public T OnStream<T>(
+            IOStream io,
+            Func<IOStream, T> func
         )
         {
             var token = _cts.Token;

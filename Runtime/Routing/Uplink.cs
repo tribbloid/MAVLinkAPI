@@ -1,14 +1,20 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.API;
 using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.Resource;
 
 namespace MAVLinkAPI.Routing
 {
-    public abstract class Uplink : IDisposable
+    public abstract class Uplink : Cleanable
     {
+        protected Uplink(
+            Lifetime? lifetime = null
+        ) : base(lifetime)
+        {
+        }
+
         // only has 1 impl, so this interface is optional
 
         public abstract int BytesToRead { get; }
@@ -28,19 +34,8 @@ namespace MAVLinkAPI.Routing
             return reader;
         }
 
-        public class MetricsT
-        {
-            public IDIndexed<AtomicLong> Counters;
 
-            public int BufferPressure; // pending data size in the buffer
-        }
-
-        public MetricsT Metrics { get; } = new()
-        {
-            Counters = new IDIndexed<AtomicLong>()
-        };
-
-        public abstract void Dispose();
+        public readonly IDIndexed<AtomicLong> Metric_MsgCounts = new();
 
 
         // Mock Uplink that can provide a stream of messages for testing
@@ -64,12 +59,11 @@ namespace MAVLinkAPI.Routing
 
             public override void WriteData<T>(T data) where T : struct
             {
-                /* Do nothing */
             }
 
-            public override void Dispose()
+
+            public override void DoClean()
             {
-                /* Do nothing */
             }
         }
     }

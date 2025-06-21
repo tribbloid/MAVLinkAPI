@@ -10,7 +10,7 @@ namespace MAVLinkAPI.Tests.Routing
         {
             // Arrange
             var originalArgs = new IOStream.ArgsT(
-                Protocol.Udp,
+                IOStream.Protocol.Udp,
                 "localhost:14550"
             );
             var text = originalArgs.URIString;

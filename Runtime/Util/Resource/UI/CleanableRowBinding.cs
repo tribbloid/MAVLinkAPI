@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Autofill;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
@@ -11,32 +8,32 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MAVLinkAPI.Util.Resource
+namespace MAVLinkAPI.Util.Resource.UI
 {
     public class CleanableRowBinding : MonoBehaviour
     {
-        [Autofill] public TableRow row;
+        [Autofill] public TableRow row = null!;
 
-        [Required] public TextMeshProUGUI summary;
-        [Required] public TextMeshProUGUI detail;
+        [Required] public TextMeshProUGUI summary = null!;
+        [Required] public TextMeshProUGUI detail = null!;
 
         // if both are ticked the instance will be terminated
-        [Required] public Toggle terminate1;
-        [Required] public Toggle terminate2;
+        [Required] public Toggle terminate1 = null!;
+        [Required] public Toggle terminate2 = null!;
 
-        [Serialize] private float updateFreqSec = 0.5f;
+        [Serialize] private readonly float _updateFreqSec = 0.5f;
 
         [Tooltip("The default icon to display when no specific icon is found for the cleanable's type.")] [Required]
-        public MutableComponent<Graphic> icon;
+        public MutableComponent<Graphic> icon = null!;
 
-        [SerializeField] public SerializedLookup<string, Graphic> iconTemplates = new();
+        [SerializeField] public SerializedDict<string, Graphic> iconTemplates = new();
 
-        [DoNotSerialize] private Cleanable? underlying;
+        [DoNotSerialize] private Cleanable? _underlying;
 
 
         public void Bind(Cleanable cleanable)
         {
-            underlying = cleanable;
+            _underlying = cleanable;
 
             UpdateIcon(cleanable);
 
@@ -45,9 +42,9 @@ namespace MAVLinkAPI.Util.Resource
 
             UpdateStatus(true); // Sync once if frequency is zero or negative.
 
-            if (updateFreqSec > 0)
+            if (_updateFreqSec > 0)
             {
-                InvokeRepeating(nameof(UpdateStatusFn), 0f, updateFreqSec);
+                InvokeRepeating(nameof(UpdateStatusFn), 0f, _updateFreqSec);
             }
             else
             {
@@ -73,7 +70,7 @@ namespace MAVLinkAPI.Util.Resource
 
             if (left && right)
             {
-                underlying?.Dispose();
+                _underlying?.Dispose();
 
                 PostClean();
             }
@@ -90,39 +87,25 @@ namespace MAVLinkAPI.Util.Resource
 
         public virtual void UpdateStatus(bool force = false)
         {
-            if (underlying == null) return;
+            if (_underlying == null) return;
 
-            if (underlying.IsDisposed)
+            if (_underlying.IsDisposed)
             {
                 PostClean();
                 return;
             }
 
-            summary.text = GetSummary(underlying);
-            if (detail.isActiveAndEnabled || force) detail.text = GetDetail(underlying);
+            summary.text = _underlying.GetStatusSummary();
+
+            if (detail.isActiveAndEnabled || force)
+                detail.text = string.Join(
+                    "\n", _underlying.GetStatusDetail()
+                );
         }
 
         public void UpdateStatusFn()
         {
             UpdateStatus();
-        }
-
-
-        public virtual string GetSummary(Cleanable cleanable)
-        {
-            var vType = underlying.GetType();
-            var text = vType.Name;
-            return text;
-        }
-
-        public virtual string GetDetail(Cleanable cleanable)
-        {
-            var lifespan = DateTime.UtcNow - cleanable.CreatedAt;
-
-            return $@"
-Object: {cleanable.ToString()}
-- ID: {cleanable.ID}
-- Lifespan: {lifespan.TotalSeconds}";
         }
     }
 }

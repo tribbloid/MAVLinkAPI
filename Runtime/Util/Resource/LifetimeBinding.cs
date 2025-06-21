@@ -5,9 +5,9 @@ namespace MAVLinkAPI.Util.Resource
 {
     public class LifetimeBinding : MonoBehaviour
     {
-        protected Maybe<Lifetime> _lifetime;
+        protected Maybe<Lifetime> lifetimeExisting;
 
-        public virtual Lifetime Lifetime => _lifetime.Lazy(() => new Lifetime());
+        public virtual Lifetime Lifetime => lifetimeExisting.Lazy(() => new Lifetime());
 
         // OnDestroy will dispose lifetime
         private void OnDestroy()

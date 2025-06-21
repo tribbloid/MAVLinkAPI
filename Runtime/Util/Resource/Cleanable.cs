@@ -10,21 +10,19 @@ namespace MAVLinkAPI.Util.Resource
 {
     public abstract class Cleanable : IDisposable
     {
-        public static class GlobalRegistry
-        {
-            public static readonly AtomicInt GlobalCounter = new();
+        // public static class GlobalRegistry
+        // {
+        //     public static readonly AtomicInt GlobalCounter = new();
+        //
+        //     // TODO: not efficient, should use ConcurrentMultiMap
+        //     public static readonly HashSet<Cleanable> Registered = new();
+        // }
 
-            // TODO: not efficient, should use ConcurrentMultiMap
-            public static readonly HashSet<Cleanable> Registered = new();
-        }
-
-        public static readonly object GlobalAccessLock = new();
 
         public int ID = new Random().Next();
         public DateTime CreatedAt = DateTime.UtcNow;
 
         private readonly Lifetime _lifetime;
-
 
         public Cleanable(Lifetime? lifetime = null)
         {
@@ -33,16 +31,7 @@ namespace MAVLinkAPI.Util.Resource
             _lifetime = lifetime;
             _lifetime.Register(this);
 
-            lock (GlobalAccessLock)
-            {
-                GlobalRegistry.Registered.Add(this);
-                GlobalRegistry.GlobalCounter.Increment();
-            }
-
-            //  TODO: how to add duplication runtime check?
-            // var peers = this.SelfAndPeers();
-            // if (!peers.Contains(this))
-            //     Debug.LogException(new IOException("INTERNAL ERROR!"));
+            Registry.Global.Register(this);
         }
 
         public bool IsDisposed = false;
@@ -68,7 +57,26 @@ namespace MAVLinkAPI.Util.Resource
             Dispose();
         }
 
-        protected abstract void DoClean();
+        public abstract void DoClean();
+
+        public virtual string GetStatusSummary()
+        {
+            var vType = GetType();
+            var text = vType.Name;
+            return text;
+        }
+
+        public virtual List<string> GetStatusDetail()
+        {
+            var uptime = DateTime.UtcNow - CreatedAt;
+
+            return new List<string>()
+            {
+                ToString(),
+                $"- ID: {ID}",
+                $"- Uptime: {uptime}"
+            };
+        }
 
 
         public class Dummy : Cleanable
@@ -79,7 +87,7 @@ namespace MAVLinkAPI.Util.Resource
             {
             }
 
-            protected override void DoClean()
+            public override void DoClean()
             {
             }
         }
@@ -96,19 +104,13 @@ namespace MAVLinkAPI.Util.Resource
         public static IEnumerable<T> SelfAndPeers<T>(this T self)
             where T : Cleanable // should be read only
         {
-            lock (Cleanable.GlobalAccessLock)
+            lock (Registry.Global.Managed)
             {
                 var selfType = self.GetType();
 
-                var filtered = Cleanable.GlobalRegistry.Registered
-                    .Where(x =>
-                    {
-                        var isSelfType = x.GetType() == selfType;
-                        return isSelfType;
-                    })
-                    .Cast<T>();
+                var filtered = Registry.Global.CollectByType(selfType);
 
-                return filtered;
+                return filtered.Cast<T>();
             }
         }
 

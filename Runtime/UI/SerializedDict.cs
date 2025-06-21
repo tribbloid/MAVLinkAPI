@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace MAVLinkAPI.UI
 {
     [Serializable]
-    public class SerializedLookup<TK, TV> : Dictionary<TK, TV>
+    public class SerializedDict<TK, TV> : Dictionary<TK, TV>
     {
         [Serializable]
         public class Pair

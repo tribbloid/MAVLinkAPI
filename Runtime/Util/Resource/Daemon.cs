@@ -1,10 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 
-namespace MAVLinkAPI.Util
+namespace MAVLinkAPI.Util.Resource
 {
     public abstract class Daemon : Cleanable
     {
@@ -30,7 +29,7 @@ namespace MAVLinkAPI.Util
             _cancelSignal = null;
         }
 
-        protected override void DoClean()
+        public override void DoClean()
         {
             Stop();
         }
@@ -39,6 +38,7 @@ namespace MAVLinkAPI.Util
         {
             var cancelSignal = Cancel.Token;
             _cancelSignal = cancelSignal;
+
             await Task.Run(() =>
                 {
                     try
