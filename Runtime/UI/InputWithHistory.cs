@@ -13,10 +13,10 @@ namespace MAVLinkAPI.UI
     public class InputWithHistory : MonoBehaviour
     {
         [Autofill(AutofillType.SelfAndChildren)]
-        public TMP_InputField input = null!;
+        public TMP_Dropdown dropdown = null!;
 
         [Autofill(AutofillType.SelfAndChildren)]
-        public TMP_Dropdown dropdown = null!;
+        public TMP_InputField input = null!;
 
         public bool isPersisted = true;
         public string? persistedIDOvrd;
@@ -77,6 +77,10 @@ namespace MAVLinkAPI.UI
         void Start()
         {
             input.onSubmit.AddListener(OnInputSubmit);
+
+            // input.onEndEdit.AddListener(_ =>
+            //         dropdown.value = -1 // Any Edit will cause dropdown selectin to reset
+            // ); TODO: need to select an ad-hoc option to sync dropdown
 
             dropdown.onValueChanged.AddListener(OnDropdownSelect);
         }

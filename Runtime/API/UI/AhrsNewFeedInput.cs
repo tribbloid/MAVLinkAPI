@@ -20,8 +20,9 @@ namespace MAVLinkAPI.API.UI
 
         [Required] public AhrsPoseProvider poseProvider = null!;
 
-        [Autofill(AutofillType.Children)] public TMP_InputField uriInput = null!;
-        [Required] public TMP_Dropdown baudRateInput = null!;
+        [Required] public TMP_InputField addressInput = null!;
+
+        [Autofill(AutofillType.Children)] public TMP_Dropdown baudRateInput = null!;
         [Autofill(AutofillType.Children)] public Button newFeedButton = null!;
 
         private Lifetime Lifetime => lifetimeB.Lifetime;
@@ -35,9 +36,9 @@ namespace MAVLinkAPI.API.UI
             });
             baudRateInput.value = IOStream.BaudRates.all.IndexOf(IOStream.BaudRates.Default);
 
-            uriInput.onSubmit.AddListener(_ => BindNewFeed());
+            addressInput.onSubmit.AddListener(_ => BindNewFeed());
 
-            newFeedButton.onClick.AddListener(() => uriInput.onSubmit.Invoke(uriInput.text));
+            newFeedButton.onClick.AddListener(() => addressInput.onSubmit.Invoke(addressInput.text));
         }
 
         // public void BindLast()
@@ -52,7 +53,7 @@ namespace MAVLinkAPI.API.UI
 
         public void BindNewFeed()
         {
-            var args = IOStream.ArgsT.Parse(uriInput.text);
+            var args = IOStream.ArgsT.Parse(addressInput.text);
 
             var io = new IOStream(args);
             io.BaudRate = int.Parse(baudRateInput.captionText.text); // TODO: should be autotune 
