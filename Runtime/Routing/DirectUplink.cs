@@ -1,6 +1,8 @@
 #nullable enable
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using MAVLinkAPI.API;
@@ -28,15 +30,15 @@ namespace MAVLinkAPI.Routing
             IO = io;
             ThisComponent = thisComponent ?? Component.Gcs0;
 
-
             lock (Registry.GlobalAccessLock)
             {
                 var peerClosed = 0;
 
                 // close others with same name
                 var peers = this.Peers().ToList();
-                Debug.LogWarning(
-                    $"found {peers.Count} peer(s) among {Registry.Global.Managed.Count} object(s)");
+                if (peers.Count > 0)
+                    Debug.LogWarning(
+                        $"found {peers.Count} peer(s) among {Registry.Global.Managed.Count} object(s)");
 
                 foreach (var peer in peers)
                     if (peer.IO.Args.URIString == IO.Args.URIString)
@@ -95,9 +97,9 @@ namespace MAVLinkAPI.Routing
         public override IEnumerable<MAVLink.MAVLinkMessage> RawReadSource =>
             _rawReadSource.Lazy(() =>
                 {
-                    return Get();
+                    return Result();
 
-                    IEnumerable<MAVLink.MAVLinkMessage> Get()
+                    IEnumerable<MAVLink.MAVLinkMessage> Result()
                     {
                         while (IO.IsOpen)
                         {
@@ -115,7 +117,9 @@ namespace MAVLinkAPI.Routing
                             }
                             else
                             {
-                                var counter = Metric_MsgCounts.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
+                                Metric.PacketCount = Mavlink.packetcount;
+                                var counter = Metric.Histogram.Get(result.msgid)
+                                    .ValueOrInsert(() => new AtomicLong());
                                 counter.Increment();
 
                                 // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
@@ -127,11 +131,11 @@ namespace MAVLinkAPI.Routing
             );
 
 
-        public override List<string> GetStatusDetail()
+        public override IEnumerable<string> GetStatusDetail()
         {
-            var details = base.GetStatusDetail();
-            details.Add($"- buffer pressure : {IO.Metric_BufferPressure}");
-            return details;
+            return base.GetStatusDetail().Prepend(
+                $"- buffer pressure : {IO.Metric_BufferPressure}"
+            );
         }
     }
 }

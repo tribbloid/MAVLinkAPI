@@ -144,10 +144,9 @@ namespace MAVLinkAPI.Routing
         public TimeSpan MinReopenInterval = TimeSpan.FromSeconds(1);
 
         public Stream BaseStream => Comm.BaseStream;
+
         public int BytesToRead => Comm.BytesToRead;
-
         public double Metric_BufferPressure => (double)BytesToRead / Comm.ReadBufferSize;
-
 
         // locking to prevent multiple reads on serial port
         public readonly object ReadLock = new();
@@ -185,8 +184,7 @@ namespace MAVLinkAPI.Routing
                     if (value != IsOpen)
                     {
                         Retry.UpTo(4).With(
-                                TimeSpan.FromSeconds(0.5),
-                                logException: true
+                                TimeSpan.FromSeconds(0.5)
                             )
                             .FixedInterval.Run((_, _) =>
                             {
@@ -266,6 +264,8 @@ namespace MAVLinkAPI.Routing
 
         public void WriteBytes(byte[] bytes)
         {
+            IsOpen = true;
+
             lock (WriteLock)
             {
                 Comm.Write(bytes, 0, bytes.Length);

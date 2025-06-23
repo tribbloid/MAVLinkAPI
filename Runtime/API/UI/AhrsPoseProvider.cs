@@ -21,25 +21,17 @@ namespace MAVLinkAPI.API.UI
 
         public void Bind(Ahrs.Feed daemon)
         {
-            lock (this)
+            ActiveFeed = daemon;
+
+            try
             {
-                ActiveFeed = daemon;
+                ActiveFeed.Start();
             }
-
-            Task.Run(() =>
-                {
-                    try
-                    {
-                        ActiveFeed.Start();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogException(ex);
-                    }
-                }
-            );
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
-
 
         public void Unbind()
         {

@@ -1,6 +1,8 @@
 #nullable enable
 using System;
+using System.Collections;
 using Autofill;
+using MAVLinkAPI.Ext;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
@@ -11,7 +13,7 @@ using UnityEngine.UI;
 
 namespace MAVLinkAPI.Util.Resource.UI
 {
-    public class CleanableRowBinding : MonoBehaviour
+    public class ServiceRowController : MonoBehaviour
     {
         [Autofill] public TableRow row = null!;
 
@@ -22,7 +24,7 @@ namespace MAVLinkAPI.Util.Resource.UI
         [Required] public Toggle terminate1 = null!;
         [Required] public Toggle terminate2 = null!;
 
-        [Serialize] private readonly float _updateFreqSec = 0.5f;
+        [Serialize] private readonly float _updateFreqSec = 1.5f;
 
         [Tooltip("The default icon to display when no specific icon is found for the cleanable's type.")] [Required]
         public MutableComponent<Graphic> icon = null!;
@@ -31,29 +33,8 @@ namespace MAVLinkAPI.Util.Resource.UI
 
         [DoNotSerialize] private Cleanable? _underlying;
 
-        public void Bind(Cleanable cleanable)
-        {
-            _underlying = cleanable;
 
-            UpdateIcon(cleanable);
-
-            terminate1.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
-            terminate2.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
-
-            UpdateStatus(true); // Sync once if frequency is zero or negative.
-
-            if (_updateFreqSec > 0)
-            {
-                InvokeRepeating(nameof(UpdateStatusFn), 0f, _updateFreqSec);
-            }
-            else
-            {
-                enabled = false; // Disable component to stop further updates, matching previous behavior.
-            }
-        }
-
-
-        private void UpdateIcon(Cleanable cleanable)
+        private void SetIcon(Cleanable cleanable)
         {
             var typeName = cleanable.GetType().Name;
 
@@ -72,11 +53,11 @@ namespace MAVLinkAPI.Util.Resource.UI
             {
                 _underlying?.Dispose();
 
-                PostClean();
+                RemoveRow();
             }
         }
 
-        private void PostClean()
+        private void RemoveRow()
         {
             terminate1.enabled = false;
             terminate2.enabled = false;
@@ -85,13 +66,42 @@ namespace MAVLinkAPI.Util.Resource.UI
         }
 
 
+        public void Bind(Cleanable cleanable)
+        {
+            _underlying = cleanable;
+
+            StartCoroutine(StartUpdatingStatusAsync());
+        }
+
+        private IEnumerator StartUpdatingStatusAsync()
+        {
+            SetIcon(_underlying!);
+
+            terminate1.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
+            terminate2.onValueChanged.AddListener(delegate { CleanIfBothTerminating(); });
+
+            yield return new WaitForEndOfFrame();
+
+            UpdateStatus(true); // Sync once if frequency is zero or negative.
+
+            if (_updateFreqSec > 0)
+            {
+                InvokeRepeating(nameof(UpdateStatusFn), 0f, _updateFreqSec);
+            }
+            else
+            {
+                UpdateStatus(true); // Sync once if frequency is zero or negative.
+                enabled = false; // Disable component to stop further updates, matching previous behavior.
+            }
+        }
+
         public virtual void UpdateStatus(bool force = false)
         {
             if (_underlying == null) return;
 
             if (_underlying.IsDisposed)
             {
-                PostClean();
+                RemoveRow();
                 return;
             }
 
@@ -100,13 +110,22 @@ namespace MAVLinkAPI.Util.Resource.UI
                 summary.text = _underlying.GetStatusSummary();
 
                 if (detail.isActiveAndEnabled || force)
-                    detail.text = string.Join(
-                        "\n", _underlying.GetStatusDetail()
-                    );
+                {
+                    try
+                    {
+                        detail.text = string.Join(
+                            "\n", _underlying.GetStatusDetail()
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        detail.text = $"<error> : {ex.GetMessageForDisplay()}";
+                    }
+                }
             }
             catch (Exception ex)
             {
-                // ignored
+                summary.text = $"<error> : {ex.GetType()}";
             }
         }
 

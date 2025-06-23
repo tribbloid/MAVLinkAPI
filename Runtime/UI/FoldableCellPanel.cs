@@ -27,7 +27,7 @@ namespace MAVLinkAPI.UI
         {
             _minHeight = row.preferredHeight;
 
-            UpdateHeights();
+            UpdateHeights(true);
 
             toggle.onClick.AddListener(() =>
             {
@@ -36,20 +36,24 @@ namespace MAVLinkAPI.UI
             });
         }
 
-        private void UpdateHeights()
+        private void UpdateHeights(bool wait = false)
         {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rectT);
-            StartCoroutine(UpdateHeightsAfterLayout());
+            StartCoroutine(UpdateHeightsAsync(wait));
         }
 
-        private IEnumerator UpdateHeightsAfterLayout()
+        private IEnumerator UpdateHeightsAsync(bool wait)
         {
             // Wait until the end of the frame, after layout calculations
+            if (wait) yield return new WaitForEndOfFrame();
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectT);
+            // rectT.ForceUpdateRectTransforms();
+
             yield return new WaitForEndOfFrame();
 
             // Now get the updated height
             row.preferredHeight = Math.Max(
-                GetComponent<RectTransform>()!.rect.height + 10,
+                rectT.rect.height + 10,
                 _minHeight
             );
 

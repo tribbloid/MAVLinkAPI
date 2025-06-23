@@ -90,11 +90,8 @@ namespace MAVLinkAPI.Util
                         // TODO: should stop retry if the current thread is cancelled with a token
                         if (!Outer.Args.ShouldContinue(ex, attempt) || next == null)
                         {
-                            Debug.Log(
-                                baseInfo + $"\nthis is the last"
-                            );
+                            Debug.Log(baseInfo + $"\nthis is the last");
 
-                            // augmenting error message
                             var info =
                                 $"All {counter + 1} attempt(s) failed on [" +
                                 $"{string.Join(", ", errors.Select(kv => kv.Item1))}" +
@@ -108,9 +105,7 @@ namespace MAVLinkAPI.Util
                             throw ee;
                         }
 
-                        Debug.Log(
-                            baseInfo + $"\nwill try again at [{next.Value}]"
-                        );
+                        Debug.Log(baseInfo + $"\nwill try again at [{next.Value}]");
 
                         Thread.Sleep(Outer.Args.Interval);
                     }

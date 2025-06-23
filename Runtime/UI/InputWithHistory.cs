@@ -68,19 +68,11 @@ namespace MAVLinkAPI.UI
             public HistoryWrapper(List<string> items) => this.items = items;
         }
 
-
-        // void Awake()
-        // {
-        //     // LoadHistory() is called in Start() to ensure persistenceID is set.
-        // }
-
         void Start()
         {
             input.onSubmit.AddListener(OnInputSubmit);
 
-            // input.onEndEdit.AddListener(_ =>
-            //         dropdown.value = -1 // Any Edit will cause dropdown selectin to reset
-            // ); TODO: need to select an ad-hoc option to sync dropdown
+            input.onEndEdit.AddListener(OnInputChanged); // TODO: need to select an ad-hoc option to sync dropdown
 
             dropdown.onValueChanged.AddListener(OnDropdownSelect);
         }
@@ -88,6 +80,8 @@ namespace MAVLinkAPI.UI
         private void OnEnable()
         {
             RefreshHistory();
+
+            OnInputChanged(input.text);
         }
 
         void OnInputSubmit(string text)
@@ -104,6 +98,13 @@ namespace MAVLinkAPI.UI
                 SaveHistory();
                 RefreshHistory();
             }
+        }
+
+        void OnInputChanged(string text)
+        {
+            dropdown.AddOptions(new List<string> { text });
+            dropdown.SetValueWithoutNotify(dropdown.options.Count - 1);
+            // Any Edit will cause dropdown selectin to reset
         }
 
         void OnDropdownSelect(int index)

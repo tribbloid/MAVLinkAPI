@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MAVLinkAPI.log4net;
 using UnityEngine;
 using Random = System.Random;
 
@@ -10,15 +9,6 @@ namespace MAVLinkAPI.Util.Resource
 {
     public abstract class Cleanable : IDisposable
     {
-        // public static class GlobalRegistry
-        // {
-        //     public static readonly AtomicInt GlobalCounter = new();
-        //
-        //     // TODO: not efficient, should use ConcurrentMultiMap
-        //     public static readonly HashSet<Cleanable> Registered = new();
-        // }
-
-
         public int ID = new Random().Next();
         public DateTime CreatedAt = DateTime.UtcNow;
 
@@ -43,12 +33,10 @@ namespace MAVLinkAPI.Util.Resource
                 DoClean();
                 IsDisposed = true;
                 _lifetime.Deregister(this);
-                LogManager.GetLogger(GetType()).Info("disposing " + GetType().Name);
-                Debug.Log("disposing " + GetType().Name);
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(GetType()).Error(e);
+                Debug.LogError(e);
             }
         }
 
@@ -66,11 +54,11 @@ namespace MAVLinkAPI.Util.Resource
             return text;
         }
 
-        public virtual List<string> GetStatusDetail()
+        public virtual IEnumerable<string> GetStatusDetail()
         {
             var uptime = DateTime.UtcNow - CreatedAt;
 
-            return new List<string>()
+            return new List<string>
             {
                 ToString(),
                 $"- ID: {ID}",

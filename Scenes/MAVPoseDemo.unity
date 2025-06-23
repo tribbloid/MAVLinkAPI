@@ -1212,7 +1212,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: 'M
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1239,7 +1241,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 26.85
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1247,7 +1249,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -3478,7 +3480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba901e16c5f04bf4b08d3721562f29b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetimeB: {fileID: 2009724571}
+  lifetimeBinding: {fileID: 2009724571}
   poseProvider: {fileID: 1894238930}
   addressInput: {fileID: 7961103272033720582}
   baudRateInput: {fileID: 434380689}
@@ -12622,7 +12624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   table: {fileID: 2009724567}
-  template: {fileID: 464230722}
+  rowTemplate: {fileID: 464230722}
 --- !u!1 &2022875831
 GameObject:
   m_ObjectHideFlags: 0
@@ -13107,6 +13109,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: InputWithHistory
       objectReference: {fileID: 0}
+    - target: {fileID: 3272682232475450261, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
+      propertyPath: m_Text
+      value: <protocol>://<address>
+      objectReference: {fileID: 0}
     - target: {fileID: 6259604862912724486, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13185,6 +13191,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6259604862912724486, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7963785200800300366, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
+      propertyPath: m_text
+      value: "<Address>\u200B"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8070935451276186034, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -17,29 +17,31 @@ namespace MAVLinkAPI.Routing
 
         // only has 1 impl, so this interface is optional
 
+
         public abstract int BytesToRead { get; }
 
         public abstract IEnumerable<MAVLink.MAVLinkMessage> RawReadSource { get; }
 
         public abstract void WriteData<T>(T data) where T : struct;
 
-        public readonly List<object> ExistingReaders = new();
+        public (
+            int PacketCount,
+            IDIndexed<AtomicLong> Histogram
+            ) Metric = (0, new());
+
+        public readonly List<object> SubscribedReaders = new();
         // having multiple readers polling at the same time is dangerous, but we won't give a warning or error
         //  the burden is on the user
 
         public Reader<T> Read<T>(MAVFunction<T> mavFunction)
         {
             var reader = new Reader<T>(this, mavFunction);
-            ExistingReaders.Add(reader);
+            SubscribedReaders.Add(reader);
             return reader;
         }
 
-
-        public readonly IDIndexed<AtomicLong> Metric_MsgCounts = new();
-
-
         // Mock Uplink that can provide a stream of messages for testing
-        public class Dummy : Uplink
+        public new class Dummy : Uplink
         {
             private readonly IEnumerable<MAVLink.MAVLinkMessage> _messages;
 
