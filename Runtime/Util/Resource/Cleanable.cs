@@ -28,11 +28,14 @@ namespace MAVLinkAPI.Util.Resource
 
         public void Dispose()
         {
-            try
+            try // will never fail
             {
-                DoClean();
-                IsDisposed = true;
-                _lifetime.Deregister(this);
+                lock (this)
+                {
+                    if (!IsDisposed) DoClean(); // TODO may be able to use Maybe.Lazy pattern
+                    IsDisposed = true;
+                    _lifetime.Deregister(this);
+                }
             }
             catch (Exception e)
             {
@@ -47,6 +50,7 @@ namespace MAVLinkAPI.Util.Resource
 
         public abstract void DoClean();
 
+        // TODO: the following should be in subclass "Service"
         public virtual string GetStatusSummary()
         {
             var vType = GetType();

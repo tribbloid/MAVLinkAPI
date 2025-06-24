@@ -223,7 +223,7 @@ namespace MAVLinkAPI.Routing
                                             // you wish but this is triggered as the port is
                                             // already closed and or null.
                                             Debug.LogWarning(
-                                                $"Error on closing but port already closed! {ex.GetMessageForDisplay()}");
+                                                $"Error on closing but port already closed! {ex.Message}");
                                         else
                                             throw;
                                     }

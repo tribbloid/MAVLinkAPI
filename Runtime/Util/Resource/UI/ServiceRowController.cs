@@ -70,7 +70,7 @@ namespace MAVLinkAPI.Util.Resource.UI
         {
             _underlying = cleanable;
 
-            StartCoroutine(StartUpdatingStatusAsync());
+            StartCoroutine(StartUpdatingStatusAsync()); // is coroutine overkill?
         }
 
         private IEnumerator StartUpdatingStatusAsync()
@@ -119,7 +119,7 @@ namespace MAVLinkAPI.Util.Resource.UI
                     }
                     catch (Exception ex)
                     {
-                        detail.text = $"<error> : {ex.GetMessageForDisplay()}";
+                        detail.text = $"<error> : {ex.Message}";
                     }
                 }
             }

@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using MAVLinkAPI.Ext;
+using MAVLinkAPI.Util.Text;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace MAVLinkAPI.Util
@@ -74,9 +76,12 @@ namespace MAVLinkAPI.Util
 
                 foreach (var (attempt, next) in zipped)
                 {
+                    T result = default!;
                     try
                     {
-                        return operation(attempt, stopwatch.Elapsed);
+                        result = operation(attempt, stopwatch.Elapsed);
+
+                        return result;
                     }
                     catch (Exception ex)
                     {
@@ -85,17 +90,14 @@ namespace MAVLinkAPI.Util
 
                         var baseInfo =
                             $"{Outer.Name}/[{counter}/{zipped.Count}] {attempt}: Retry failed @ {stopwatch.Elapsed}s:" +
-                            $"\n{ex.GetMessageForDisplay()}";
+                            $"\n{ex.Message}";
 
                         // TODO: should stop retry if the current thread is cancelled with a token
                         if (!Outer.Args.ShouldContinue(ex, attempt) || next == null)
                         {
-                            Debug.Log(baseInfo + $"\nthis is the last");
+                            // Debug.Log(baseInfo + $"\nthis is the last");
 
-                            var info =
-                                $"All {counter + 1} attempt(s) failed on [" +
-                                $"{string.Join(", ", errors.Select(kv => kv.Item1))}" +
-                                "]";
+                            var info = $"All {counter + 1} attempt(s) failed";
 
                             var ee = new RetryException(
                                 info,
@@ -145,16 +147,36 @@ namespace MAVLinkAPI.Util
         }
     }
 
-
-    public class RetryException : AggregateException
+    public class RetryException : Exception
     {
         // constructors
         public RetryException(string message) : base(message)
         {
         }
 
-        public RetryException(string message, IEnumerable<Exception> innerExceptions) : base(message,
-            innerExceptions)
+
+        private static string CompileMessage(string message, IEnumerable<Exception> causes)
+        {
+            var causeSummary = causes
+                .GroupBy(e => e.Message)
+                .Select(g =>
+                    new TextBlock("-")
+                        .ZipRight(
+                            new TextBlock($" (x{g.Count()}) ")
+                        )
+                        .ZipRight(
+                            new TextBlock(g.Key)
+                        )
+                        .PadLeft()
+                );
+
+            return $"{message}:\n{string.Join("\n", causeSummary)}\n";
+        }
+
+        public RetryException(string message, IEnumerable<Exception> causes) : base(
+            CompileMessage(message, causes),
+            causes.FirstOrDefault()
+        )
         {
         }
     }

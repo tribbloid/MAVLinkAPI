@@ -1,8 +1,12 @@
 #nullable enable
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Autofill;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
+using UnityEngine;
 
 namespace MAVLinkAPI.Util.Resource.UI
 {
@@ -45,6 +49,26 @@ namespace MAVLinkAPI.Util.Resource.UI
         {
             _ = new Cleanable.Dummy(Lifetime);
         }
+
+        public void AddDummy_Failed()
+        {
+            _ = new Cleanable.Dummy(Lifetime);
+
+            var items = new List<int> { 1, 1, 2, 2 };
+
+            try
+            {
+                items.Retry().FixedInterval.Run((i, elapsed) =>
+                    throw new Exception($"Failure on item {i}"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
+                // Debug.LogException(e);
+                throw;
+            }
+        }
+
 
         public void Update()
         {

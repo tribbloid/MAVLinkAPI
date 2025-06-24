@@ -16,10 +16,6 @@ namespace MAVLinkAPI.Util.Resource
         {
         }
 
-        // ~Daemon()
-        // {
-        //     Dispose();
-        // }
 
         public readonly int GraceTimeMillis = 5000;
 

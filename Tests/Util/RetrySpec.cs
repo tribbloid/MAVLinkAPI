@@ -1,8 +1,10 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using MAVLinkAPI.Util;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 
 namespace MAVLinkAPI.Tests.Util
 {
@@ -88,6 +90,28 @@ namespace MAVLinkAPI.Tests.Util
 
             Assert.That(capturedElapsed, Is.Not.Empty);
             Assert.That(capturedElapsed[1].TotalMilliseconds, Is.GreaterThanOrEqualTo(100));
+        }
+
+        [Test]
+        public void RetryException_ToString()
+        {
+            var items = new List<int> { 1, 1, 2, 2 };
+            RetryException exception = null;
+
+            try
+            {
+                items.Retry().FixedInterval.Run((i, elapsed) => throw new Exception($"Failure on item {i}"));
+            }
+            catch (RetryException e)
+            {
+                exception = e;
+            }
+
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Does.StartWith("All 4 attempt(s) failed:"));
+            Assert.That(exception.Message, Does.Contain("  - Failure on item 1 (x2)"));
+            Assert.That(exception.Message, Does.Contain("  - Failure on item 2 (x2)"));
+            Assert.That(exception.Source, Is.EqualTo("ca.hpvdt.mavlinkapi.Runtime"));
         }
     }
 }
