@@ -14,7 +14,7 @@ namespace MAVLinkAPI.Util.Resource
 
         private readonly Lifetime _lifetime;
 
-        public Cleanable(Lifetime? lifetime = null)
+        protected Cleanable(Lifetime? lifetime = null)
         {
             lifetime ??= Lifetime.Static;
 

@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using Autofill;
 using MAVLinkAPI.API.Feature;
@@ -13,7 +12,7 @@ using UnityEngine.UI;
 
 namespace MAVLinkAPI.API.UI
 {
-    public class AhrsFeedActions : MonoBehaviour
+    public class AhrsFeedController : MonoBehaviour
     {
         /**
          * bind to a lifetime in scene, an <see cref="Ahrs.Feed"/> instance can be created from the last Stream
@@ -60,9 +59,9 @@ namespace MAVLinkAPI.API.UI
                     uplink = new DirectUplink(io, null, Lifetime);
                     io.BaudRate = int.Parse(baudRateInput.captionText.text); // TODO: should be autotune 
 
-                    var ahrsFeed = new Ahrs.Feed(Lifetime, uplink);
+                    feed = Ahrs.Feed.OfUplink(Lifetime, uplink);
 
-                    poseProvider.Bind(ahrsFeed);
+                    poseProvider.Bind(feed);
                 }
                 catch (Exception ex)
                 {

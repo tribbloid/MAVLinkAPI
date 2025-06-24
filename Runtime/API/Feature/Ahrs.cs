@@ -42,15 +42,25 @@ namespace MAVLinkAPI.API.Feature
 
         public class Feed : RecurrentDaemon
         {
-            public readonly Uplink Uplink;
-            public readonly Reader<object> WatchDog;
-            public readonly Reader<Quaternion> AttitudeReader;
-
-            public Feed(Lifetime lifetime, Uplink uplink) : base(lifetime)
+            private Feed(Lifetime lifetime) : base(lifetime)
             {
-                Uplink = uplink;
-                WatchDog = Minimal.WatchDog(uplink);
-                AttitudeReader = Ahrs.Attitude(uplink);
+            }
+
+            public Reader<object> WatchDog;
+            public Reader<Quaternion> AttitudeReader;
+
+            public static Feed OfUplink(Lifetime lifetime, Uplink uplink)
+            {
+                var watchDog = Minimal.WatchDog(uplink);
+                var attitudeReader = Ahrs.Attitude(uplink);
+
+                var result = new Feed(lifetime)
+                {
+                    WatchDog = watchDog,
+                    AttitudeReader = attitudeReader
+                };
+
+                return result;
             }
 
             public Quaternion Attitude = Quaternion.identity;

@@ -58,19 +58,19 @@ namespace MAVLinkAPI.API.Feature
 
             var reader = uplink.Read(fn);
 
-            Retry.UpTo(12).With(TimeSpan.Zero).FixedInterval
+            Retry.UpTo(6).With(TimeSpan.FromSeconds(0.2)).FixedInterval
                 .Run((_, _) =>
                     {
                         uplink.WriteData(HeartbeatFromHere);
 
-                        Thread.Sleep(200); // wait for a while before collecting
+                        Thread.Sleep(500); // wait for a while before collecting
 
                         if (requireReceivedBytes)
                         {
                             var minReadBytes = 8;
 
                             //sanity check, port is deemed unusable if it doesn't receive any data
-                            Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval
+                            Retry.UpTo(6).With(TimeSpan.FromSeconds(0.8)).FixedInterval
                                 .Run((_, tt) =>
                                     {
                                         if (uplink.BytesToRead >= minReadBytes)

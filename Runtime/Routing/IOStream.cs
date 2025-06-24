@@ -183,57 +183,47 @@ namespace MAVLinkAPI.Routing
                 {
                     if (value != IsOpen)
                     {
-                        Retry.UpTo(4).With(
-                                TimeSpan.FromSeconds(0.5)
-                            )
-                            .FixedInterval.Run((_, _) =>
+                        if (value)
+                        {
+                            // wait for a bit before opening the port
+                            // TODO: should be simplified
+                            var millisSinceClosed = (DateTime.Now - _lastActiveTime).TotalMilliseconds;
+
+                            if (millisSinceClosed < MinReopenInterval.TotalMilliseconds)
                             {
-                                if (value)
-                                {
-                                    // wait for a bit before opening the port
-                                    // TODO: should be simplified
-                                    var millisSinceClosed = (DateTime.Now - _lastActiveTime).TotalMilliseconds;
+                                var waitMillis =
+                                    (int)(MinReopenInterval.TotalMilliseconds - millisSinceClosed);
+                                // Debug.Log($"Waiting {waitMillis} ms before opening port {Comm.PortName}");
+                                Thread.Sleep(waitMillis);
+                            }
 
-                                    if (millisSinceClosed < MinReopenInterval.TotalMilliseconds)
-                                    {
-                                        var waitMillis =
-                                            (int)(MinReopenInterval.TotalMilliseconds - millisSinceClosed);
-                                        Debug.Log($"Waiting {waitMillis} ms before opening port {Comm.PortName}");
-                                        Thread.Sleep(waitMillis);
-                                    }
-
-                                    Comm.Open();
-                                    Debug.Log(
-                                        $"Connected to {Comm.PortName} at {Comm.BaudRate} baud ({Args})"
-                                    );
-                                }
+                            Comm.Open();
+                            Debug.Log($"Connected to {Comm.PortName}, baud rate {Comm.BaudRate})");
+                        }
+                        else
+                        {
+                            // from Unity_SerialPort
+                            try
+                            {
+                                Comm.Close();
+                                _lastActiveTime = DateTime.Now;
+                            }
+                            catch (Exception ex)
+                            {
+                                if (Comm.IsOpen == false)
+                                    // Failed to close the serial port. Uncomment if
+                                    // you wish but this is triggered as the port is
+                                    // already closed and or null.
+                                    Debug.LogWarning($"Error on closing but port already closed! {ex.Message}");
                                 else
-                                {
-                                    // from Unity_SerialPort
-                                    try
-                                    {
-                                        // Close the serial port
-                                        Comm.Close();
-                                        _lastActiveTime = DateTime.Now;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if (Comm.IsOpen == false)
-                                            // Failed to close the serial port. Uncomment if
-                                            // you wish but this is triggered as the port is
-                                            // already closed and or null.
-                                            Debug.LogWarning(
-                                                $"Error on closing but port already closed! {ex.Message}");
-                                        else
-                                            throw;
-                                    }
-                                }
+                                    throw;
+                            }
+                        }
 
-                                // assert
-                                if (value != Comm.IsOpen)
-                                    throw new IOException(
-                                        $"Failed to set port {Comm.PortName} to {(value ? "open" : "closed")}, baud rate {Comm.BaudRate}");
-                            });
+                        // assert
+                        if (value != Comm.IsOpen)
+                            throw new IOException(
+                                $"Failed to set port {Comm.PortName} to {(value ? "open" : "closed")}, baud rate {Comm.BaudRate}");
 
                         Debug.Log(
                             $"Port {Comm.PortName} is now {(value ? "open" : "closed")}, baud rate {Comm.BaudRate}");
