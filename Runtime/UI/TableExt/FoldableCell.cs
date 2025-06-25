@@ -7,16 +7,19 @@ using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MAVLinkAPI.UI
+namespace MAVLinkAPI.UI.TableExt
 {
     [RequireComponent(typeof(RectTransform))]
-    public class FoldableCellPanel : MonoBehaviour
+    public class FoldableCell : MonoBehaviour
     {
         [Autofill] public RectTransform rectT = null!;
 
-        [Autofill(AutofillType.Parent)] public TableLayout table = null!;
+        [Autofill(AutofillType.SelfAndParent)] public TableRow row = null!;
+        [Autofill(AutofillType.Parent)] public ScrollLock scrollLock = null!;
 
-        [Autofill(AutofillType.Parent)] public TableRow row = null!;
+        // [Required] public ScrollLock scrollLock = null!;
+
+        // [Autofill(AutofillType.Parent)] public TableLayout table = null!;
 
         [Required] public Button toggle = null!;
         public MonoBehaviour? detail;
@@ -38,10 +41,10 @@ namespace MAVLinkAPI.UI
 
         private void UpdateHeights(bool wait = false)
         {
-            StartCoroutine(UpdateHeightsAsync(wait));
+            StartCoroutine(UpdateHeightsTask(wait));
         }
 
-        private IEnumerator UpdateHeightsAsync(bool wait)
+        private IEnumerator UpdateHeightsTask(bool wait)
         {
             // Wait until the end of the frame, after layout calculations
             if (wait) yield return new WaitForEndOfFrame();
@@ -57,8 +60,17 @@ namespace MAVLinkAPI.UI
                 _minHeight
             );
 
-            // row.UpdateLayout(); // Update the layout.CellCount
-            table.UpdateLayout();
+            foreach (var o in scrollLock.RefreshTable())
+            {
+                yield return o; // TODO: how to simplify this?
+            }
+
+            // row.UpdateLayout(); // doesn't work
+            // table.UpdateLayout(); // reset the scroll position
+            // LayoutRebuilder.MarkLayoutForRebuild(table.GetComponent<RectTransform>()); // ditto
+
+            // var tempRow = table.AddRow();
+            // Destroy(tempRow.gameObject); // ditto
         }
     }
 }

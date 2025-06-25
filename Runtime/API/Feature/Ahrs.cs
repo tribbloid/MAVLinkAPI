@@ -22,7 +22,7 @@ namespace MAVLinkAPI.API.Feature
                     var data = msg.Data;
 
                     var q = UnityQuaternionExtensions.AeronauticFrame.FromEulerRadian(
-                        data.roll, data.pitch, data.yaw
+                        -data.pitch, data.yaw, -data.roll
                     );
 
                     return q;

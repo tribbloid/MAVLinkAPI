@@ -42,10 +42,11 @@ namespace MAVLinkAPI.API.Feature
                         var sender = msg.Sender;
 
                         // TODO: too frequent, should only send once
-                        //  also deprecated
+                        //  req_message_rate is also too high for all stats, only need the relevant parts
+                        //  also superseded by MAV_CMD_SET_MESSAGE_INTERVAL
                         var requestStream = new MAVLink.mavlink_request_data_stream_t
                         {
-                            req_message_rate = 2,
+                            req_message_rate = 25,
                             req_stream_id = (byte)MAVLink.MAV_DATA_STREAM.ALL,
                             start_stop = 1,
                             target_component = sender.ComponentID,
@@ -54,18 +55,18 @@ namespace MAVLinkAPI.API.Feature
                         uplink.WriteData(requestStream);
 
                         // MAV_CMD_SET_MESSAGE_INTERVAL same as above, but not deprecated 
-                        var setInterval = new MAVLink.mavlink_command_long_t
-                        {
-                            command = (ushort)MAVLink.MAV_CMD.SET_MESSAGE_INTERVAL,
-                            confirmation = 0,
-                            param1 = 2, // req_message_rate
-                            param2 = (byte)MAVLink.MAV_DATA_STREAM.ALL, // req_stream_id
-                            param3 = 1, // start_stop
-                            target_system = sender.SystemID,
-                            target_component = sender.ComponentID
-                        };
-                        // TODO: expecting mavlink_message_interval_t
-                        uplink.WriteData(setInterval);
+                        // var setInterval = new MAVLink.mavlink_command_long_t
+                        // {
+                        //     command = (ushort)MAVLink.MAV_CMD.SET_MESSAGE_INTERVAL,
+                        //     confirmation = 0,
+                        //     param1 = 2, // req_message_rate
+                        //     param2 = (byte)MAVLink.MAV_DATA_STREAM.ALL, // req_stream_id
+                        //     param3 = 1, // start_stop
+                        //     target_system = sender.SystemID,
+                        //     target_component = sender.ComponentID
+                        // };
+                        // // TODO: expecting mavlink_message_interval_t
+                        // uplink.WriteData(setInterval);
 
                         return msg;
                     }

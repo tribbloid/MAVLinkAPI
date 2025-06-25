@@ -50,7 +50,7 @@ namespace MAVLinkAPI.Util.Resource.UI
             _ = new Cleanable.Dummy(Lifetime);
         }
 
-        public void AddDummy_Failed()
+        public void AddDummy_Fail()
         {
             _ = new Cleanable.Dummy(Lifetime);
 
@@ -69,6 +69,10 @@ namespace MAVLinkAPI.Util.Resource.UI
             }
         }
 
+        // public void Start()
+        // {
+        //     rowTemplate.gameObject.SetActive(false);
+        // }
 
         public void Update()
         {
