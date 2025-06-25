@@ -3,7 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace MAVLinkAPI.Util.Resource.UI
 {
     public class ServiceTableController : LifetimeBinding
     {
-        [Autofill] public TableLayout table = null!;
+        [AutoHook] public TableLayout table = null!;
         [Required] public ServiceRowController rowTemplate = null!;
 
         private readonly Queue<Cleanable> _pending = new();

@@ -29,7 +29,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     runtime.run()?;
     
     println!("🎉 Runtime execution completed successfully!");
-    println!("📄 The 'arduplane' SITL binary should be downloaded from the YAML job definition.");
     
     // Verify the download
     match std::fs::metadata("arduplane") {

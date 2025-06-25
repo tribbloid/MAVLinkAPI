@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Collections;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
@@ -12,14 +12,15 @@ namespace MAVLinkAPI.UI.TableExt
     [RequireComponent(typeof(RectTransform))]
     public class FoldableCell : MonoBehaviour
     {
-        [Autofill] public RectTransform rectT = null!;
+        [AutoHook] public RectTransform rectT = null!;
 
-        [Autofill(AutofillType.SelfAndParent)] public TableRow row = null!;
-        [Autofill(AutofillType.Parent)] public ScrollLock scrollLock = null!;
+        [AutoHook(SearchArea = AutoHookSearchArea.Parent)]
+        public TableRow row = null!;
+
+        [AutoHook(SearchArea = AutoHookSearchArea.Parent)]
+        public ScrollLock scrollLock = null!;
 
         // [Required] public ScrollLock scrollLock = null!;
-
-        // [Autofill(AutofillType.Parent)] public TableLayout table = null!;
 
         [Required] public Button toggle = null!;
         public MonoBehaviour? detail;

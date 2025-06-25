@@ -1,5 +1,5 @@
 using System.Collections;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace MAVLinkAPI.UI.TableExt
     {
         [Required] public TableLayout table = null!;
 
-        [Autofill(AutofillType.Parent)] [Required]
+        [AutoHook(SearchArea = AutoHookSearchArea.Parent)] [Required]
         public ScrollRect scroll;
 
 

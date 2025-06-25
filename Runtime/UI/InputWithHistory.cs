@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using TMPro;
@@ -12,10 +12,10 @@ namespace MAVLinkAPI.UI
 {
     public class InputWithHistory : MonoBehaviour
     {
-        [Autofill(AutofillType.SelfAndChildren)]
+        [AutoHook(SearchArea = AutoHookSearchArea.Children)]
         public TMP_Dropdown dropdown = null!;
 
-        [Autofill(AutofillType.SelfAndChildren)]
+        [AutoHook(SearchArea = AutoHookSearchArea.Children)]
         public TMP_InputField input = null!;
 
         public bool isPersisted = true;

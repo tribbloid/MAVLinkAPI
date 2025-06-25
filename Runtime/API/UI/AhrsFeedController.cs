@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.API.Feature;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util.NullSafety;
@@ -25,8 +25,8 @@ namespace MAVLinkAPI.API.UI
 
         [Required] public TMP_InputField addressInput = null!;
 
-        [Autofill(AutofillType.Children)] public TMP_Dropdown baudRateInput = null!;
-        [Autofill(AutofillType.Children)] public Button newFeedButton = null!;
+        [AutoHook(SearchArea = AutoHookSearchArea.AllChildrenOnly)] public TMP_Dropdown baudRateInput = null!;
+        [AutoHook(SearchArea = AutoHookSearchArea.AllChildrenOnly)] public Button newFeedButton = null!;
 
         private Lifetime Lifetime => lifetimeBinding.Lifetime;
 

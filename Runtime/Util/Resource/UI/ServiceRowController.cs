@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Collections;
-using Autofill;
+using TNRD.Autohook;
 using MAVLinkAPI.Ext;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
@@ -15,7 +15,7 @@ namespace MAVLinkAPI.Util.Resource.UI
 {
     public class ServiceRowController : MonoBehaviour
     {
-        [Autofill] public TableRow row = null!;
+        [AutoHook] public TableRow row = null!;
 
         [Required] public TextMeshProUGUI summary = null!;
         [Required] public TextMeshProUGUI detail = null!;
