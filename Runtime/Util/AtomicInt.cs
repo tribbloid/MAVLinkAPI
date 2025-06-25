@@ -32,7 +32,10 @@ namespace MAVLinkAPI.Util
             }
         }
 
-        public override string ToString() => Value.ToString();
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     public class AtomicInt : Atomic<int>

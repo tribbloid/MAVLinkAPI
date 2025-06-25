@@ -26,9 +26,9 @@ namespace MAVLinkAPI.UI
             get
             {
                 var v = persistedIDOvrd;
-                if (String.IsNullOrWhiteSpace(v))
-                    v = SearchUtils.GetHierarchyPath(gameObject, includeScene: true);
-                Assert.IsFalse(String.IsNullOrEmpty(v), "persistentID cannot be null or empty");
+                if (string.IsNullOrWhiteSpace(v))
+                    v = SearchUtils.GetHierarchyPath(gameObject, true);
+                Assert.IsFalse(string.IsNullOrEmpty(v), "persistentID cannot be null or empty");
                 return v!;
             }
         }
@@ -39,20 +39,14 @@ namespace MAVLinkAPI.UI
 
         public List<string> History => _history.Lazy(() =>
         {
-            if (!isPersisted)
-            {
-                return new List<string>();
-            }
+            if (!isPersisted) return new List<string>();
 
             // load from PlayerPrefs ONCE
-            string json = PlayerPrefs.GetString(PersistedID, null);
+            var json = PlayerPrefs.GetString(PersistedID, null);
             if (!string.IsNullOrEmpty(json))
             {
-                HistoryWrapper wrapper = JsonUtility.FromJson<HistoryWrapper>(json);
-                if (wrapper != null)
-                {
-                    return wrapper.items;
-                }
+                var wrapper = JsonUtility.FromJson<HistoryWrapper>(json);
+                if (wrapper != null) return wrapper.items;
 
                 // return new List<string>(); // Fallback to empty list if deserialization fails
             }
@@ -65,10 +59,14 @@ namespace MAVLinkAPI.UI
         private class HistoryWrapper
         {
             public List<string> items;
-            public HistoryWrapper(List<string> items) => this.items = items;
+
+            public HistoryWrapper(List<string> items)
+            {
+                this.items = items;
+            }
         }
 
-        void Start()
+        private void Start()
         {
             input.onSubmit.AddListener(OnInputSubmit);
 
@@ -84,7 +82,7 @@ namespace MAVLinkAPI.UI
             OnInputChanged(input.text);
         }
 
-        void OnInputSubmit(string text)
+        private void OnInputSubmit(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
@@ -100,19 +98,16 @@ namespace MAVLinkAPI.UI
             }
         }
 
-        void OnInputChanged(string text)
+        private void OnInputChanged(string text)
         {
             dropdown.AddOptions(new List<string> { text });
             dropdown.SetValueWithoutNotify(dropdown.options.Count - 1);
             // Any Edit will cause dropdown selectin to reset
         }
 
-        void OnDropdownSelect(int index)
+        private void OnDropdownSelect(int index)
         {
-            if (dropdown != null && History.Count > index && index >= 0)
-            {
-                input.text = History[index];
-            }
+            if (dropdown != null && History.Count > index && index >= 0) input.text = History[index];
         }
 
         public void RefreshHistory()
@@ -120,10 +115,7 @@ namespace MAVLinkAPI.UI
             if (dropdown == null) return;
 
             dropdown.ClearOptions();
-            if (History.Count > 0)
-            {
-                dropdown.AddOptions(History);
-            }
+            if (History.Count > 0) dropdown.AddOptions(History);
 
             dropdown.RefreshShownValue();
         }
@@ -133,13 +125,13 @@ namespace MAVLinkAPI.UI
         {
             if (!isPersisted) return;
 
-            HistoryWrapper wrapper = new HistoryWrapper(History);
-            string json = JsonUtility.ToJson(wrapper);
+            var wrapper = new HistoryWrapper(History);
+            var json = JsonUtility.ToJson(wrapper);
             PlayerPrefs.SetString(PersistedID, json);
             PlayerPrefs.Save(); // Ensure data is written to disk
         }
 
-        void OnApplicationQuit()
+        private void OnApplicationQuit()
         {
             SaveHistory();
         }

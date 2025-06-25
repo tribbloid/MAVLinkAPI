@@ -39,9 +39,7 @@ namespace MAVLinkAPI.Util.Resource.UI
             var typeName = cleanable.GetType().Name;
 
             if (iconTemplates.Dictionary?.TryGetValue(typeName, out var template) == true && template != null)
-            {
                 icon.CopyToReplace(template);
-            }
         }
 
         private void CleanIfBothTerminating()
@@ -110,7 +108,6 @@ namespace MAVLinkAPI.Util.Resource.UI
                 summary.text = _underlying.GetStatusSummary();
 
                 if (detail.isActiveAndEnabled || force)
-                {
                     try
                     {
                         detail.text = string.Join("\n", _underlying.GetStatusDetail());
@@ -119,7 +116,6 @@ namespace MAVLinkAPI.Util.Resource.UI
                     {
                         detail.text = $"<error> : {ex.Message}";
                     }
-                }
             }
             catch (Exception ex)
             {

@@ -7,8 +7,8 @@ namespace MAVLinkAPI.Util.Resource
 {
     public class CanRunAfterConstruction
     {
-        private readonly List<Action> _pendingActions = new List<Action>();
-        private readonly object _lock = new object();
+        private readonly List<Action> _pendingActions = new();
+        private readonly object _lock = new();
         private volatile bool _constructionComplete = false;
 
         public CanRunAfterConstruction()
@@ -72,7 +72,6 @@ namespace MAVLinkAPI.Util.Resource
 
             // Execute all pending actions outside the lock to avoid deadlocks
             foreach (var action in actionsToExecute)
-            {
                 try
                 {
                     action?.Invoke();
@@ -81,7 +80,6 @@ namespace MAVLinkAPI.Util.Resource
                 {
                     Debug.LogError($"Error executing post-construction action: {ex}");
                 }
-            }
         }
     }
 }

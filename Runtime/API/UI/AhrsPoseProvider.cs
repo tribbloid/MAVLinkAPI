@@ -13,10 +13,7 @@ namespace MAVLinkAPI.API.UI
 
         public void Bind(Ahrs.Feed daemon)
         {
-            if (ActiveFeed != null)
-            {
-                Unbind();
-            }
+            if (ActiveFeed != null) Unbind();
 
             ActiveFeed = daemon;
             ActiveFeed.Start();

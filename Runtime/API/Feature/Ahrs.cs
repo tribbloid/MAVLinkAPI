@@ -121,10 +121,7 @@ namespace MAVLinkAPI.API.Feature
             public override void DoClean()
             {
                 base.DoClean();
-                foreach (var uplink in Updater.Sources.Keys)
-                {
-                    uplink.Dispose();
-                }
+                foreach (var uplink in Updater.Sources.Keys) uplink.Dispose();
             }
 
             public override IEnumerable<string> GetStatusDetail()

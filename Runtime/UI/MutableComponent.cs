@@ -9,7 +9,7 @@ namespace MAVLinkAPI.UI
     {
         [Required] public volatile T mutable;
 
-        struct OldLocation
+        private struct OldLocation
         {
             public Transform parent;
             public int siblingIndex;

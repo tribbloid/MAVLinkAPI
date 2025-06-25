@@ -55,7 +55,7 @@ namespace MAVLinkAPI.Util.Resource
             }
         }
 
-        public static Registry Global => new Registry(false);
+        public static Registry Global => new(false);
 
         public static object GlobalAccessLock => Global.Managed;
     }

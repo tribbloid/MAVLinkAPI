@@ -16,7 +16,7 @@ namespace MAVLinkAPI.API.Feature
 
             public MAVLink.mavlink_heartbeat_t Ack =>
                 _ack.Lazy(() =>
-                    new() // this should be sent regardless of received heartbeat
+                    new MAVLink.mavlink_heartbeat_t() // this should be sent regardless of received heartbeat
                     {
                         custom_mode = 0, // not sure how to use this
                         mavlink_version = 2,

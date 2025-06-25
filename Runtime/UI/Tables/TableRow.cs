@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace MAVLinkAPI.UI.Tables
 {
     [RequireComponent(typeof(RectTransform))]
-    public class TableRow : MonoBehaviour//LayoutGroup
+    public class TableRow : MonoBehaviour //LayoutGroup
     {
         /*private RectTransform _rectTransform;
         new RectTransform rectTransform
@@ -19,52 +19,43 @@ namespace MAVLinkAPI.UI.Tables
             }
         }*/
 
-       /*new List<RectTransform> rectChildren
-        {
-            get
-            {
-                List<RectTransform> list = new List<RectTransform>();
-                foreach (RectTransform r in this.rectTransform)
-                {
-                    list.Add(r);
-                }
-                return list;
-            }
-        }*/
+        /*new List<RectTransform> rectChildren
+         {
+             get
+             {
+                 List<RectTransform> list = new List<RectTransform>();
+                 foreach (RectTransform r in this.rectTransform)
+                 {
+                     list.Add(r);
+                 }
+                 return list;
+             }
+         }*/
 
         public List<TableCell> Cells
         {
             get
             {
                 return GetComponentsInChildren<TableCell>()
-                        .Where(tc => tc.transform.parent == this.transform)
-                        .ToList();                
+                    .Where(tc => tc.transform.parent == transform)
+                    .ToList();
             }
         }
 
-        public int CellCount
-        {
-            get
-            {
-                return Cells.Count;
-            }
-        }
+        public int CellCount => Cells.Count;
 
         public float preferredHeight = 0;
-        [NonSerialized]
-        internal float actualHeight = 0f;
+        [NonSerialized] internal float actualHeight = 0f;
 
         public bool dontUseTableRowBackground = false;
 
         protected Image _image;
+
         public Image image
         {
             get
             {
-                if (_image == null)
-                {
-                    _image = this.GetComponent<Image>();
-                }
+                if (_image == null) _image = GetComponent<Image>();
 
                 return _image;
             }
@@ -72,8 +63,7 @@ namespace MAVLinkAPI.UI.Tables
 
         private DrivenRectTransformTracker _tracker;
 
-        [SerializeField]
-        private TableLayout m_tableLayout;        
+        [SerializeField] private TableLayout m_tableLayout;
 
         internal void Initialise(TableLayout tableLayout)
         {
@@ -93,7 +83,7 @@ namespace MAVLinkAPI.UI.Tables
             Debug.Log("TableRow::Update");
             UpdateLayout();
         }*/
-       
+
         public void UpdateLayout()
         {
             _tracker.Clear();
@@ -102,7 +92,7 @@ namespace MAVLinkAPI.UI.Tables
 
             foreach (var cell in cells)
             {
-                var rectTransform = ((RectTransform)cell.transform);
+                var rectTransform = (RectTransform)cell.transform;
 
                 _tracker.Add(this, rectTransform, DrivenTransformProperties.All);
 
@@ -113,12 +103,12 @@ namespace MAVLinkAPI.UI.Tables
                 rectTransform.anchorMin = new Vector2(0, 1);
                 rectTransform.anchorMax = new Vector2(0, 1);
 
-                cell.Initialise(m_tableLayout, this);                                
-            }        
+                cell.Initialise(m_tableLayout, this);
+            }
         }
 
         /*public override void CalculateLayoutInputVertical()
-        {            
+        {
         }
 
         protected override void OnRectTransformDimensionsChange()
@@ -127,17 +117,17 @@ namespace MAVLinkAPI.UI.Tables
         }
 
         public override void SetLayoutHorizontal()
-        {                        
+        {
         }
 
         public override void SetLayoutVertical()
-        {            
+        {
         }*/
 
         public TableCell AddCell(RectTransform cellContent = null)
         {
             var cell = TableLayoutUtilities.InstantiatePrefab("UI/Tables/Cell");
-            cell.transform.SetParent(this.transform);
+            cell.transform.SetParent(transform);
             cell.transform.SetAsLastSibling();
             cell.name = "Cell";
 
@@ -146,14 +136,14 @@ namespace MAVLinkAPI.UI.Tables
                 cellContent.SetParent(cell.transform);
                 cellContent.transform.localScale = new Vector3(1, 1, 1);
                 cellContent.localPosition = Vector3.zero;
-            }            
+            }
 
             return cell.GetComponent<TableCell>();
         }
 
         public TableCell AddCell(TableCell cell)
         {
-            cell.transform.SetParent(this.transform);
+            cell.transform.SetParent(transform);
             cell.transform.SetAsLastSibling();
             cell.transform.localScale = new Vector3(1, 1, 1);
             cell.transform.localRotation = new Quaternion(0, 0, 0, 0);
@@ -163,7 +153,8 @@ namespace MAVLinkAPI.UI.Tables
 
         public void NotifyTableRowPropertiesChanged()
         {
-            if(m_tableLayout != null && m_tableLayout.gameObject.activeInHierarchy) m_tableLayout.CalculateLayoutInputHorizontal();
+            if (m_tableLayout != null && m_tableLayout.gameObject.activeInHierarchy)
+                m_tableLayout.CalculateLayoutInputHorizontal();
         }
 
         public TableLayout GetTable()
@@ -173,10 +164,7 @@ namespace MAVLinkAPI.UI.Tables
 
         public void ClearCells()
         {
-            foreach (var cell in Cells)
-            {
-                DestroyImmediate(cell.gameObject);
-            }
+            foreach (var cell in Cells) DestroyImmediate(cell.gameObject);
         }
-    }    
+    }
 }

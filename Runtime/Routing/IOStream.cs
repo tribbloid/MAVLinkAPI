@@ -26,7 +26,7 @@ namespace MAVLinkAPI.Routing
         }
 
 
-        public static String ProtocolPrompt => string.Join(", ", Enum.GetNames(typeof(Protocol)));
+        public static string ProtocolPrompt => string.Join(", ", Enum.GetNames(typeof(Protocol)));
 
         public static class BaudRates
         {
@@ -66,15 +66,11 @@ namespace MAVLinkAPI.Routing
             {
                 var parts = s.Split(new[] { "://" }, 2, StringSplitOptions.None);
                 if (parts.Length != 2)
-                {
                     throw new ArgumentException($"Invalid format (must be <protocol>://<address>): {s}");
-                }
 
                 if (!Enum.TryParse<Protocol>(parts[0], true, out var protocol))
-                {
                     throw new ArgumentException(
                         $"Invalid protocol (must be chosen from {ProtocolPrompt}): {parts[0]}");
-                }
 
                 return new ArgsT(
                     protocol,

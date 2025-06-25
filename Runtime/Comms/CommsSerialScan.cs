@@ -7,17 +7,17 @@ namespace MAVLinkAPI.Comms
 {
     public class CommsSerialScan
     {
-        static public bool foundport = false;
+        public static bool foundport = false;
         public static ConcurrentBag<ICommsSerial> portinterface;
 
-        static object runlock = new object();
+        private static object runlock = new();
         public static int run = 0;
         public static int running = 0;
-        static bool connect = false;
+        private static bool connect = false;
 
-        static int[] bauds = new int[] { 0, 115200, 57600, 38400, 19200, 9600 };
+        private static int[] bauds = new int[] { 0, 115200, 57600, 38400, 19200, 9600 };
 
-        static public void Scan(bool connect = false)
+        public static void Scan(bool connect = false)
         {
             foundport = false;
             portinterface = new ConcurrentBag<ICommsSerial>();
@@ -29,15 +29,12 @@ namespace MAVLinkAPI.Comms
 
             CommsSerialScan.connect = connect;
 
-            string[] portlist = SerialPort.GetPortNames();
+            var portlist = SerialPort.GetPortNames();
 
-            foreach (var portname in portlist)
-            {
-                new Thread(o => { doread(portname.Clone()); }).Start();
-            }
+            foreach (var portname in portlist) new Thread(o => { doread(portname.Clone()); }).Start();
         }
 
-        static void doread(object o)
+        private static void doread(object o)
         {
             lock (runlock)
             {
@@ -75,17 +72,16 @@ namespace MAVLinkAPI.Comms
                             }
                         }
 
-                        int available = port.BytesToRead;
+                        var available = port.BytesToRead;
                         var buffer = new byte[available];
-                        int read = port.Read(buffer, 0, available);
+                        var read = port.Read(buffer, 0, available);
 
                         Console.WriteLine("{0} {1}", portname, read);
 
                         if (read > 0)
-                        {
-                            using (MemoryStream ms = new MemoryStream(buffer, 0, read))
+                            using (var ms = new MemoryStream(buffer, 0, read))
                             {
-                                MAVLink.MavlinkParse mav = new MAVLink.MavlinkParse();
+                                var mav = new MAVLink.MavlinkParse();
 
                                 try
                                 {
@@ -127,7 +123,6 @@ namespace MAVLinkAPI.Comms
                                     Console.WriteLine(portname + " " + ex.ToString());
                                 }
                             }
-                        }
 
                         try
                         {

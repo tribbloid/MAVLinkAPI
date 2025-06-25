@@ -25,27 +25,27 @@ namespace MAVLinkAPI.Tests.UI
 
             _testHost = new GameObject("TestHost");
 
-            GameObject inputFieldGo = new GameObject("TestInputField");
+            var inputFieldGo = new GameObject("TestInputField");
             inputFieldGo.transform.SetParent(_testHost.transform);
             _inputField = inputFieldGo.AddComponent<TMP_InputField>();
-            GameObject inputViewportGo = new GameObject("Text Area");
+            var inputViewportGo = new GameObject("Text Area");
             inputViewportGo.transform.SetParent(inputFieldGo.transform);
             _inputField.textViewport = inputViewportGo.AddComponent<RectTransform>();
-            GameObject inputTextGo = new GameObject("Text");
+            var inputTextGo = new GameObject("Text");
             inputTextGo.transform.SetParent(inputViewportGo.transform);
             _inputField.textComponent = inputTextGo.AddComponent<TextMeshProUGUI>();
 
-            GameObject dropdownGo = new GameObject("TestDropdown");
+            var dropdownGo = new GameObject("TestDropdown");
             dropdownGo.transform.SetParent(_testHost.transform);
             _dropdown = dropdownGo.AddComponent<TMP_Dropdown>();
-            GameObject dropdownCaptionTextGo = new GameObject("Label");
+            var dropdownCaptionTextGo = new GameObject("Label");
             dropdownCaptionTextGo.transform.SetParent(dropdownGo.transform);
             _dropdown.captionText = dropdownCaptionTextGo.AddComponent<TextMeshProUGUI>();
-            GameObject dropdownTemplateGo = new GameObject("Template");
+            var dropdownTemplateGo = new GameObject("Template");
             dropdownTemplateGo.transform.SetParent(dropdownGo.transform);
             dropdownTemplateGo.AddComponent<RectTransform>();
             _dropdown.template = dropdownTemplateGo.GetComponent<RectTransform>();
-            GameObject dropdownItemGo = new GameObject("Item");
+            var dropdownItemGo = new GameObject("Item");
             dropdownItemGo.transform.SetParent(dropdownTemplateGo.transform);
             _dropdown.itemText = dropdownItemGo.AddComponent<TextMeshProUGUI>();
             dropdownTemplateGo.SetActive(false);
@@ -61,10 +61,7 @@ namespace MAVLinkAPI.Tests.UI
         [TearDown]
         public void TearDown()
         {
-            if (_testHost != null)
-            {
-                Object.DestroyImmediate(_testHost);
-            }
+            if (_testHost != null) Object.DestroyImmediate(_testHost);
 
             PlayerPrefs.DeleteKey(MAVLINK_HISTORY_KEY);
             PlayerPrefs.Save();
@@ -73,7 +70,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator InputSubmission_AddsToHistoryAndDropdown_Test()
         {
-            string testInput = "test entry 1";
+            var testInput = "test entry 1";
             _inputField.text = testInput;
             _inputField.onSubmit.Invoke(_inputField.text);
             yield return null;
@@ -87,7 +84,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator InputSubmission_NOTClearedAfterSubmission_Test()
         {
-            string testInput = "this should be cleared";
+            var testInput = "this should be cleared";
             _inputField.text = testInput;
             _inputField.onSubmit.Invoke(testInput);
             yield return null;
@@ -98,7 +95,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator DropdownSelection_UpdatesInputField_Test()
         {
-            string item1 = "select this";
+            var item1 = "select this";
             _historyDropDown.History.Add(item1);
             _historyDropDown.RefreshHistory();
             yield return null;
@@ -115,7 +112,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator HistoryPersistence_SavesAndLoads_Test()
         {
-            string entryToPersist = "persistent entry";
+            var entryToPersist = "persistent entry";
             _inputField.onSubmit.Invoke(entryToPersist);
             yield return null;
 
@@ -139,7 +136,7 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator DuplicateInput_IsNotAddedToHistory_Test()
         {
-            string testInput = "duplicate test";
+            var testInput = "duplicate test";
             _inputField.onSubmit.Invoke(testInput);
             yield return null;
             Assert.AreEqual(1, _historyDropDown.History.Count, "First entry not added.");
@@ -167,7 +164,7 @@ namespace MAVLinkAPI.Tests.UI
             _historyDropDown.isPersisted = false;
 
             // 2. Submit an entry
-            string testInput = "this should not be saved";
+            var testInput = "this should not be saved";
             _inputField.onSubmit.Invoke(testInput);
             yield return null;
 
@@ -193,9 +190,9 @@ namespace MAVLinkAPI.Tests.UI
         {
             _historyDropDown.maxHistorySize = 5;
 
-            for (int i = 0; i < _historyDropDown.maxHistorySize + 1; i++)
+            for (var i = 0; i < _historyDropDown.maxHistorySize + 1; i++)
             {
-                string entry = $"entry {i}";
+                var entry = $"entry {i}";
                 _inputField.onSubmit.Invoke(entry);
                 yield return null;
             }

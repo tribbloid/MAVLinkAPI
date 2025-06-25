@@ -84,7 +84,7 @@ namespace MAVLinkAPI.Tests.API
             var message = MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var reader = (uplink.Read(mavFunction));
+            var reader = uplink.Read(mavFunction);
 
             // Act
             var listReader = reader.SelectMany((m, i) => new List<string> { "A", "B" });

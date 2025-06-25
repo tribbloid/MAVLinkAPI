@@ -33,13 +33,9 @@ namespace MAVLinkAPI.API
                 set
                 {
                     if (value is not null)
-                    {
                         Outer.Index[ID] = value;
-                    }
                     else
-                    {
                         Outer.Index.Remove(ID);
-                    }
                 }
             }
 
@@ -99,10 +95,7 @@ namespace MAVLinkAPI.API
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var (type, value) in TypeToValue())
-            {
-                sb.AppendLine($"{type.Name}: {value}");
-            }
+            foreach (var (type, value) in TypeToValue()) sb.AppendLine($"{type.Name}: {value}");
 
             return sb.ToString();
         }

@@ -11,26 +11,32 @@ namespace MAVLinkAPI.UI.Tables
     public class TableLayout : LayoutGroup, ILayoutSelfController
     {
         public Sprite RowBackgroundImage;
-        public Color RowBackgroundColor = new Color(0, 0, 0, 0);
+        public Color RowBackgroundColor = new(0, 0, 0, 0);
 
         public bool UseAlternateRowBackgroundColors = false;
-        public Color RowBackgroundColorAlternate = new Color(0, 0, 0, 0);
+        public Color RowBackgroundColorAlternate = new(0, 0, 0, 0);
 
         public Sprite CellBackgroundImage;
-        public Color CellBackgroundColor = new Color(0,0,0,0);
+        public Color CellBackgroundColor = new(0, 0, 0, 0);
 
         public bool UseAlternateCellBackroundColors = false;
-        public Color CellBackgroundColorAlternate = new Color(0, 0, 0, 0);
+        public Color CellBackgroundColorAlternate = new(0, 0, 0, 0);
 
-        [Tooltip("If this is set, then this TableLayout will automatically add columns if there are more cells than columns on any row (this includes ColumnSpan checks)")]
+        [Tooltip(
+            "If this is set, then this TableLayout will automatically add columns if there are more cells than columns on any row (this includes ColumnSpan checks)")]
         public bool AutomaticallyAddColumns = true;
-        [Tooltip("If this is set, then this TableLayout will automatically remove any columns with no cells in them in any row (at the END of the row)")]
-        public bool AutomaticallyRemoveEmptyColumns = true;
-        public List<float> ColumnWidths = new List<float>();
 
-        [Tooltip("If this is set, then the cellpadding set here will override any padding settings set on individual cells")]
+        [Tooltip(
+            "If this is set, then this TableLayout will automatically remove any columns with no cells in them in any row (at the END of the row)")]
+        public bool AutomaticallyRemoveEmptyColumns = true;
+
+        public List<float> ColumnWidths = new();
+
+        [Tooltip(
+            "If this is set, then the cellpadding set here will override any padding settings set on individual cells")]
         public bool UseGlobalCellPadding = true;
-        public RectOffset CellPadding = new RectOffset();
+
+        public RectOffset CellPadding = new();
 
         public float CellSpacing = 0f;
 
@@ -41,8 +47,8 @@ namespace MAVLinkAPI.UI.Tables
             get
             {
                 return GetComponentsInChildren<TableRow>()
-                        .Where(tr => tr.transform.parent == this.transform)
-                        .ToList();
+                    .Where(tr => tr.transform.parent == transform)
+                    .ToList();
             }
         }
 
@@ -54,7 +60,7 @@ namespace MAVLinkAPI.UI.Tables
         {
             base.Awake();
 
-            _layoutElement = this.GetComponent<LayoutElement>();
+            _layoutElement = GetComponent<LayoutElement>();
         }
 
         public override void CalculateLayoutInputHorizontal()
@@ -86,27 +92,24 @@ namespace MAVLinkAPI.UI.Tables
             //Debug.Log("TableLayout::UpdateLayout");
             _tracker.Clear();
 
-            var tableRect = this.rectTransform.rect;
+            var tableRect = rectTransform.rect;
             var tableHeight = tableRect.height;
             var tableWidth = tableRect.width;
 
-            var rows = this.Rows.ToList();
+            var rows = Rows.ToList();
 
             if (!rows.Any()) return;
 
             var rowHeights = new List<float>();
-            var availableHeight = Mathf.Max(0, tableHeight - rows.Sum(r => r.preferredHeight) - (this.padding.top + this.padding.bottom) - (this.CellSpacing * (rows.Count - 1)));
+            var availableHeight = Mathf.Max(0,
+                tableHeight - rows.Sum(r => r.preferredHeight) - (padding.top + padding.bottom) -
+                CellSpacing * (rows.Count - 1));
             var numberOfAutoSizeRows = rows.Count(r => r.preferredHeight == 0);
             float calculatedAutoSizeRowHeight = 0;
-            if (numberOfAutoSizeRows > 0)
-            {
-                calculatedAutoSizeRowHeight = availableHeight / numberOfAutoSizeRows;
-            }
+            if (numberOfAutoSizeRows > 0) calculatedAutoSizeRowHeight = availableHeight / numberOfAutoSizeRows;
 
             foreach (var row in rows)
-            {
                 rowHeights.Add(row.preferredHeight > 0 ? row.preferredHeight : calculatedAutoSizeRowHeight);
-            }
 
 #if !UNITY_IOS
             var columnCount = rows.Max(r => r.Cells.Sum(c => c.columnSpan));
@@ -125,14 +128,12 @@ namespace MAVLinkAPI.UI.Tables
 #endif
 
             if (AutomaticallyRemoveEmptyColumns && columnCount < ColumnWidths.Count)
-            {
                 ColumnWidths.RemoveRange(columnCount, ColumnWidths.Count - columnCount);
-            }
 
             // 0 == auto-size
             var availableWidth = tableWidth
-                                - (this.padding.left + this.padding.right)
-                                - (this.CellSpacing * (columnCount - 1));
+                                 - (padding.left + padding.right)
+                                 - CellSpacing * (columnCount - 1);
 
             foreach (var columnWidth in ColumnWidths)
             {
@@ -146,30 +147,23 @@ namespace MAVLinkAPI.UI.Tables
             }
 
             for (var c = 0; c < columnCount; c++)
-            {
                 // If we don't have enough column width entries, then
                 // a) if we should automatically add column widths, then add a new zero value (which is translated into AutoSize)
                 // c) if we don't want to automatically add column widths, then additional cells over the column count will likely have a width of zero (which is only a problem if that happens)
                 if (AutomaticallyAddColumns && ColumnWidths.Count <= c)
-                {
                     ColumnWidths.Add(0);
-                }
-            }
 
             var numberOfAutoSizeColumns = ColumnWidths.Count(c => c == 0);
-            float calculatedAutoSizeColumnWidth = 0f;
-            if (numberOfAutoSizeColumns > 0)
-            {
-                calculatedAutoSizeColumnWidth = availableWidth / numberOfAutoSizeColumns;
-            }
+            var calculatedAutoSizeColumnWidth = 0f;
+            if (numberOfAutoSizeColumns > 0) calculatedAutoSizeColumnWidth = availableWidth / numberOfAutoSizeColumns;
 
             var columnWidths = new List<float>();
             for (var c = 0; c < columnCount; c++)
-            {
-                columnWidths.Add(ColumnWidths.Count > c && ColumnWidths[c] != 0 ? ColumnWidths[c] : calculatedAutoSizeColumnWidth);
-            }
+                columnWidths.Add(ColumnWidths.Count > c && ColumnWidths[c] != 0
+                    ? ColumnWidths[c]
+                    : calculatedAutoSizeColumnWidth);
 
-            float y = -this.padding.top;
+            float y = -padding.top;
             for (var r = 0; r < rows.Count; r++)
             {
                 var row = rows[r];
@@ -179,7 +173,9 @@ namespace MAVLinkAPI.UI.Tables
                 if (!row.dontUseTableRowBackground)
                 {
                     row.image.sprite = RowBackgroundImage;
-                    row.image.color = !UseAlternateRowBackgroundColors || r % 2 == 0 ? RowBackgroundColor : RowBackgroundColorAlternate;
+                    row.image.color = !UseAlternateRowBackgroundColors || r % 2 == 0
+                        ? RowBackgroundColor
+                        : RowBackgroundColorAlternate;
                 }
 
                 var rowHeight = rowHeights[r];
@@ -196,23 +192,20 @@ namespace MAVLinkAPI.UI.Tables
                 //rowRectTransform.localPosition = Vector3.zero;
                 rowRectTransform.localRotation = new Quaternion();
 
-                rowRectTransform.sizeDelta = new Vector2(tableWidth - (this.padding.left + this.padding.right), rowHeight);
-                rowRectTransform.anchoredPosition3D = new Vector3(this.padding.left, y, 0);
+                rowRectTransform.sizeDelta = new Vector2(tableWidth - (padding.left + padding.right), rowHeight);
+                rowRectTransform.anchoredPosition3D = new Vector3(padding.left, y, 0);
                 y -= rowHeight;
                 y -= CellSpacing;
 
-                float x = 0f;
-                int c = 0;
+                var x = 0f;
+                var c = 0;
                 var cells = row.Cells.ToList();
                 foreach (var cell in cells)
                 {
-                    float columnWidth = 0f;
+                    var columnWidth = 0f;
                     var endColumn = c + cell.columnSpan;
 
-                    for (var c2 = c; c2 < endColumn; c2++)
-                    {
-                        columnWidth += columnWidths[c2];
-                    }
+                    for (var c2 = c; c2 < endColumn; c2++) columnWidth += columnWidths[c2];
 
                     columnWidth += (cell.columnSpan - 1) * CellSpacing;
 
@@ -224,14 +217,15 @@ namespace MAVLinkAPI.UI.Tables
                     cell.actualX = x;
 
                     if (UseGlobalCellPadding && !cell.overrideGlobalPadding)
-                    {
-                        cell.padding = new RectOffset(CellPadding.left, CellPadding.right, CellPadding.top, CellPadding.bottom);
-                    }
+                        cell.padding = new RectOffset(CellPadding.left, CellPadding.right, CellPadding.top,
+                            CellPadding.bottom);
 
                     if (!cell.dontUseTableCellBackground)
                     {
-                        cell.image.sprite = this.CellBackgroundImage;
-                        cell.image.color = !this.UseAlternateCellBackroundColors || c % 2 == 0 ? this.CellBackgroundColor : this.CellBackgroundColorAlternate;
+                        cell.image.sprite = CellBackgroundImage;
+                        cell.image.color = !UseAlternateCellBackroundColors || c % 2 == 0
+                            ? CellBackgroundColor
+                            : CellBackgroundColorAlternate;
                     }
 
                     x += columnWidth + CellSpacing;
@@ -252,10 +246,7 @@ namespace MAVLinkAPI.UI.Tables
 
                 rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, 0);
 
-                if (_layoutElement != null)
-                {
-                    _layoutElement.preferredHeight = rectTransform.rect.height;
-                }
+                if (_layoutElement != null) _layoutElement.preferredHeight = rectTransform.rect.height;
             }
         }
 
@@ -269,22 +260,19 @@ namespace MAVLinkAPI.UI.Tables
             var row = TableLayoutUtilities.InstantiatePrefab("UI/Tables/Row");
             row.name = "Row";
 
-            row.transform.SetParent(this.transform);
+            row.transform.SetParent(transform);
             row.transform.SetAsLastSibling();
 
             var rowComponent = row.GetComponent<TableRow>();
 
-            for (var x = 0; x < cells; x++)
-            {
-                rowComponent.AddCell();
-            }
+            for (var x = 0; x < cells; x++) rowComponent.AddCell();
 
             return rowComponent;
         }
 
         public TableRow AddRow(TableRow row)
         {
-            row.transform.SetParent(this.transform);
+            row.transform.SetParent(transform);
             row.transform.SetAsLastSibling();
 
             return row;
@@ -293,12 +281,10 @@ namespace MAVLinkAPI.UI.Tables
         public void ClearRows()
         {
             foreach (var row in Rows)
-            {
                 if (Application.isPlaying)
                     Destroy(row.gameObject);
                 else
                     DestroyImmediate(row.gameObject);
-            }
         }
     }
 }

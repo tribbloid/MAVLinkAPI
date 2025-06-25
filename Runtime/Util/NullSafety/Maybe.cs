@@ -7,7 +7,7 @@ namespace MAVLinkAPI.Util.NullSafety
     public struct Maybe<T>
     {
         private object? _value;
-        
+
         public T Lazy(Func<T> fn)
         {
             if (fn == null) throw new ArgumentNullException(nameof(fn));

@@ -35,7 +35,7 @@ namespace MAVLinkAPI.Routing
         };
 
         private Maybe<MetricT> _metric; // fuck C# verbosity
-        public MetricT Metric => _metric.Lazy(() => new MetricT(this, new(), new()));
+        public MetricT Metric => _metric.Lazy(() => new MetricT(this, new AtomicLong(), new IDIndexed<AtomicLong>()));
 
         public readonly List<object> SubscribedReaders = new();
         // having multiple readers polling at the same time is dangerous, but we won't give a warning or error

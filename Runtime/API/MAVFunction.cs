@@ -14,7 +14,7 @@ namespace MAVLinkAPI.API
         {
             protected override IDIndexed<Topic> Topics_Mk()
             {
-                IDIndexed<Topic> result = new IDIndexed<Topic>();
+                var result = new IDIndexed<Topic>();
                 Topic topic = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)

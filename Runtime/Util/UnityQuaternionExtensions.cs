@@ -13,7 +13,6 @@ namespace MAVLinkAPI.Util
         public abstract class FrameT
         {
             public Quaternion FromEulerRadian(
-
                 float roll,
                 float pitch,
                 float yaw
@@ -25,7 +24,7 @@ namespace MAVLinkAPI.Util
                     yaw * Mathf.Rad2Deg
                 );
             }
-            
+
             public Quaternion FromEulerDegree(
                 float roll,
                 float pitch,

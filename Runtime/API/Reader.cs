@@ -19,12 +19,12 @@ namespace MAVLinkAPI.API
             Sources = sources;
         }
 
-        public Reader(Routing.Uplink uplink, MAVFunction<T> mavFunction) : this(
-            new Dictionary<Routing.Uplink, MAVFunction<T>> { { uplink, mavFunction } })
+        public Reader(Uplink uplink, MAVFunction<T> mavFunction) : this(
+            new Dictionary<Uplink, MAVFunction<T>> { { uplink, mavFunction } })
         {
         }
 
-        record SubReader(KeyValuePair<Uplink, MAVFunction<T>> Pair)
+        private record SubReader(KeyValuePair<Uplink, MAVFunction<T>> Pair)
         {
             public IEnumerable<List<T>> ByMessage_Mk()
             {
@@ -121,18 +121,12 @@ namespace MAVLinkAPI.API
 
         private Reader<T> Combine(Reader<T> that, Func<MAVFunction<T>, MAVFunction<T>, MAVFunction<T>> combineFn)
         {
-            var newSources = new Dictionary<Routing.Uplink, MAVFunction<T>>(this.Sources);
+            var newSources = new Dictionary<Uplink, MAVFunction<T>>(Sources);
             foreach (var (uplink, mavFunction) in that.Sources)
-            {
                 if (newSources.TryGetValue(uplink, out var existingMavFunction))
-                {
                     newSources[uplink] = combineFn(existingMavFunction, mavFunction);
-                }
                 else
-                {
                     newSources[uplink] = mavFunction;
-                }
-            }
 
             return new Reader<T>(newSources);
         }

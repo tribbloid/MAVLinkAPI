@@ -11,10 +11,7 @@ namespace MAVLinkAPI.UI.Tables
         {
             var prefab = Resources.Load<GameObject>("Prefabs/" + name);
 
-            if (prefab == null)
-            {
-                throw new UnityException(String.Format("Could not find prefab '{0}'!", name));
-            }
+            if (prefab == null) throw new UnityException(string.Format("Could not find prefab '{0}'!", name));
 
             Transform parent = null;
 
@@ -24,10 +21,7 @@ namespace MAVLinkAPI.UI.Tables
             var gameObject = GameObject.Instantiate(prefab) as GameObject;
             gameObject.name = name;
 
-            if (parent == null || !(parent is RectTransform))
-            {
-                parent = GetCanvasTransform();
-            }
+            if (parent == null || !(parent is RectTransform)) parent = GetCanvasTransform();
 
             gameObject.transform.SetParent(parent);
 
@@ -37,10 +31,7 @@ namespace MAVLinkAPI.UI.Tables
             FixInstanceTransform(prefabTransform, transform);
 
 #if UNITY_EDITOR
-            if (generateUndo)
-            {
-                UnityEditor.Undo.RegisterCreatedObjectUndo(gameObject, "Created " + name);
-            }
+            if (generateUndo) UnityEditor.Undo.RegisterCreatedObjectUndo(gameObject, "Created " + name);
 #endif
 
             return gameObject;
@@ -52,10 +43,8 @@ namespace MAVLinkAPI.UI.Tables
 #if UNITY_EDITOR
             // Attempt to locate a canvas object parented to the currently selected object
             if (!Application.isPlaying && UnityEditor.Selection.activeGameObject != null)
-            {
                 canvas = FindParentOfType<Canvas>(UnityEditor.Selection.activeGameObject);
-                //canvas = UnityEditor.Selection.activeTransform.GetComponentInParent<Canvas>();                
-            }
+            //canvas = UnityEditor.Selection.activeTransform.GetComponentInParent<Canvas>();                
 #endif
 
             if (canvas == null)
@@ -70,7 +59,7 @@ namespace MAVLinkAPI.UI.Tables
             // ...So I guess we'd better create one
 
 
-            GameObject canvasGameObject = new GameObject("Canvas");
+            var canvasGameObject = new GameObject("Canvas");
             canvasGameObject.layer = LayerMask.NameToLayer("UI");
             canvas = canvasGameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -85,7 +74,7 @@ namespace MAVLinkAPI.UI.Tables
 
             if (eventSystem == null)
             {
-                GameObject eventSystemGameObject = new GameObject("EventSystem");
+                var eventSystemGameObject = new GameObject("EventSystem");
                 eventSystem = eventSystemGameObject.AddComponent<EventSystem>();
                 eventSystemGameObject.AddComponent<StandaloneInputModule>();
 
@@ -109,14 +98,15 @@ namespace MAVLinkAPI.UI.Tables
             instanceTransform.position = Vector3.zero;
             instanceTransform.rotation = baseTransform.rotation;
             instanceTransform.localScale = baseTransform.localScale;
-            instanceTransform.anchoredPosition3D = new Vector3(baseTransform.anchoredPosition3D.x, baseTransform.anchoredPosition3D.y, 0);
+            instanceTransform.anchoredPosition3D = new Vector3(baseTransform.anchoredPosition3D.x,
+                baseTransform.anchoredPosition3D.y, 0);
             instanceTransform.sizeDelta = baseTransform.sizeDelta;
         }
 
         public static T FindParentOfType<T>(GameObject childObject)
             where T : UnityEngine.Object
         {
-            Transform t = childObject.transform;
+            var t = childObject.transform;
             while (t.parent != null)
             {
                 var component = t.parent.GetComponent<T>();
@@ -129,5 +119,5 @@ namespace MAVLinkAPI.UI.Tables
             // We didn't find anything
             return null;
         }
-    }    
+    }
 }

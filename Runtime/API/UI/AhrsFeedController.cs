@@ -30,7 +30,7 @@ namespace MAVLinkAPI.API.UI
 
         private Lifetime Lifetime => lifetimeBinding.Lifetime;
 
-        void Start()
+        private void Start()
         {
             baudRateInput.options.Clear();
             IOStream.BaudRates.all.ForEach(baudRate =>
