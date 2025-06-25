@@ -29,6 +29,7 @@
     "io.github.gkngkc.unity-standalone-file-browser": "1.3.2",
     "com.unity.xr.management": "4.5.1",
     "com.unity.visualscripting": "1.9.7",
-    "com.jonagill.autofill": "1.0.7"
+    "com.jonagill.autofill": "1.0.7",
+    "net.tnrd.autohook": "1.0.2"
   }
 }

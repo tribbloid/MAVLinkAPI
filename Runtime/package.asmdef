@@ -7,7 +7,8 @@
     "StandaloneFileBrowser",
     "UnityEngine.SpatialTracking",
     "Unity.VisualScripting.Core",
-    "Autofill.Runtime"
+    "Autofill.Runtime",
+    "TNRD.Autohook"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
