@@ -2,11 +2,11 @@ namespace MAVLinkAPI.Util
 {
     public abstract class HasOuter<T>
     {
-        public readonly T Outer;
+        public T Outer { get; init; }
 
-        protected HasOuter(T outer)
-        {
-            Outer = outer;
-        }
+        // protected HasOuter(T outer)
+        // {
+        //     Outer = outer;
+        // }
     }
 }

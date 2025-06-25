@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using MAVLinkAPI.Ext;
 using MAVLinkAPI.Util.Text;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace MAVLinkAPI.Util
@@ -57,8 +56,9 @@ namespace MAVLinkAPI.Util
 
         public class FixedIntervalT : HasOuter<Retry<TI>>
         {
-            public FixedIntervalT(Retry<TI> outer) : base(outer)
+            public FixedIntervalT(Retry<TI> outer)
             {
+                Outer = outer;
             }
 
             public T Run<T>(Func<TI, TimeSpan, T> operation)
