@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util;
-using MAVLinkAPI.Util.NullSafety;
 using Unity.VisualScripting;
 
 namespace MAVLinkAPI.API.Feature
@@ -12,19 +10,15 @@ namespace MAVLinkAPI.API.Feature
     {
         public record ConstT
         {
-            private Maybe<MAVLink.mavlink_heartbeat_t> _ack;
-
-            public MAVLink.mavlink_heartbeat_t Ack =>
-                _ack.Lazy(() =>
-                    new MAVLink.mavlink_heartbeat_t() // this should be sent regardless of received heartbeat
-                    {
-                        custom_mode = 0, // not sure how to use this
-                        mavlink_version = 2,
-                        type = (byte)MAVLink.MAV_TYPE.GCS,
-                        autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
-                        base_mode = 0
-                    }
-                );
+            public readonly MAVLink.mavlink_heartbeat_t Ack =
+                new() // this should be sent regardless of received heartbeat
+                {
+                    custom_mode = 0, // not sure how to use this
+                    mavlink_version = 2,
+                    type = (byte)MAVLink.MAV_TYPE.GCS,
+                    autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
+                    base_mode = 0
+                };
         }
 
         public static ConstT Const = new();

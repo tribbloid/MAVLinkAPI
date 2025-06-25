@@ -4,8 +4,9 @@ using System.Threading;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MAVLinkAPI.Tests.Pose
+namespace MAVLinkAPI.Tests.__Spike
 {
+    [Ignore("Spike")]
     public class ParallelQuerySpike
     {
         [Test]

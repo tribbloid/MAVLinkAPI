@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace MAVLinkAPI.API.Feature
 {
+    // TODO: how about making it a normal class with metrics?
     public static class Ahrs
     {
         public static Reader<Quaternion> ReadAttitude(
@@ -66,13 +67,6 @@ namespace MAVLinkAPI.API.Feature
 
         public class Feed : RecurrentDaemon
         {
-            private Feed(Lifetime lifetime) : base(lifetime)
-            {
-            }
-
-            public Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog { get; init; }
-            public Reader<Quaternion> AttitudeReader { get; init; }
-
             public static Feed OfUplink(Lifetime lifetime, Uplink uplink)
             {
                 var watchDog = Minimal.WatchDog(uplink);
@@ -87,9 +81,18 @@ namespace MAVLinkAPI.API.Feature
                 return result;
             }
 
-            public Atomic<DateTime> LatestHeartBeat = new(DateTime.MinValue);
-            // TODO: need latency
+            private Feed(Lifetime lifetime) : base(lifetime)
+            {
+            }
 
+            public Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog { get; init; }
+            public Reader<Quaternion> AttitudeReader { get; init; }
+
+
+            // TODO: need latency
+            public Atomic<DateTime> LatestHeartBeat = new(DateTime.MinValue);
+
+            // TODO: need covariance
             public Atomic<Quaternion> Attitude = new(Quaternion.identity);
 
             private Maybe<Reader<object>> _updater;

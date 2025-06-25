@@ -12,6 +12,12 @@ namespace MAVLinkAPI.API
         public IDLookup Lookup { get; init; }
         public Dictionary<uint, T> Index { get; init; }
 
+        // public IDIndexed()
+        // {
+        //     Lookup = IDLookup.Global;
+        //     Index = new Dictionary<uint, T>();
+        // }
+
         public IDIndexed(Dictionary<uint, T>? index = null, IDLookup? lookup = null)
         {
             Lookup = lookup ?? IDLookup.Global;

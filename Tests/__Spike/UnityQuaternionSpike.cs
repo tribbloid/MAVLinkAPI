@@ -1,8 +1,9 @@
-﻿using MAVLinkAPI.Util;
+﻿using MAVLinkAPI.Tests.Util;
+using MAVLinkAPI.Util;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace MAVLinkAPI.Tests.Util
+namespace MAVLinkAPI.Tests.__Spike
 {
     [TestFixture]
     [TestOf(typeof(UnityQuaternionExtensions))]

@@ -1,10 +1,11 @@
 ﻿using System;
+using MAVLinkAPI.Tests.Util.Resource;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
-namespace MAVLinkAPI.Tests.Util.Resource
+namespace MAVLinkAPI.Tests.__Spike
 {
-    public class UsingSyntaxSpike
+    public class CleanableUsingSyntaxSpike
     {
         [Test]
         public void Fake()
