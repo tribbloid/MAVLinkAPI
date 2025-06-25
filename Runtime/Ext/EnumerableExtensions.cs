@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Linq;
 using MAVLinkAPI.Util;
 
 namespace MAVLinkAPI.Ext
@@ -22,6 +23,13 @@ namespace MAVLinkAPI.Ext
             }
 
             yield return (current, null);
+        }
+
+        public static IEnumerable<T>? UnionNullSafe<T>(this IEnumerable<T>? first, IEnumerable<T>? second)
+        {
+            if (first == null) return second;
+            if (second == null) return first;
+            return first.Union(second);
         }
     }
 }

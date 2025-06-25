@@ -26,9 +26,13 @@
   "dependencies": {
     "com.unity.textmeshpro": "3.0.9",
     "com.yamldotnet.uni": "13.2.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
     "io.github.gkngkc.unity-standalone-file-browser": "1.3.2",
     "com.unity.xr.management": "4.5.1",
     "com.unity.visualscripting": "1.9.7",
     "com.jonagill.autofill": "1.0.7"
-  }
+  },
+  "testables": [
+    "ca.hpvdt.mavlinkapi.Tests"
+  ]
 }

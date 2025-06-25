@@ -2,14 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using MAVLinkAPI.Comms;
-using MAVLinkAPI.Ext;
-using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
-using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 
 namespace MAVLinkAPI.Routing
@@ -143,7 +139,14 @@ namespace MAVLinkAPI.Routing
 
         public int BytesToRead => Comm.BytesToRead;
 
-        public double Metric_BufferPressure => (double)BytesToRead / Comm.ReadBufferSize;
+        public double Metric_BufferPressure
+        {
+            get
+            {
+                if (Comm.ReadBufferSize == 0) return 0;
+                return (double)BytesToRead / Comm.ReadBufferSize;
+            }
+        }
 
         // locking to prevent multiple reads on serial port
         public readonly object ReadLock = new();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MAVLinkAPI.Tests.Util.Resource;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
@@ -27,20 +27,20 @@ namespace MAVLinkAPI.Tests.__Spike
         [Test]
         public void Real()
         {
-            var i1 = CleanableExample.Counter;
+            var i1 = CleanableExample.Counter.Value;
             using (var obj = new CleanableExample())
             {
-                Assert.AreEqual(i1, CleanableExample.Counter);
+                Assert.AreEqual(i1, CleanableExample.Counter.Value);
                 // do things
             }
 
-            Assert.AreEqual(i1 + 1, CleanableExample.Counter);
+            Assert.AreEqual(i1 + 1, CleanableExample.Counter.Value);
         }
     }
 
     public class HandleExample : SafeHandleMinusOneIsInvalid
     {
-        public static volatile int Counter;
+        public static int Counter;
 
         public HandleExample(nint handle, bool ownsHandle) : base(ownsHandle)
         {

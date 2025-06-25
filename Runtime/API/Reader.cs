@@ -139,7 +139,7 @@ namespace MAVLinkAPI.API
         {
             var newSources = reader.Sources.ToDictionary(
                 pair => pair.Key,
-                pair => (MAVFunction<T>)pair.Value.Upcast<T, T1>());
+                pair => pair.Value.Upcast<T, T1>());
             return new Reader<T>(newSources);
         }
     }

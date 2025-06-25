@@ -1,52 +1,77 @@
+#nullable enable
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 
 namespace MAVLinkAPI.Util.Resource
 {
     public abstract class Daemon : Cleanable
     {
-        // Can only be canceled once, as a result, it can only be started once
-        public CancellationTokenSource Cancel = new();
+        // Can only be started once and canceled once
+        public readonly CancellationTokenSource Cancel = new();
 
-        private CancellationToken? _cancelSignal;
 
         public Daemon(Lifetime lifetime) : base(lifetime)
         {
         }
 
-
         public readonly int GraceTimeMillis = 5000;
+
+        private Maybe<Task> _started;
+
+        public void Start()
+        {
+            if (Cancel.IsCancellationRequested)
+                throw new InvalidOperationException("Daemon has been stopped and cannot be restarted.");
+
+            _started.Lazy(() =>
+            {
+                var cancelSignal = Cancel.Token;
+
+                return Task.Run(() =>
+                    {
+                        try
+                        {
+                            Execute(cancelSignal);
+                        }
+                        catch (Exception e)
+                        {
+                            if (e is not OperationCanceledException) Debug.LogException(e);
+                        }
+                    }, cancelSignal
+                );
+            });
+        }
+
 
         public void Stop()
         {
-            Cancel.CancelAfter(GraceTimeMillis); // Execute() should drop out of the loop first
-            _cancelSignal = null;
+            if (!Cancel.IsCancellationRequested) Cancel.Cancel();
+        }
+
+        public void StopBlocking()
+        {
+            Stop();
+            try
+            {
+                _started.ValueOrNull?.Wait(GraceTimeMillis);
+            }
+            catch (AggregateException e)
+            {
+                e.Handle(ex => ex is OperationCanceledException);
+            }
+            catch (OperationCanceledException)
+            {
+                // also possible
+            }
         }
 
         public override void DoClean()
         {
-            Stop();
-        }
-
-        public async void Start()
-        {
-            var cancelSignal = Cancel.Token;
-            _cancelSignal = cancelSignal;
-
-            await Task.Run(() =>
-                {
-                    try
-                    {
-                        Execute(cancelSignal);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                    }
-                }, cancelSignal // hard cancel after 5 seconds
-            );
+            StopBlocking();
+            Cancel.Dispose();
         }
 
         public abstract void Execute(CancellationToken cancelSignal);

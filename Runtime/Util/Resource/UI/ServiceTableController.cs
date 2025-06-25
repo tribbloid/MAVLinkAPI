@@ -1,8 +1,6 @@
 #nullable enable
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Autofill;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
@@ -69,10 +67,10 @@ namespace MAVLinkAPI.Util.Resource.UI
             }
         }
 
-        // public void Start()
-        // {
-        //     rowTemplate.gameObject.SetActive(false);
-        // }
+        public void Start()
+        {
+            rowTemplate.gameObject.SetActive(false);
+        }
 
         public void Update()
         {

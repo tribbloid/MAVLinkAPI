@@ -86,13 +86,8 @@ namespace MAVLinkAPI.Util.Resource
     }
 
 
-    public static class SafeCleanExtensions
+    public static class CleanableExtensions
     {
-        // public static object AccessLock<T>(this T self) where T : Cleanable
-        // {
-        //     return Cleanable.GlobalAccessLock; // this is very blocking, will optimise later
-        // }
-
         public static IEnumerable<T> SelfAndPeers<T>(this T self)
             where T : Cleanable // should be read only
         {
@@ -105,7 +100,6 @@ namespace MAVLinkAPI.Util.Resource
                 return filtered.Cast<T>();
             }
         }
-
 
         public static IEnumerable<T> Peers<T>(this T self) where T : Cleanable
         {

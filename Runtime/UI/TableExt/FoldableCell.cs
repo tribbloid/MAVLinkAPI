@@ -5,43 +5,53 @@ using Autofill;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MAVLinkAPI.UI.TableExt
 {
     [RequireComponent(typeof(RectTransform))]
-    public class FoldableCell : MonoBehaviour
+    public class FoldableCell : UIBehaviour
     {
+        public bool startFolded = true;
+
         [Autofill] public RectTransform rectT = null!;
 
         [Autofill(AutofillType.SelfAndParent)] public TableRow row = null!;
-        [Autofill(AutofillType.Parent)] public ScrollLock scrollLock = null!;
 
-        // [Required] public ScrollLock scrollLock = null!;
-
-        // [Autofill(AutofillType.Parent)] public TableLayout table = null!;
+        [Autofill(AutofillType.Parent)] public TableLayout table = null!;
 
         [Required] public Button toggle = null!;
         public MonoBehaviour? detail;
 
         private float _minHeight = -1;
 
-        public void Start()
+        protected override void Start()
         {
             _minHeight = row.preferredHeight;
 
+            if (startFolded) detail?.gameObject.SetActive(false);
             UpdateHeights(true);
 
-            toggle.onClick.AddListener(() =>
-            {
-                detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
-                UpdateHeights();
-            });
+            toggle.onClick.AddListener(() => { detail?.gameObject.SetActive(!detail.gameObject.activeSelf); });
+        }
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+            // Debug.Log("RectTransform size changed!");
+            UpdateHeights();
+            // Place your custom callback logic here
+        }
+
+        protected override void OnEnable()
+        {
+            UpdateHeights(true);
         }
 
         private void UpdateHeights(bool wait = false)
         {
-            StartCoroutine(UpdateHeightsTask(wait));
+            if (isActiveAndEnabled) StartCoroutine(UpdateHeightsTask(wait));
         }
 
         private IEnumerator UpdateHeightsTask(bool wait)
@@ -60,17 +70,7 @@ namespace MAVLinkAPI.UI.TableExt
                 _minHeight
             );
 
-            foreach (var o in scrollLock.RefreshTable())
-            {
-                yield return o; // TODO: how to simplify this?
-            }
-
-            // row.UpdateLayout(); // doesn't work
-            // table.UpdateLayout(); // reset the scroll position
-            // LayoutRebuilder.MarkLayoutForRebuild(table.GetComponent<RectTransform>()); // ditto
-
-            // var tempRow = table.AddRow();
-            // Destroy(tempRow.gameObject); // ditto
+            table.UpdateLayout();
         }
     }
 }

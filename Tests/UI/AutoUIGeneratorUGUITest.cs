@@ -24,8 +24,8 @@ namespace MAVLinkAPI.Tests.UI
     [TestFixture]
     public class AutoUIGeneratorUGUITests
     {
-        private GameObject canvasGO;
-        private PlayerUIGen _generatorUGUI;
+        private GameObject canvasGO = null!;
+        private PlayerUIGen _generatorUGUI = null!;
 
         [SetUp]
         public void SetUp()

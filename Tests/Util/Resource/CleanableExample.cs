@@ -1,11 +1,12 @@
 #nullable enable
+using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.Resource;
 
 namespace MAVLinkAPI.Tests.Util.Resource
 {
     public class CleanableExample : Cleanable
     {
-        public static volatile int Counter;
+        public static readonly AtomicInt Counter = new();
 
         // default constructor with lifetime argument
         public CleanableExample(
@@ -16,7 +17,7 @@ namespace MAVLinkAPI.Tests.Util.Resource
 
         public override void DoClean()
         {
-            Counter += 1;
+            Counter.Increment();
         }
     }
 }

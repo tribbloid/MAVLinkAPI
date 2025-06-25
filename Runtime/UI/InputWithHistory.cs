@@ -1,12 +1,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autofill;
+using MAVLinkAPI.Ext;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using TMPro;
-using UnityEditor.Search;
-using UnityEngine.Assertions;
 
 namespace MAVLinkAPI.UI
 {
@@ -21,17 +21,11 @@ namespace MAVLinkAPI.UI
         public bool isPersisted = true;
         public string? persistedIDOvrd;
 
-        public string PersistedID
-        {
-            get
-            {
-                var v = persistedIDOvrd;
-                if (string.IsNullOrWhiteSpace(v))
-                    v = SearchUtils.GetHierarchyPath(gameObject, true);
-                Assert.IsFalse(string.IsNullOrEmpty(v), "persistentID cannot be null or empty");
-                return v!;
-            }
-        }
+        private Maybe<string> _persistedID;
+
+        public string PersistedID => _persistedID.Lazy(() =>
+            persistedIDOvrd ?? gameObject.GetScenePath()
+        );
 
         public int maxHistorySize = 30;
 
@@ -75,7 +69,8 @@ namespace MAVLinkAPI.UI
             dropdown.onValueChanged.AddListener(OnDropdownSelect);
 
             RefreshHistory();
-            input.text = dropdown.options[dropdown.value].text;
+
+            if (dropdown.options.Count > 0) input.text = dropdown.options[dropdown.value].text;
 
             // OnInputChanged(input.text);
         }
@@ -102,7 +97,10 @@ namespace MAVLinkAPI.UI
 
         private void OnInputChanged(string text)
         {
-            dropdown.AddOptions(new List<string> { text });
+            var last = dropdown.options.LastOrDefault();
+
+            if (last == null || last.text != text)
+                dropdown.AddOptions(new List<string> { text });
             dropdown.SetValueWithoutNotify(dropdown.options.Count - 1);
             // Any Edit will cause dropdown selectin to reset
         }

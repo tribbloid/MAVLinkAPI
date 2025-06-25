@@ -129,7 +129,7 @@ namespace MAVLinkAPI.Tests.UI
 
             Assert.AreEqual(1, newHistoryDropDown.History.Count, "History not loaded correctly after restart.");
             Assert.AreEqual(entryToPersist, newHistoryDropDown.History[0], "Persistent entry content mismatch.");
-            Assert.AreEqual(2, _dropdown.options.Count, "Dropdown not populated from loaded history.");
+            Assert.AreEqual(1, _dropdown.options.Count, "Dropdown not populated from loaded history.");
             Assert.AreEqual(entryToPersist, _dropdown.options[0].text, "Dropdown option text mismatch after load.");
         }
 
@@ -154,15 +154,12 @@ namespace MAVLinkAPI.Tests.UI
             yield return null;
 
             Assert.AreEqual(0, _historyDropDown.History.Count, "Empty string was added to history.");
-            Assert.AreEqual(1, _dropdown.options.Count, "Dropdown options not empty after empty input.");
+            Assert.AreEqual(0, _dropdown.options.Count, "Dropdown options not empty after empty input.");
         }
 
         [UnityTest]
         public IEnumerator Persistence_IsDisabled()
         {
-            // 1. Ensure persistence is disabled by setting ID to null
-            _historyDropDown.isPersisted = false;
-
             // 2. Submit an entry
             var testInput = "this should not be saved";
             _inputField.onSubmit.Invoke(testInput);
@@ -174,9 +171,14 @@ namespace MAVLinkAPI.Tests.UI
             // 3. Simulate restart
             Object.DestroyImmediate(_historyDropDown);
             var newHistoryDropDown = _testHost.AddComponent<InputWithHistory>();
+
+            // 1. Ensure persistence is disabled by setting ID to null
+            newHistoryDropDown.isPersisted = false;
+            newHistoryDropDown.persistedIDOvrd = null; // Ensure new instance also has a null ID
+
             newHistoryDropDown.input = _inputField;
             newHistoryDropDown.dropdown = _dropdown;
-            newHistoryDropDown.persistedIDOvrd = null; // Ensure new instance also has a null ID
+
 
             yield return null; // Allow Awake/Start
 

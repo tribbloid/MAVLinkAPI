@@ -1,8 +1,6 @@
 #nullable enable
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using MAVLinkAPI.API;
@@ -14,7 +12,7 @@ using Component = MAVLinkAPI.API.Component;
 
 namespace MAVLinkAPI.Routing
 {
-    public class DirectUplink : Uplink
+    public class DirectUplink : Uplink // TODO: shoudl be "Endpoint"
     {
         public readonly IOStream IO;
         public readonly Component ThisComponent;
@@ -70,9 +68,8 @@ namespace MAVLinkAPI.Routing
         }
 
 
-        public void Write<T>(Message<T> msg) where T : struct
+        public void Write<T>(IMessage<T> msg) where T : struct
         {
-            // TODO: why not GenerateMAVLinkPacket10?
             var bytes = Mavlink.GenerateMAVLinkPacket20(
                 msg.TypeID,
                 msg.Data,

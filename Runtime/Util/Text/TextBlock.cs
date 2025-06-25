@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MAVLinkAPI.Util.Text
 {
@@ -90,9 +91,15 @@ namespace MAVLinkAPI.Util.Text
             return new TextBlock(text);
         }
 
-        public static string BlockSelect(this string text, Func<TextBlock, TextBlock> fn)
+        // public static string BlockSelect(this string text, Func<TextBlock, TextBlock> fn)
+        // {
+        //     return fn(Block(text)).ToString();
+        // }
+
+        public static string normaliseLineBreak(this string text)
         {
-            return fn(Block(text)).ToString();
+            if (text == null) return null;
+            return Regex.Replace(text, "\r\n?|\n", Environment.NewLine);
         }
     }
 }

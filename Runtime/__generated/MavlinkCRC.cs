@@ -1,4 +1,4 @@
-﻿public partial class MAVLink
+public partial class MAVLink
 {
     public class MavlinkCRC
     {

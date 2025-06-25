@@ -10,7 +10,7 @@ using UnityEngine;
 namespace MAVLinkAPI.API.Feature
 {
     // TODO: how about making it a normal class with metrics?
-    public static class Ahrs
+    public static class Common
     {
         public static Reader<Quaternion> ReadAttitude(
             this Uplink uplink
@@ -65,14 +65,14 @@ namespace MAVLinkAPI.API.Feature
             return uplink.Read(getAttitudeQ);
         }
 
-        public class Feed : RecurrentDaemon
+        public class NavigationFeed : RecurrentDaemon
         {
-            public static Feed OfUplink(Lifetime lifetime, Uplink uplink)
+            public static NavigationFeed OfUplink(Lifetime lifetime, Uplink uplink)
             {
                 var watchDog = Minimal.WatchDog(uplink);
                 var attitudeReader = ReadAttitude(uplink);
 
-                var result = new Feed(lifetime)
+                var result = new NavigationFeed(lifetime)
                 {
                     WatchDog = watchDog,
                     AttitudeReader = attitudeReader
@@ -81,7 +81,7 @@ namespace MAVLinkAPI.API.Feature
                 return result;
             }
 
-            private Feed(Lifetime lifetime) : base(lifetime)
+            private NavigationFeed(Lifetime lifetime) : base(lifetime)
             {
             }
 
@@ -90,10 +90,10 @@ namespace MAVLinkAPI.API.Feature
 
 
             // TODO: need latency
-            public Atomic<DateTime> LatestHeartBeat = new(DateTime.MinValue);
+            public Atomic<DateTime> LastHeartBeat = new(DateTime.MinValue);
 
             // TODO: need covariance
-            public Atomic<Quaternion> Attitude = new(Quaternion.identity);
+            public Atomic<Quaternion> LastAttitude = new(Quaternion.identity);
 
             private Maybe<Reader<object>> _updater;
 
@@ -102,14 +102,14 @@ namespace MAVLinkAPI.API.Feature
                 return WatchDog
                     .SelectMany((_, v) =>
                         {
-                            LatestHeartBeat.Value = v.RxTime;
+                            LastHeartBeat.Value = v.RxTime;
                             return new List<object> { };
                         }
                     )
                     .Union(
                         AttitudeReader.SelectMany((_, v) =>
                         {
-                            Attitude.Value = v;
+                            LastAttitude.Value = v;
                             return new List<object> { };
                         })
                     );
@@ -131,8 +131,8 @@ namespace MAVLinkAPI.API.Feature
             {
                 var list = new List<string>
                 {
-                    $"    - heartbeat count : {LatestHeartBeat.UpdateCount}",
-                    $"    - attitude count : {Attitude.UpdateCount}"
+                    $"    - heartbeat count : {LastHeartBeat.UpdateCount}",
+                    $"    - attitude count : {LastAttitude.UpdateCount}"
                 };
 
                 return list.Union(base.GetStatusDetail());

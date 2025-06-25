@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 
 namespace MAVLinkAPI.Routing
 {
@@ -13,7 +12,7 @@ namespace MAVLinkAPI.Routing
     public record ArduPilotSitlRepo(
         SitlArch Arch = SitlArch.X64Linux,
         string Frame = "Plane",
-        string Version = "stable-4.5.7"
+        string Version = "stable"
     )
     {
         public string Url
