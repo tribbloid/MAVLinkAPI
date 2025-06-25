@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 using MAVLinkAPI.Util;
 
 namespace MAVLinkAPI.API
@@ -82,6 +83,30 @@ namespace MAVLinkAPI.API
             return Get(id);
         }
 
-        // do we need by systemID and componentID?
+        public Dictionary<Type, T> TypeToValue()
+        {
+            var result = new Dictionary<Type, T>();
+            foreach (var (id, value) in Index)
+            {
+                if (!Lookup.ByID.TryGetValue(id, out var info)) continue;
+
+                result[info.type] = value;
+            }
+
+            return result;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var (type, value) in TypeToValue())
+            {
+                sb.AppendLine($"{type.Name}: {value}");
+            }
+
+            return sb.ToString();
+        }
+
+        // do we need filtering by systemID and componentID?
     }
 }

@@ -31,6 +31,8 @@ namespace MAVLinkAPI.Util
                 Interlocked.Increment(ref UpdateCount);
             }
         }
+
+        public override string ToString() => Value.ToString();
     }
 
     public class AtomicInt : Atomic<int>

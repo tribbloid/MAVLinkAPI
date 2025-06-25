@@ -1,0 +1,25 @@
+jobs:
+  foo: |
+    bar ? baz : qux;
+    [
+      bar;
+      baz;
+      qux;
+    ]
+    bar; @quux
+
+processes:
+  bar:
+    command: echo bar
+  baz:
+    command: echo baz
+  qux:
+    command: echo qux
+  quux:
+    command: echo quux
+
+log_monitors:
+  quux:
+    buffer_size: 1
+    test: 'echo "$ARPX_BUFFER" | grep -q "bar"' # or equivalent for your system
+    ontrigger: quux

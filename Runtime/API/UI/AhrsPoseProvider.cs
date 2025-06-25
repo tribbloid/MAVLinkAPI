@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using MAVLinkAPI.API.Feature;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
@@ -12,8 +13,12 @@ namespace MAVLinkAPI.API.UI
 
         public void Bind(Ahrs.Feed daemon)
         {
-            ActiveFeed = daemon;
+            if (ActiveFeed != null)
+            {
+                Unbind();
+            }
 
+            ActiveFeed = daemon;
             ActiveFeed.Start();
         }
 
@@ -25,7 +30,6 @@ namespace MAVLinkAPI.API.UI
                 ActiveFeed = null;
             }
         }
-
 
         private void OnDestroy()
         {

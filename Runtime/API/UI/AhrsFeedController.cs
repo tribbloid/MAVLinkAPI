@@ -71,5 +71,19 @@ namespace MAVLinkAPI.API.UI
                 }
             });
         }
+
+        public void PrintInfo() // will print very long stats in the console
+        {
+            if (poseProvider.ActiveFeed == null) return;
+
+            var uplinks = poseProvider.ActiveFeed.Updater.Sources.Keys;
+
+            foreach (var uplink in uplinks)
+            {
+                var info = uplink.ToString() + "\n" + uplink.Metric.Histogram.ToString();
+
+                Debug.Log(info);
+            }
+        }
     }
 }
