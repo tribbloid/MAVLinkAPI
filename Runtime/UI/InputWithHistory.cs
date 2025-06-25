@@ -75,8 +75,9 @@ namespace MAVLinkAPI.UI
             dropdown.onValueChanged.AddListener(OnDropdownSelect);
 
             RefreshHistory();
+            input.text = dropdown.options[dropdown.value].text;
 
-            OnInputChanged(input.text);
+            // OnInputChanged(input.text);
         }
 
         // private void OnEnable()
