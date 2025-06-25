@@ -146,6 +146,7 @@ namespace MAVLinkAPI.Routing
         public Stream BaseStream => Comm.BaseStream;
 
         public int BytesToRead => Comm.BytesToRead;
+
         public double Metric_BufferPressure => (double)BytesToRead / Comm.ReadBufferSize;
 
         // locking to prevent multiple reads on serial port

@@ -101,6 +101,13 @@ namespace MAVLinkAPI.API
             return new Reader<T2>(newSources);
         }
 
+        // public Reader<object> ForEach(Action<MAVLink.MAVLinkMessage, T> ac)
+        // { TODO:// need a better name
+        //     var newSources = Sources.ToDictionary(
+        //         pair => pair.Key,
+        //         pair => (MAVFunction<object>)pair.Value.SelectMany((x, y) => ac(x, y); ));
+        //     return new Reader<object>(newSources);
+        // }
 
         public Reader<T> OrElse(Reader<T> that)
         {

@@ -1,8 +1,10 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.API;
 using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.NullSafety;
 using MAVLinkAPI.Util.Resource;
 
 namespace MAVLinkAPI.Routing
@@ -24,10 +26,16 @@ namespace MAVLinkAPI.Routing
 
         public abstract void WriteData<T>(T data) where T : struct;
 
-        public (
-            int PacketCount,
+        public record MetricT(
+            Uplink Outer,
+            AtomicLong PacketCount,
             IDIndexed<AtomicLong> Histogram
-            ) Metric = (0, new());
+        )
+        {
+        };
+
+        private Maybe<MetricT> _metric; // fuck C# verbosity
+        public MetricT Metric => _metric.Lazy(() => new MetricT(this, new(), new()));
 
         public readonly List<object> SubscribedReaders = new();
         // having multiple readers polling at the same time is dangerous, but we won't give a warning or error
@@ -38,6 +46,11 @@ namespace MAVLinkAPI.Routing
             var reader = new Reader<T>(this, mavFunction);
             SubscribedReaders.Add(reader);
             return reader;
+        }
+
+        public Reader<Message<T>> On<T>() where T : struct
+        {
+            return Read(MAVFunction.On<T>());
         }
 
         // Mock Uplink that can provide a stream of messages for testing
@@ -61,11 +74,12 @@ namespace MAVLinkAPI.Routing
 
             public override void WriteData<T>(T data) where T : struct
             {
+                // dummy
             }
-
 
             public override void DoClean()
             {
+                // dummy
             }
         }
     }

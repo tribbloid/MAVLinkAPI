@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
@@ -9,10 +11,32 @@ namespace MAVLinkAPI.API.Feature
 {
     public static class Ahrs
     {
-        public static Reader<Quaternion> Attitude(
+        public static Reader<Quaternion> ReadAttitude(
             this Uplink uplink
         )
         {
+            var getAttitudeQ = MAVFunction.On<MAVLink.mavlink_attitude_t>()
+                .Select((_, msg) =>
+                {
+                    var data = msg.Data;
+
+                    var q = UnityQuaternionExtensions.AeronauticFrame.FromEulerRadian(
+                        data.roll, data.pitch, data.yaw
+                    );
+
+                    return q;
+                });
+
+
+            return uplink.Read(getAttitudeQ);
+        }
+
+        // experimental, supported only by ArduPilot 4.1.0+
+        public static Reader<Quaternion> ReadAttitudeQ(
+            this Uplink uplink
+        )
+        {
+            // var backup = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_cov_t>(); TODO: switch to this for health check
             var getAttitudeQ = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_t>()
                 .Select((_, msg) =>
                 {
@@ -46,13 +70,13 @@ namespace MAVLinkAPI.API.Feature
             {
             }
 
-            public Reader<object> WatchDog;
-            public Reader<Quaternion> AttitudeReader;
+            public Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog { get; init; }
+            public Reader<Quaternion> AttitudeReader { get; init; }
 
             public static Feed OfUplink(Lifetime lifetime, Uplink uplink)
             {
                 var watchDog = Minimal.WatchDog(uplink);
-                var attitudeReader = Ahrs.Attitude(uplink);
+                var attitudeReader = ReadAttitude(uplink);
 
                 var result = new Feed(lifetime)
                 {
@@ -63,19 +87,29 @@ namespace MAVLinkAPI.API.Feature
                 return result;
             }
 
-            public Quaternion Attitude = Quaternion.identity;
+            public Atomic<DateTime> LatestHeartBeat = new(DateTime.MinValue);
+            // TODO: need latency
+
+            public Atomic<Quaternion> Attitude = new(Quaternion.identity);
 
             private Maybe<Reader<object>> _updater;
 
             public Reader<object> Updater => _updater.Lazy(() =>
             {
-                return WatchDog.Union(
-                    AttitudeReader.SelectMany((_, v) =>
-                    {
-                        Attitude = v;
-                        return new List<object> { };
-                    })
-                );
+                return WatchDog
+                    .SelectMany((_, v) =>
+                        {
+                            LatestHeartBeat.Value = v.RxTime;
+                            return new List<object> { };
+                        }
+                    )
+                    .Union(
+                        AttitudeReader.SelectMany((_, v) =>
+                        {
+                            Attitude.Value = v;
+                            return new List<object> { };
+                        })
+                    );
             });
 
 
@@ -83,36 +117,26 @@ namespace MAVLinkAPI.API.Feature
             {
                 Updater.Drain();
             }
-        }
 
-        // public void StartUpdate()
-        // {
-        //     var reader = Reader;
-        //
-        //     lock (this)
-        //     {
-        //         if (UpdaterDaemon == null)
-        //         {
-        //             var daemon = new Daemon
-        //             {
-        //                 AttitudeReader = reader
-        //             };
-        //             daemon.Start();
-        //             UpdaterDaemon = daemon;
-        //         }
-        //     }
-        // }
-        //
-        // public void StopUpdate()
-        // {
-        //     lock (this)
-        //     {
-        //         if (UpdaterDaemon != null)
-        //         {
-        //             UpdaterDaemon.Dispose();
-        //             UpdaterDaemon = null;
-        //         }
-        //     }
-        // }
+            public override void DoClean()
+            {
+                base.DoClean();
+                foreach (var uplink in Updater.Sources.Keys)
+                {
+                    uplink.Dispose();
+                }
+            }
+
+            public override IEnumerable<string> GetStatusDetail()
+            {
+                var list = new List<string>
+                {
+                    $"    - heartbeat count : {LatestHeartBeat.UpdateCount}",
+                    $"    - attitude count : {Attitude.UpdateCount}"
+                };
+
+                return list.Union(base.GetStatusDetail());
+            }
+        }
     }
 }

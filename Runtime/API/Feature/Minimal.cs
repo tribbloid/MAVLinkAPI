@@ -1,26 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util;
+using MAVLinkAPI.Util.NullSafety;
 using Unity.VisualScripting;
 
 namespace MAVLinkAPI.API.Feature
 {
     public static class Minimal
     {
-        public static MAVLink.mavlink_heartbeat_t HeartbeatFromHere =>
-            new() // this should be sent regardless of received heartbeat
-            {
-                custom_mode = 0, // not sure how to use this
-                mavlink_version = 3,
-                type = (byte)MAVLink.MAV_TYPE.GCS,
-                autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
-                base_mode = 0
-            };
+        public record ConstT
+        {
+            private Maybe<MAVLink.mavlink_heartbeat_t> _ack;
 
-        public static Reader<object> WatchDog(
+            public MAVLink.mavlink_heartbeat_t Ack =>
+                _ack.Lazy(() =>
+                    new() // this should be sent regardless of received heartbeat
+                    {
+                        custom_mode = 0, // not sure how to use this
+                        mavlink_version = 2,
+                        type = (byte)MAVLink.MAV_TYPE.GCS,
+                        autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
+                        base_mode = 0
+                    }
+                );
+        }
+
+        public static ConstT Const = new();
+
+        public static Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog(
             this Uplink uplink,
             bool requireReceivedBytes = true,
             bool requireHeartbeat = true
@@ -29,17 +38,18 @@ namespace MAVLinkAPI.API.Feature
             // this will return an empty reader that respond to heartbeat and request target to send all data
             // will fail if heartbeat is not received within 2 seconds
 
-            var fn = MAVFunction
+            var rawReader = uplink
                 .On<MAVLink.mavlink_heartbeat_t>()
-                .SelectMany((_, msg) =>
+                .Select((_, msg) =>
                     {
+                        // var heartbeatBack = ctx.Msg.Data;
+                        uplink.WriteData(Const.Ack);
+
                         var sender = msg.Sender;
 
-                        // var heartbeatBack = ctx.Msg.Data;
-                        var ack = HeartbeatFromHere;
-
                         // TODO: too frequent, should only send once
-                        var requestAll = new MAVLink.mavlink_request_data_stream_t
+                        //  also deprecated
+                        var requestStream = new MAVLink.mavlink_request_data_stream_t
                         {
                             req_message_rate = 2,
                             req_stream_id = (byte)MAVLink.MAV_DATA_STREAM.ALL,
@@ -47,21 +57,32 @@ namespace MAVLinkAPI.API.Feature
                             target_component = sender.ComponentID,
                             target_system = sender.SystemID
                         };
+                        uplink.WriteData(requestStream);
 
-                        uplink.WriteData(ack);
-                        uplink.WriteData(requestAll);
+                        // MAV_CMD_SET_MESSAGE_INTERVAL same as above, but not deprecated 
+                        var setInterval = new MAVLink.mavlink_command_long_t
+                        {
+                            command = (ushort)MAVLink.MAV_CMD.SET_MESSAGE_INTERVAL,
+                            confirmation = 0,
+                            param1 = 2, // req_message_rate
+                            param2 = (byte)MAVLink.MAV_DATA_STREAM.ALL, // req_stream_id
+                            param3 = 1, // start_stop
+                            target_system = sender.SystemID,
+                            target_component = sender.ComponentID
+                        };
+                        // TODO: expecting mavlink_message_interval_t
+                        uplink.WriteData(setInterval);
 
-
-                        return new List<object>();
+                        return msg;
                     }
                 );
 
-            var reader = uplink.Read(fn);
+            var count = new AtomicInt();
 
             Retry.UpTo(6).With(TimeSpan.FromSeconds(0.2)).FixedInterval
                 .Run((_, _) =>
                     {
-                        uplink.WriteData(HeartbeatFromHere);
+                        uplink.WriteData(Const.Ack);
 
                         Thread.Sleep(500); // wait for a while before collecting
 
@@ -90,18 +111,17 @@ namespace MAVLinkAPI.API.Feature
 
                         if (requireHeartbeat)
                         {
-                            reader.Drain();
+                            var rxTimeReader = rawReader.Select((_, v) => { return v.RxTime; });
 
-                            if (reader.Sources.Keys.Sum(ll =>
-                                    ll.Metric.Histogram.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value) <=
-                                0)
-                                throw new InvalidConnectionException(
-                                    $"No heartbeat received");
+                            count.Add(rxTimeReader.Drain().Count);
+
+                            if (count.Value == 0)
+                                throw new InvalidConnectionException($"No heartbeat received");
                         }
                     }
                 );
 
-            return reader;
+            return rawReader;
         }
     }
 }

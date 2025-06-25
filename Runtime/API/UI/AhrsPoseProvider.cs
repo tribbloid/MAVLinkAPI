@@ -38,7 +38,7 @@ namespace MAVLinkAPI.API.UI
             var d = ActiveFeed;
             if (d != null)
             {
-                output = new Pose(new Vector3(0, 0, 0), d.Attitude);
+                output = new Pose(new Vector3(0, 0, 0), d.Attitude.Value);
                 return PoseDataFlags.Rotation;
             }
 

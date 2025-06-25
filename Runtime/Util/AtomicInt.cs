@@ -5,6 +5,7 @@ namespace MAVLinkAPI.Util
     public class Atomic<T>
     {
         protected T ValueInternal;
+        public long UpdateCount = 0; // counter is not synchronised
 
         public Atomic(T initialValue = default)
         {
@@ -13,36 +14,46 @@ namespace MAVLinkAPI.Util
 
         public T Value
         {
-            get => ValueInternal;
-            set => ValueInternal = value;
-        }
+            get
+            {
+                lock (this)
+                {
+                    return ValueInternal;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    ValueInternal = value;
+                }
 
-        public T Get()
-        {
-            return Value;
+                Interlocked.Increment(ref UpdateCount);
+            }
         }
     }
 
     public class AtomicInt : Atomic<int>
     {
-        // public AtomicInt(int initialValue) : base(initialValue)
-        // {
-        // }
-
-
         public int Increment()
         {
-            return Interlocked.Increment(ref ValueInternal);
+            var result = Interlocked.Increment(ref ValueInternal);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
 
         public int Decrement()
         {
-            return Interlocked.Decrement(ref ValueInternal);
+            var result = Interlocked.Decrement(ref ValueInternal);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
 
         public int Add(int value)
         {
-            return Interlocked.Add(ref ValueInternal, value);
+            var result = Interlocked.Add(ref ValueInternal, value);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
     }
 
@@ -50,17 +61,23 @@ namespace MAVLinkAPI.Util
     {
         public long Increment()
         {
-            return Interlocked.Increment(ref ValueInternal);
+            var result = Interlocked.Increment(ref ValueInternal);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
 
         public long Decrement()
         {
-            return Interlocked.Decrement(ref ValueInternal);
+            var result = Interlocked.Decrement(ref ValueInternal);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
 
         public long Add(long value)
         {
-            return Interlocked.Add(ref ValueInternal, value);
+            var result = Interlocked.Add(ref ValueInternal, value);
+            Interlocked.Increment(ref UpdateCount);
+            return result;
         }
     }
 }

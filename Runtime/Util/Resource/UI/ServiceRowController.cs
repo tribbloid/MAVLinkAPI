@@ -113,9 +113,7 @@ namespace MAVLinkAPI.Util.Resource.UI
                 {
                     try
                     {
-                        detail.text = string.Join(
-                            "\n", _underlying.GetStatusDetail()
-                        );
+                        detail.text = string.Join("\n", _underlying.GetStatusDetail());
                     }
                     catch (Exception ex)
                     {

@@ -117,7 +117,7 @@ namespace MAVLinkAPI.Routing
                             }
                             else
                             {
-                                Metric.PacketCount = Mavlink.packetcount;
+                                Metric.PacketCount.Value = Mavlink.packetcount;
                                 var counter = Metric.Histogram.Get(result.msgid)
                                     .ValueOrInsert(() => new AtomicLong());
                                 counter.Increment();
@@ -133,9 +133,13 @@ namespace MAVLinkAPI.Routing
 
         public override IEnumerable<string> GetStatusDetail()
         {
-            return base.GetStatusDetail().Prepend(
-                $"- buffer pressure : {IO.Metric_BufferPressure}"
-            );
+            var list = new List<string>
+            {
+                $"    - buffer pressure : {IO.Metric_BufferPressure}",
+                $"    - packet count : {Metric.PacketCount.Value}"
+            };
+
+            return list.Union(base.GetStatusDetail());
         }
     }
 }

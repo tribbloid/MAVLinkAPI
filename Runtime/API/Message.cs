@@ -39,8 +39,7 @@ namespace MAVLinkAPI.API
             {
                 var id1 = IDLookup.Global.ByType[typeof(T)];
 
-                return id1;
-                // TODO: add verified info that also run the lookup by 
+                return id1; // TODO: add verified info that also run the lookup by 
             }
         }
 

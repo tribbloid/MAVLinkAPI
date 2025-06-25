@@ -1,0 +1,7 @@
+processes:
+  download_sitl:
+    command: "wget https://firmware.ardupilot.org/Plane/stable/SITL_x86_64_linux_gnu/arduplane -O arduplane"
+
+jobs:
+  download: |
+    [ download_sitl : arpx_exit_error ]

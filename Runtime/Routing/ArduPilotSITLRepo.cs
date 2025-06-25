@@ -11,7 +11,7 @@ namespace MAVLinkAPI.Routing
     }
 
     public record ArduPilotSitlRepo(
-        SitlArch arch = SitlArch.X64Linux,
+        SitlArch Arch = SitlArch.X64Linux,
         string Frame = "Plane",
         string Version = "stable-4.5.7"
     )
@@ -22,7 +22,7 @@ namespace MAVLinkAPI.Routing
             {
                 string result;
 
-                switch (arch)
+                switch (Arch)
                 {
                     // case Arch.SITLX64Windows:
                     //     return $"https://firmware.ardupilot.org/{Frame}/{Version}/windows/{Env}/";
@@ -32,7 +32,7 @@ namespace MAVLinkAPI.Routing
                     // case Arch.SITLAppleSilicon:
                     //     return $"https://firmware.ardupilot.org/{Frame}/{Version}/macos/{Env}/";
                     default:
-                        throw new NotImplementedException($"architecture {arch} not supported");
+                        throw new NotImplementedException($"architecture {Arch} not supported");
                 }
 
                 return result;

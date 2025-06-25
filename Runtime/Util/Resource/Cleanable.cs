@@ -65,8 +65,8 @@ namespace MAVLinkAPI.Util.Resource
             return new List<string>
             {
                 ToString(),
-                $"- ID: {ID}",
-                $"- Uptime: {uptime}"
+                $"    - ID: {ID}",
+                $"    - Uptime: {uptime}"
             };
         }
 

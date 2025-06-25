@@ -24,7 +24,7 @@ namespace MAVLinkAPI.API
             }
         }
 
-        public static OnT<T> On<T>() where T : struct
+        public static OnT<T> On<T>() where T : struct // TODO: this should be a shortcut on Uplink
         {
             return new OnT<T>();
         }
