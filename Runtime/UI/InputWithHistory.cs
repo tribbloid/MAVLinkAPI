@@ -73,14 +73,15 @@ namespace MAVLinkAPI.UI
             input.onEndEdit.AddListener(OnInputChanged); // TODO: need to select an ad-hoc option to sync dropdown
 
             dropdown.onValueChanged.AddListener(OnDropdownSelect);
-        }
 
-        private void OnEnable()
-        {
             RefreshHistory();
 
             OnInputChanged(input.text);
         }
+
+        // private void OnEnable()
+        // {
+        // }
 
         private void OnInputSubmit(string text)
         {

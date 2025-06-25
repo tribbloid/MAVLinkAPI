@@ -109,8 +109,8 @@ namespace MAVLinkAPI.Tests.Util
 
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Does.StartWith("All 4 attempt(s) failed:"));
-            Assert.That(exception.Message, Does.Contain("  - Failure on item 1 (x2)"));
-            Assert.That(exception.Message, Does.Contain("  - Failure on item 2 (x2)"));
+            Assert.That(exception.Message, Does.Contain("- (x2) Failure on item 1"));
+            Assert.That(exception.Message, Does.Contain("- (x2) Failure on item 2"));
             Assert.That(exception.Source, Is.EqualTo("ca.hpvdt.mavlinkapi.Runtime"));
         }
     }
