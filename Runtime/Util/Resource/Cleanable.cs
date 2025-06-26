@@ -106,7 +106,6 @@ namespace MAVLinkAPI.Util.Resource
             }
         }
 
-
         public static IEnumerable<T> Peers<T>(this T self) where T : Cleanable
         {
             var peers = self.SelfAndPeers<T>();

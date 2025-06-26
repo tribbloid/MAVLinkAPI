@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using MAVLinkAPI.API.Feature;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
@@ -9,9 +8,9 @@ namespace MAVLinkAPI.API.UI
 {
     public class AhrsPoseProvider : BasePoseProvider
     {
-        public Ahrs.Feed? ActiveFeed;
+        public Common.NavigationFeed? ActiveFeed;
 
-        public void Bind(Ahrs.Feed daemon)
+        public void Bind(Common.NavigationFeed daemon)
         {
             if (ActiveFeed != null) Unbind();
 
@@ -39,7 +38,7 @@ namespace MAVLinkAPI.API.UI
             var d = ActiveFeed;
             if (d != null)
             {
-                output = new Pose(new Vector3(0, 0, 0), d.Attitude.Value);
+                output = new Pose(new Vector3(0, 0, 0), d.LastAttitude.Value);
                 return PoseDataFlags.Rotation;
             }
 

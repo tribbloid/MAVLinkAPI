@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using Autofill;
-using MAVLinkAPI.Ext;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
@@ -32,7 +31,6 @@ namespace MAVLinkAPI.Util.Resource.UI
         [SerializeField] public SerializedDict<string, Graphic> iconTemplates = new();
 
         [DoNotSerialize] private Cleanable? _underlying;
-
 
         private void SetIcon(Cleanable cleanable)
         {

@@ -69,10 +69,10 @@ namespace MAVLinkAPI.Util.Resource.UI
             }
         }
 
-        // public void Start()
-        // {
-        //     rowTemplate.gameObject.SetActive(false);
-        // }
+        public void Start()
+        {
+            rowTemplate.gameObject.SetActive(false);
+        }
 
         public void Update()
         {

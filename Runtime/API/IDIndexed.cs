@@ -28,7 +28,7 @@ namespace MAVLinkAPI.API
         {
             public readonly uint ID;
 
-            public Accessor(IDIndexed<T> outer, uint id) 
+            public Accessor(IDIndexed<T> outer, uint id)
             {
                 Outer = outer;
                 ID = id;

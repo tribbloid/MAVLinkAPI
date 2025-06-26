@@ -13,7 +13,7 @@ namespace MAVLinkAPI.Tests.API
             var index = new IDIndexed<int>(new Dictionary<uint, int>
             {
                 { 0, 10 }, // Corresponds to MAVLink.mavlink_heartbeat_t
-                { 1, 20 }  // Corresponds to MAVLink.mavlink_sys_status_t
+                { 1, 20 } // Corresponds to MAVLink.mavlink_sys_status_t
             });
 
             // Act
