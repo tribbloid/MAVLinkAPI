@@ -15,11 +15,8 @@ namespace MAVLinkAPI.UI.TableExt
         [Autofill] public RectTransform rectT = null!;
 
         [Autofill(AutofillType.SelfAndParent)] public TableRow row = null!;
-        [Autofill(AutofillType.Parent)] public ScrollLock scrollLock = null!;
 
-        // [Required] public ScrollLock scrollLock = null!;
-
-        // [Autofill(AutofillType.Parent)] public TableLayout table = null!;
+        [Autofill(AutofillType.Parent)] public TableLayout table = null!;
 
         [Required] public Button toggle = null!;
         public MonoBehaviour? detail;
@@ -60,10 +57,7 @@ namespace MAVLinkAPI.UI.TableExt
                 _minHeight
             );
 
-            foreach (var o in scrollLock.RefreshTable())
-            {
-                yield return o; // TODO: how to simplify this?
-            }
+            table.UpdateLayout();
 
             // row.UpdateLayout(); // doesn't work
             // table.UpdateLayout(); // reset the scroll position

@@ -30,16 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     println!("🎉 Runtime execution completed successfully!");
     println!("📄 The 'arduplane' SITL binary should be downloaded from the YAML job definition.");
-    
-    // Verify the download
-    match std::fs::metadata("arduplane") {
-        Ok(metadata) => {
-            println!("📊 Downloaded file size: {} bytes", metadata.len());
-        }
-        Err(_) => {
-            println!("⚠️  Warning: Could not verify downloaded file");
-        }
-    }
+
     
     Ok(())
 }
