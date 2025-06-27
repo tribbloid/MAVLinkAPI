@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MAVLinkAPI.Util.NullSafety
 {
@@ -19,7 +21,7 @@ namespace MAVLinkAPI.Util.NullSafety
                 return true;
 
             // Check if it's a UnityEngine.Object and if it has been destroyed
-            if (obj is UnityEngine.Object unityObject)
+            if (obj is Object unityObject)
                 return unityObject == null;
 
             return false;
@@ -31,17 +33,17 @@ namespace MAVLinkAPI.Util.NullSafety
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CheckField()
         {
-            var objects = UnityEngine.Object.FindObjectsOfType<MonoBehaviour>();
-            foreach (var obj in objects)
+            var gameObjs = Object.FindObjectsOfType<MonoBehaviour>();
+            foreach (var gameObj in gameObjs)
             {
-                var type = obj.GetType();
+                var type = gameObj.GetType();
                 var fields = type.GetFields(BindingFlags.Instance |
                                             BindingFlags.Public |
                                             BindingFlags.NonPublic);
 
-                // var properties = type.GetProperties(BindingFlags.Instance |
-                //                                     BindingFlags.Public |
-                //                                     BindingFlags.NonPublic);
+                var properties = type.GetProperties(BindingFlags.Instance |
+                                                    BindingFlags.Public |
+                                                    BindingFlags.NonPublic);
 
                 var enabledOnClass = Attribute.GetCustomAttribute(type, typeof(RequiredAttribute)) is
                     RequiredAttribute;
@@ -50,25 +52,27 @@ namespace MAVLinkAPI.Util.NullSafety
                     if (enabledOnClass || Attribute.GetCustomAttribute(field, typeof(RequiredAttribute)) is
                             RequiredAttribute)
                     {
-                        var value = field.GetValue(obj);
-                        Report(value, type, field);
+                        var value = field.GetValue(gameObj);
+                        Report(value, type, field, gameObj);
                     }
 
-                // foreach (var property in properties)
-                //     if (enabledOnClass || Attribute.GetCustomAttribute(property, typeof(NullSafeAttribute)) is
-                //             NullSafeAttribute)
-                //         if (property.IsAccessor())
-                //         {
-                //             var value = property.GetValue(obj);
-                //             Report(value, type, property);
-                //         }
+                foreach (var property in properties)
+                    if (enabledOnClass || Attribute.GetCustomAttribute(property, typeof(RequiredAttribute)) is
+                            RequiredAttribute)
+                        if (property.IsAccessor())
+                        {
+                            var value = property.GetValue(gameObj);
+                            Report(value, type, property, gameObj);
+                        }
             }
 
-            void Report(object value, Type type, MemberInfo field)
+            void Report(object value, Type type, MemberInfo field, Object gameObject)
             {
                 if (value == null || value.IsUnityNull())
-                    Debug.LogException(new NullReferenceException(
-                        $"NullSafe violation: {type.Name}.{field.Name} is null")
+                    Debug.LogException(
+                        new NullReferenceException(
+                            $"NullSafe violation: {type.Name}.{field.Name} is null"),
+                        gameObject
                     );
             }
         }

@@ -27,6 +27,8 @@ namespace MAVLinkAPI.UI.TableExt
         {
             _minHeight = row.preferredHeight;
 
+            // TODO: this will set all panels to be folded on start, is it a good idea?
+            detail?.gameObject.SetActive(false);
             UpdateHeights(true);
 
             toggle.onClick.AddListener(() =>
@@ -34,6 +36,11 @@ namespace MAVLinkAPI.UI.TableExt
                 detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
                 UpdateHeights();
             });
+        }
+
+        public void OnEnable()
+        {
+            UpdateHeights(true);
         }
 
         private void UpdateHeights(bool wait = false)

@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using MAVLinkAPI.API.Feature;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
@@ -8,9 +9,11 @@ namespace MAVLinkAPI.API.UI
 {
     public class NavPoseProvider : BasePoseProvider
     {
-        public Common.NavigationFeed? ActiveFeed;
+        public bool verboseLogging = false;
 
-        public void Bind(Common.NavigationFeed daemon)
+        [NonSerialized] public Common.NavigationFeed? ActiveFeed;
+
+        public void Connect(Common.NavigationFeed daemon)
         {
             if (ActiveFeed != null) Unbind();
 
@@ -38,7 +41,12 @@ namespace MAVLinkAPI.API.UI
             var d = ActiveFeed;
             if (d != null)
             {
-                output = new Pose(new Vector3(0, 0, 0), d.LastAttitude.Value);
+                var qRaw = d.LastAttitude.Value;
+                output = new Pose(new Vector3(0, 0, 0), qRaw);
+
+                if (verboseLogging)
+                    Debug.Log($"update from XR (Euler): {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
+
                 return PoseDataFlags.Rotation;
             }
 

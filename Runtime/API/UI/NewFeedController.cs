@@ -61,7 +61,7 @@ namespace MAVLinkAPI.API.UI
 
                     feed = Common.NavigationFeed.OfUplink(Lifetime, uplink);
 
-                    poseProvider.Bind(feed);
+                    poseProvider.Connect(feed);
                 }
                 catch (Exception ex)
                 {
