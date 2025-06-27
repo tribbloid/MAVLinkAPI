@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace MAVLinkAPI.API.UI
 {
-    public class AhrsFeedController : MonoBehaviour
+    public class NewFeedController : MonoBehaviour
     {
         /**
          * bind to a lifetime in scene, an <see cref="Common.NavigationFeed"/> instance can be created from the last Stream
@@ -21,7 +21,7 @@ namespace MAVLinkAPI.API.UI
          */
         [Required] public LifetimeBinding lifetimeBinding = null!;
 
-        [Required] public AhrsPoseProvider poseProvider = null!;
+        [Required] public NavPoseProvider poseProvider = null!;
 
         [Required] public TMP_InputField addressInput = null!;
 
@@ -39,12 +39,12 @@ namespace MAVLinkAPI.API.UI
             });
             baudRateInput.value = IOStream.BaudRates.all.IndexOf(IOStream.BaudRates.Default);
 
-            addressInput.onSubmit.AddListener(address => BindInputAsync(address));
+            addressInput.onSubmit.AddListener(address => BindNavPoseAsync(address));
 
             newFeedButton.onClick.AddListener(() => addressInput.onSubmit.Invoke(addressInput.text));
         }
 
-        private void BindInputAsync(string address)
+        private void BindNavPoseAsync(string address)
         {
             var args = IOStream.ArgsT.Parse(address);
 

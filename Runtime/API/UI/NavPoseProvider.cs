@@ -6,7 +6,7 @@ using UnityEngine.SpatialTracking;
 
 namespace MAVLinkAPI.API.UI
 {
-    public class AhrsPoseProvider : BasePoseProvider
+    public class NavPoseProvider : BasePoseProvider
     {
         public Common.NavigationFeed? ActiveFeed;
 
