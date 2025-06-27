@@ -17,10 +17,7 @@ namespace MAVLinkAPI.Spike
             if (transform.parent != null)
             {
                 var parentRect = transform.parent.GetComponent<RectTransform>();
-                if (parentRect != null)
-                {
-                    LayoutRebuilder.MarkLayoutForRebuild(parentRect);
-                }
+                if (parentRect != null) LayoutRebuilder.MarkLayoutForRebuild(parentRect);
             }
         }
 

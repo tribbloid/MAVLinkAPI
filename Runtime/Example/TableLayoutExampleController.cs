@@ -6,7 +6,7 @@ namespace MAVLinkAPI.Example
 {
     public class TableLayoutExampleController : MonoBehaviour
     {
-        public List<TableLayout> Examples = new List<TableLayout>();
+        public List<TableLayout> Examples = new();
 
         public void ShowExample(TableLayout example)
         {

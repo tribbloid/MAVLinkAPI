@@ -41,6 +41,7 @@ namespace MAVLinkAPI.UI.TableExt
             StartCoroutine(UpdateHeightsTask(wait));
         }
 
+
         private IEnumerator UpdateHeightsTask(bool wait)
         {
             // Wait until the end of the frame, after layout calculations

@@ -35,10 +35,7 @@ namespace MAVLinkAPI.Tests.Spike
         [TearDown]
         public void TearDown()
         {
-            if (testObject != null)
-            {
-                Object.DestroyImmediate(testObject.transform.root.gameObject);
-            }
+            if (testObject != null) Object.DestroyImmediate(testObject.transform.root.gameObject);
         }
 
         [UnityTest]

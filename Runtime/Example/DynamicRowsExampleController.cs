@@ -24,7 +24,7 @@ namespace MAVLinkAPI.Example
         // Font for the dynamic rows example
         public Font font;
 
-        void OnEnable()
+        private void OnEnable()
         {
             // This doesn't have to be done with a coroutine, this is just so that the example runs slowly enough so that you can see each row being added
             // (normally we'd probably add them all at once)
@@ -34,7 +34,7 @@ namespace MAVLinkAPI.Example
             //StartCoroutine(AddRowsWithoutTemplate());
         }
 
-        IEnumerator AddRowsUsingTemplate()
+        private IEnumerator AddRowsUsingTemplate()
         {
             while (numberOfRowsAdded <= numberOfRowsToAdd)
             {
@@ -64,7 +64,7 @@ namespace MAVLinkAPI.Example
             }
         }
 
-        IEnumerator AddRowsWithoutTemplate()
+        private IEnumerator AddRowsWithoutTemplate()
         {
             while (numberOfRowsAdded <= numberOfRowsToAdd)
             {

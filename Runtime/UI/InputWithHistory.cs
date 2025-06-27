@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autofill;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
@@ -103,7 +104,10 @@ namespace MAVLinkAPI.UI
 
         private void OnInputChanged(string text)
         {
-            dropdown.AddOptions(new List<string> { text });
+            var last = dropdown.options.LastOrDefault();
+
+            if (last == null || last.text != text)
+                dropdown.AddOptions(new List<string> { text });
             dropdown.SetValueWithoutNotify(dropdown.options.Count - 1);
             // Any Edit will cause dropdown selectin to reset
         }
