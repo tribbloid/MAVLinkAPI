@@ -11,16 +11,16 @@ namespace MAVLinkAPI.UI
 
         private struct OldLocation
         {
-            public Transform parent;
-            public int siblingIndex;
+            public Transform Parent;
+            public int SiblingIndex;
         }
 
         private Maybe<OldLocation> _stats;
 
         private OldLocation Stats => _stats.Lazy(() => new OldLocation
         {
-            parent = mutable.gameObject.transform.parent,
-            siblingIndex = mutable.gameObject.transform.GetSiblingIndex()
+            Parent = mutable.gameObject.transform.parent,
+            SiblingIndex = mutable.gameObject.transform.GetSiblingIndex()
         });
 
         public T CopyToReplace(T template)
@@ -36,8 +36,8 @@ namespace MAVLinkAPI.UI
             UnityEngine.Object.Destroy(oldGameObject);
 
             var newTransform = newInstance.transform;
-            newTransform.SetParent(Stats.parent);
-            newTransform.SetSiblingIndex(Stats.siblingIndex);
+            newTransform.SetParent(Stats.Parent);
+            newTransform.SetSiblingIndex(Stats.SiblingIndex);
 
             mutable = newInstance;
             return newInstance;

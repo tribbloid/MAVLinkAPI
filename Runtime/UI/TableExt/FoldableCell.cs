@@ -13,6 +13,8 @@ namespace MAVLinkAPI.UI.TableExt
     [RequireComponent(typeof(RectTransform))]
     public class FoldableCell : UIBehaviour
     {
+        public bool startFolded = true;
+
         [Autofill] public RectTransform rectT = null!;
 
         [Autofill(AutofillType.SelfAndParent)] public TableRow row = null!;
@@ -28,14 +30,10 @@ namespace MAVLinkAPI.UI.TableExt
         {
             _minHeight = row.preferredHeight;
 
-            // detail?.gameObject.SetActive(false); // enable to this to fold panel on start
+            if (startFolded) detail?.gameObject.SetActive(false);
             UpdateHeights(true);
 
-            toggle.onClick.AddListener(() =>
-            {
-                detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
-                // UpdateHeights();
-            });
+            toggle.onClick.AddListener(() => { detail?.gameObject.SetActive(!detail.gameObject.activeSelf); });
         }
 
         protected override void OnRectTransformDimensionsChange()

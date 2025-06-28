@@ -856,13 +856,13 @@ MonoBehaviour:
   terminate1: {fileID: 1631848073993925288}
   terminate2: {fileID: 7017152302801704594}
   icon:
-    mutable: {fileID: 0}
+    mutable: {fileID: 1561869664206926921}
   iconTemplates:
     pairs:
     - key: DirectUplink
-      value: {fileID: 0}
+      value: {fileID: 297748130133717217}
     - key: NavigationFeed
-      value: {fileID: 0}
+      value: {fileID: 1089991617900811595}
 --- !u!1 &842922972223132232
 GameObject:
   m_ObjectHideFlags: 0
@@ -1859,6 +1859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3620a6151fc4ac38e787ceb94315904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startFolded: 1
   rectT: {fileID: 3383910854234379501}
   row: {fileID: 2302731144773506518}
   table: {fileID: 8603409320676572451}
@@ -4036,6 +4037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3620a6151fc4ac38e787ceb94315904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startFolded: 1
   rectT: {fileID: 2734535780523855129}
   row: {fileID: 4050551015202173504}
   table: {fileID: 8603409320676572451}
@@ -5273,6 +5275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3620a6151fc4ac38e787ceb94315904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startFolded: 1
   rectT: {fileID: 8026846715850434746}
   row: {fileID: 8619691031088663729}
   table: {fileID: 8603409320676572451}
@@ -7662,6 +7665,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3620a6151fc4ac38e787ceb94315904, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startFolded: 1
   rectT: {fileID: 889094996531745486}
   row: {fileID: 6958835758795677372}
   table: {fileID: 8603409320676572451}

@@ -26,9 +26,9 @@ namespace MAVLinkAPI.Util.Resource.UI
         [Serialize] private readonly float _updateFreqSec = 1.5f;
 
         [Tooltip("The default icon to display when no specific icon is found for the cleanable's type.")] [Required]
-        public MutableComponent<Graphic> icon = null!;
+        public MutableComponent<Component> icon = null!;
 
-        [SerializeField] public SerializedDict<string, Graphic> iconTemplates = new();
+        [SerializeField] public SerializedDict<string, Component> iconTemplates = new();
 
         [DoNotSerialize] private Cleanable? _underlying;
 
