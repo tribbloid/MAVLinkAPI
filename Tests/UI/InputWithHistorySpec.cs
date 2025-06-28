@@ -129,7 +129,7 @@ namespace MAVLinkAPI.Tests.UI
 
             Assert.AreEqual(1, newHistoryDropDown.History.Count, "History not loaded correctly after restart.");
             Assert.AreEqual(entryToPersist, newHistoryDropDown.History[0], "Persistent entry content mismatch.");
-            Assert.AreEqual(2, _dropdown.options.Count, "Dropdown not populated from loaded history.");
+            Assert.AreEqual(1, _dropdown.options.Count, "Dropdown not populated from loaded history.");
             Assert.AreEqual(entryToPersist, _dropdown.options[0].text, "Dropdown option text mismatch after load.");
         }
 
@@ -154,7 +154,7 @@ namespace MAVLinkAPI.Tests.UI
             yield return null;
 
             Assert.AreEqual(0, _historyDropDown.History.Count, "Empty string was added to history.");
-            Assert.AreEqual(1, _dropdown.options.Count, "Dropdown options not empty after empty input.");
+            Assert.AreEqual(0, _dropdown.options.Count, "Dropdown options not empty after empty input.");
         }
 
         [UnityTest]

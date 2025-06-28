@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,35 +8,27 @@ namespace MAVLinkAPI.Util.Resource
 {
     public abstract class Daemon : Cleanable
     {
-        // Can only be canceled once, as a result, it can only be started once
-        public CancellationTokenSource Cancel = new();
+        // Can only be started once and canceled once
+        public readonly CancellationTokenSource Cancel = new();
 
-        private CancellationToken? _cancelSignal;
 
         public Daemon(Lifetime lifetime) : base(lifetime)
         {
         }
 
-
         public readonly int GraceTimeMillis = 5000;
 
-        public void Stop()
-        {
-            Cancel.CancelAfter(GraceTimeMillis); // Execute() should drop out of the loop first
-            _cancelSignal = null;
-        }
+        private Task? _task;
 
-        public override void DoClean()
+        public void Start()
         {
-            Stop();
-        }
+            if (Cancel.IsCancellationRequested)
+                throw new InvalidOperationException("Daemon has been stopped and cannot be restarted.");
+            if (_task != null) return;
 
-        public async void Start()
-        {
             var cancelSignal = Cancel.Token;
-            _cancelSignal = cancelSignal;
 
-            await Task.Run(() =>
+            _task = Task.Run(() =>
                 {
                     try
                     {
@@ -43,10 +36,38 @@ namespace MAVLinkAPI.Util.Resource
                     }
                     catch (Exception e)
                     {
-                        Debug.LogException(e);
+                        if (e is not OperationCanceledException) Debug.LogException(e);
                     }
-                }, cancelSignal // hard cancel after 5 seconds
+                }, cancelSignal
             );
+        }
+
+        public void Stop()
+        {
+            if (!Cancel.IsCancellationRequested) Cancel.Cancel();
+        }
+
+        public void StopBlocking()
+        {
+            Stop();
+            try
+            {
+                _task?.Wait(GraceTimeMillis);
+            }
+            catch (AggregateException e)
+            {
+                e.Handle(ex => ex is OperationCanceledException);
+            }
+            catch (OperationCanceledException)
+            {
+                // also possible
+            }
+        }
+
+        public override void DoClean()
+        {
+            StopBlocking();
+            Cancel.Dispose();
         }
 
         public abstract void Execute(CancellationToken cancelSignal);

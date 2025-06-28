@@ -57,6 +57,7 @@ namespace MAVLinkAPI.Tests.Spike
             var sizeFitter = parentObject.AddComponent<ContentSizeFitter>();
             sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            parentObject.AddComponent<VerticalLayoutGroup>();
 
             // Wait a few frames for layout system to update
             yield return null;
