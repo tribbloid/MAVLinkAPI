@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 
 namespace MAVLinkAPI.Util.Resource
@@ -18,29 +19,32 @@ namespace MAVLinkAPI.Util.Resource
 
         public readonly int GraceTimeMillis = 5000;
 
-        private Task? _task;
+        private Maybe<Task> _started;
 
         public void Start()
         {
             if (Cancel.IsCancellationRequested)
                 throw new InvalidOperationException("Daemon has been stopped and cannot be restarted.");
-            if (_task != null) return;
 
-            var cancelSignal = Cancel.Token;
+            _started.Lazy(() =>
+            {
+                var cancelSignal = Cancel.Token;
 
-            _task = Task.Run(() =>
-                {
-                    try
+                return Task.Run(() =>
                     {
-                        Execute(cancelSignal);
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is not OperationCanceledException) Debug.LogException(e);
-                    }
-                }, cancelSignal
-            );
+                        try
+                        {
+                            Execute(cancelSignal);
+                        }
+                        catch (Exception e)
+                        {
+                            if (e is not OperationCanceledException) Debug.LogException(e);
+                        }
+                    }, cancelSignal
+                );
+            });
         }
+
 
         public void Stop()
         {
@@ -52,7 +56,7 @@ namespace MAVLinkAPI.Util.Resource
             Stop();
             try
             {
-                _task?.Wait(GraceTimeMillis);
+                _started.ValueOrNull?.Wait(GraceTimeMillis);
             }
             catch (AggregateException e)
             {

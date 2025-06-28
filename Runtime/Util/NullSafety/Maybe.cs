@@ -43,7 +43,7 @@ namespace MAVLinkAPI.Util.NullSafety
             set => _value = value;
         }
 
-        public T ValueOrDefault(T defaultValue)
+        public T? ValueOrDefault(T? defaultValue = default)
         {
             return _value != null ? (T)_value! : defaultValue;
         }

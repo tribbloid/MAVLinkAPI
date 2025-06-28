@@ -5,12 +5,13 @@ using Autofill;
 using MAVLinkAPI.UI.Tables;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MAVLinkAPI.UI.TableExt
 {
     [RequireComponent(typeof(RectTransform))]
-    public class FoldableCell : MonoBehaviour
+    public class FoldableCell : UIBehaviour
     {
         [Autofill] public RectTransform rectT = null!;
 
@@ -23,31 +24,37 @@ namespace MAVLinkAPI.UI.TableExt
 
         private float _minHeight = -1;
 
-        public void Start()
+        protected override void Start()
         {
             _minHeight = row.preferredHeight;
 
-            // TODO: this will set all panels to be folded on start, is it a good idea?
-            detail?.gameObject.SetActive(false);
+            // detail?.gameObject.SetActive(false); // enable to this to fold panel on start
             UpdateHeights(true);
 
             toggle.onClick.AddListener(() =>
             {
                 detail?.gameObject.SetActive(!detail.gameObject.activeSelf);
-                UpdateHeights();
+                // UpdateHeights();
             });
         }
 
-        public void OnEnable()
+        protected override void OnRectTransformDimensionsChange()
+        {
+            base.OnRectTransformDimensionsChange();
+            // Debug.Log("RectTransform size changed!");
+            UpdateHeights();
+            // Place your custom callback logic here
+        }
+
+        protected override void OnEnable()
         {
             UpdateHeights(true);
         }
 
         private void UpdateHeights(bool wait = false)
         {
-            StartCoroutine(UpdateHeightsTask(wait));
+            if (isActiveAndEnabled) StartCoroutine(UpdateHeightsTask(wait));
         }
-
 
         private IEnumerator UpdateHeightsTask(bool wait)
         {
@@ -66,13 +73,6 @@ namespace MAVLinkAPI.UI.TableExt
             );
 
             table.UpdateLayout();
-
-            // row.UpdateLayout(); // doesn't work
-            // table.UpdateLayout(); // reset the scroll position
-            // LayoutRebuilder.MarkLayoutForRebuild(table.GetComponent<RectTransform>()); // ditto
-
-            // var tempRow = table.AddRow();
-            // Destroy(tempRow.gameObject); // ditto
         }
     }
 }
