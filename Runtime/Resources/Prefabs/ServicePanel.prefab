@@ -5427,9 +5427,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba901e16c5f04bf4b08d3721562f29b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetimeBinding: {fileID: 1161893056345704773}
+  lifetimeBinding: {fileID: 0}
   poseProvider: {fileID: 0}
-  addressInput: {fileID: 2221015118842877301}
+  addressInput: {fileID: 0}
   baudRateInput: {fileID: 5716895458231969438}
   newFeedButton: {fileID: 7604349687020549058}
 --- !u!1 &5985583929068317117
@@ -8948,17 +8948,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
---- !u!114 &2221015118842877301 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3272682232475450261, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
-  m_PrefabInstance: {fileID: 3726806056996220640}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &7306759615384965350 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6259604862912724486, guid: 7f8fbfeeb512b1d74b4afce426fe2312, type: 3}
