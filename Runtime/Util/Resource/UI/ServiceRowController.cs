@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using Autofill;
 using MAVLinkAPI.UI;
 using MAVLinkAPI.UI.Tables;
@@ -40,27 +41,25 @@ namespace MAVLinkAPI.Util.Resource.UI
                 icon.CopyToReplace(template);
         }
 
-        private void CleanIfBothTerminating()
+        private async Task CleanIfBothTerminating()
         {
             var left = terminate1.isOn;
             var right = terminate2.isOn;
 
             if (left && right)
             {
-                _underlying?.Dispose();
+                terminate1.interactable = false;
+                terminate2.interactable = false;
 
-                RemoveRow();
+                await Task.Run(() =>
+                    {
+                        _underlying?.Dispose();
+
+                        Destroy(row.gameObject);
+                    }
+                );
             }
         }
-
-        private void RemoveRow()
-        {
-            terminate1.enabled = false;
-            terminate2.enabled = false;
-
-            Destroy(row.gameObject);
-        }
-
 
         public void Bind(Cleanable cleanable)
         {
@@ -97,7 +96,10 @@ namespace MAVLinkAPI.Util.Resource.UI
 
             if (_underlying.IsDisposed)
             {
-                RemoveRow();
+                terminate1.interactable = false;
+                terminate2.interactable = false;
+
+                Destroy(row.gameObject);
                 return;
             }
 
