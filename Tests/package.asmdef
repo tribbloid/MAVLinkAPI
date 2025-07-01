@@ -2,11 +2,11 @@
   "name": "ca.hpvdt.mavlinkapi.Tests",
   "rootNamespace": "MAVLinkAPI",
   "references": [
-    "Unity.TextMeshPro",
     "ca.hpvdt.mavlinkapi.Runtime",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner",
-    "YamlDotNet"
+    "YamlDotNet",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
@@ -14,7 +14,7 @@
   "overrideReferences": true,
   "precompiledReferences": [
     "nunit.framework.dll",
-    "YamlDotNet"
+    "Newtonsoft.Json.dll"
   ],
   "autoReferenced": false,
   "defineConstraints": [
