@@ -65,7 +65,7 @@ namespace MAVLinkAPI.API
 
         protected abstract IDIndexed<CaseFn> Topics_Mk();
 
-        protected virtual CaseFn OtherCase => _ => new List<T>();
+        protected virtual CaseFn OtherCase => _ => null;
         // theoretically this will be interned to avoid multiple initialization
 
         public List<T>? ProcessOrNull(MAVLink.MAVLinkMessage message)
