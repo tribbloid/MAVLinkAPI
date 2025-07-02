@@ -13109,7 +13109,6 @@ GameObject:
   - component: {fileID: 2009724567}
   - component: {fileID: 2009724568}
   - component: {fileID: 2009724571}
-  - component: {fileID: 2009724572}
   m_Layer: 5
   m_Name: TableLayout
   m_TagString: Untagged
@@ -13214,18 +13213,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   table: {fileID: 2009724567}
   rowTemplate: {fileID: 464230722}
---- !u!114 &2009724572
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2009724565}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ab107bbcf924d288af9302a55595bfc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2022875831
 GameObject:
   m_ObjectHideFlags: 0
