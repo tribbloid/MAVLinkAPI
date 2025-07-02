@@ -1,8 +1,6 @@
 #nullable enable
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using MAVLinkAPI.API;
@@ -70,7 +68,7 @@ namespace MAVLinkAPI.Routing
         }
 
 
-        public void Write<T>(Message<T> msg) where T : struct
+        public void Write<T>(IMessage<T> msg) where T : struct
         {
             var bytes = Mavlink.GenerateMAVLinkPacket20(
                 msg.TypeID,

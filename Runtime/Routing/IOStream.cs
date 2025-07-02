@@ -2,14 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using MAVLinkAPI.Comms;
-using MAVLinkAPI.Ext;
-using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
-using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 
 namespace MAVLinkAPI.Routing

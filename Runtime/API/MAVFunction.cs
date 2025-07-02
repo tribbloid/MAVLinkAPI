@@ -3,51 +3,79 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.Ext;
-using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
 
 namespace MAVLinkAPI.API
 {
     public static class MAVFunction
     {
+        public class RawT : MAVFunction<MAVLink.MAVLinkMessage>
+        {
+            protected override IDIndexed<CaseFn> Topics_Mk()
+            {
+                return new IDIndexed<CaseFn>(); // no topic
+            }
+
+            protected override CaseFn OtherCase => m => new List<MAVLink.MAVLinkMessage> { m };
+        }
+
+        public static readonly RawT Raw = new();
+
         public class OnT<T> : MAVFunction<Message<T>> where T : struct
         {
-            protected override IDIndexed<Topic> Topics_Mk()
+            public readonly MAVFunction<MAVLink.MAVLinkMessage> Prev;
+
+            public OnT(MAVFunction<MAVLink.MAVLinkMessage> prev)
             {
-                var result = new IDIndexed<Topic>();
-                Topic topic = message => new List<Message<T>>
+                Prev = prev;
+            }
+
+            protected override IDIndexed<CaseFn> Topics_Mk()
+            {
+                var result = new IDIndexed<CaseFn>();
+                CaseFn topic = message =>
                 {
-                    Message<T>.FromRaw(message)
+                    var ms = Prev.Process(message);
+                    var res = ms.SelectMany(x => new List<Message<T>> { Message<T>.FromRaw(x) }).ToList();
+
+                    return res;
                 };
                 result.Get<T>().Value = topic;
                 return result;
             }
         }
 
-        public static OnT<T> On<T>() where T : struct // TODO: this should be a shortcut on Uplink
+        public static OnT<T> On<T>(MAVFunction<MAVLink.MAVLinkMessage>? prev = null)
+            where T : struct // TODO: this should be a shortcut on Uplink
         {
-            return new OnT<T>();
+            prev ??= Raw;
+
+            return new OnT<T>(prev);
         }
     }
 
 
     public abstract class MAVFunction<T>
     {
-        public delegate List<T> Topic(MAVLink.MAVLinkMessage message);
+        public delegate List<T>? CaseFn(MAVLink.MAVLinkMessage message);
 
-        public static readonly Topic TopicMissing = _ => new List<T>();
+        private Maybe<IDIndexed<CaseFn>> _topics;
 
-        private Maybe<IDIndexed<Topic>> _topics;
+        private IDIndexed<CaseFn> Topics => _topics.Lazy(Topics_Mk);
 
-        private IDIndexed<Topic> Topics =>
-            _topics.Lazy(Topics_Mk);
+        protected abstract IDIndexed<CaseFn> Topics_Mk();
 
-        protected abstract IDIndexed<Topic> Topics_Mk();
+        protected virtual CaseFn OtherCase => _ => new List<T>();
+        // theoretically this will be interned to avoid multiple initialization
 
+        public List<T>? ProcessOrNull(MAVLink.MAVLinkMessage message)
+        {
+            return Topics.Get(message.msgid).ValueOr(OtherCase)(message);
+        }
 
         public List<T> Process(MAVLink.MAVLinkMessage message)
         {
-            return Topics.Get(message.msgid).ValueOr(TopicMissing)(message);
+            return ProcessOrNull(message) ?? new List<T>();
         }
 
         public static implicit operator Func<MAVLink.MAVLinkMessage, List<T>?>(MAVFunction<T> function)
@@ -63,21 +91,17 @@ namespace MAVLinkAPI.API
 
         public class UnionT : BothT
         {
-            protected override IDIndexed<Topic> Topics_Mk()
+            protected override IDIndexed<CaseFn> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
-                    (ll, rr) => input =>
-                    {
-                        var before = new List<List<T>?> { ll(input), rr(input) };
+                    (ll, rr) => input => ll(input).UnionNullSafe(rr(input))?.ToList());
 
-                        return before.Where(x => x != null)
-                            .Aggregate((l, r) => l.Union(r).ToList());
-                    }
-                );
-
-                return new IDIndexed<Topic>(merged);
+                return new IDIndexed<CaseFn>(merged);
             }
+
+            protected override CaseFn OtherCase => m =>
+                Left.OtherCase(m).UnionNullSafe(Right.OtherCase(m))?.ToList();
         }
 
         public UnionT Union(MAVFunction<T> that)
@@ -91,20 +115,17 @@ namespace MAVLinkAPI.API
 
         public class OrElseT : BothT
         {
-            protected override IDIndexed<Topic> Topics_Mk()
+            protected override IDIndexed<CaseFn> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
-                    (ll, rr) => input =>
-                    {
-                        var before = (ll(input), rr(input));
+                    (ll, rr) => input => ll(input) ?? rr(input));
 
-                        return before.Item1 ?? before.Item2;
-                    }
-                );
-
-                return new IDIndexed<Topic>(merged);
+                return new IDIndexed<CaseFn>(merged);
             }
+
+
+            protected override CaseFn OtherCase => m => Left.OtherCase(m) ?? Right.OtherCase(m);
         }
 
         public OrElseT OrElse(MAVFunction<T> that)
@@ -121,7 +142,7 @@ namespace MAVLinkAPI.API
             public MAVFunction<T> Prev = null!;
             public Func<MAVLink.MAVLinkMessage, T, List<T2>> Fn = null!;
 
-            protected override IDIndexed<Topic> Topics_Mk()
+            protected override IDIndexed<CaseFn> Topics_Mk()
             {
                 var oldTopics = Prev.Topics.Index;
 
@@ -129,9 +150,10 @@ namespace MAVLinkAPI.API
                     kv => kv.Key,
                     kv =>
                     {
-                        Topic topic = ii =>
+                        CaseFn topic = ii =>
                         {
                             var prevV = kv.Value(ii);
+                            if (prevV == null) return null;
 
                             var result = prevV.SelectMany(x => Fn(ii, x)
                             ).ToList();
@@ -142,8 +164,18 @@ namespace MAVLinkAPI.API
                     }
                 );
 
-                return new IDIndexed<Topic>(newTopics);
+                return new IDIndexed<CaseFn>(newTopics);
             }
+
+            protected override CaseFn OtherCase => m =>
+            {
+                var prevV = Prev.OtherCase(m);
+                if (prevV == null) return null;
+
+                return prevV.SelectMany(v =>
+                    Fn(m, v)
+                ).ToList();
+            };
         }
 
         public CutElimination<T2> SelectMany<T2>(Func<MAVLink.MAVLinkMessage, T, List<T2>> fn)
@@ -163,6 +195,7 @@ namespace MAVLinkAPI.API
 
     public static class ProcessorExtensions
     {
+        // TODO: will be redundant if MAVFunction<T> => IMAVFunction<out T>
         public static MAVFunction<T> Upcast<T, T1>(this MAVFunction<T1> left) where T1 : T
         {
             return left.Select((_, t) => (T)t);

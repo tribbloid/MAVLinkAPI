@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.API;
@@ -30,7 +29,9 @@ namespace MAVLinkAPI.Routing
             Uplink Outer,
             AtomicLong PacketCount,
             IDIndexed<AtomicLong> Histogram
-        );
+        )
+        {
+        };
 
         private Maybe<MetricT> _metric; // fuck C# verbosity
         public MetricT Metric => _metric.Lazy(() => new MetricT(this, new AtomicLong(), new IDIndexed<AtomicLong>()));

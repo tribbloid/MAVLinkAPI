@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 
 namespace MAVLinkAPI.API
 {
@@ -25,11 +24,23 @@ namespace MAVLinkAPI.API
 
 
     // mavlink msg id is automatically inferred by reflection
+    public interface IMessage<out T>
+    {
+        T Data { get; }
+        Component Sender { get; }
+
+        DateTime RxTime { get; }
+
+        MAVLink.message_info Info { get; }
+
+        public MAVLink.MAVLINK_MSG_ID TypeID => (MAVLink.MAVLINK_MSG_ID)Info.msgid;
+    }
+
     public record Message<T>(
         T Data,
         Component Sender,
         DateTime? RxTimeOrNull = null
-    )
+    ) : IMessage<T> where T : struct
     {
         public DateTime RxTime => RxTimeOrNull ?? DateTime.UtcNow;
 
@@ -43,22 +54,12 @@ namespace MAVLinkAPI.API
             }
         }
 
-        public MAVLink.MAVLINK_MSG_ID TypeID => (MAVLink.MAVLINK_MSG_ID)Info.msgid;
 
         public static Message<T> FromRaw(MAVLink.MAVLinkMessage msg)
         {
             var sender = new Component(msg.sysid, msg.compid);
 
             return new Message<T>((T)msg.data, sender, msg.rxtime);
-        }
-    }
-
-
-    public static class RawMessageExtension
-    {
-        public static Message<T> OfType<T>(this MAVLink.MAVLinkMessage msg) where T : struct
-        {
-            return Message<T>.FromRaw(msg);
         }
     }
 }
