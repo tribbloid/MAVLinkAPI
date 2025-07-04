@@ -27,9 +27,9 @@ namespace MAVLinkAPI.Util.Resource.UI
         [Serialize] private readonly float _updateFreqSec = 1.5f;
 
         [Tooltip("The default icon to display when no specific icon is found for the cleanable's type.")] [Required]
-        public MutableComponent<Component> icon = null!;
+        public MutableComponent<RectTransform> icon = null!;
 
-        [SerializeField] public SerializedDict<string, Component> iconTemplates = new();
+        [SerializeField] public SerializedDict<string, RectTransform> iconTemplates = new();
 
         [DoNotSerialize] private Cleanable? _underlying;
 
@@ -39,6 +39,8 @@ namespace MAVLinkAPI.Util.Resource.UI
 
             if (iconTemplates.Dictionary?.TryGetValue(typeName, out var template) == true && template != null)
                 icon.CopyToReplace(template);
+            else
+                Debug.Log($"unknown type {typeName}");
         }
 
         private async Task CleanIfBothTerminating()

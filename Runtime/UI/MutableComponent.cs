@@ -9,18 +9,28 @@ namespace MAVLinkAPI.UI
     {
         [Required] public volatile T mutable;
 
-        private struct OldLocation
+        private struct OldStatsT
         {
             public Transform Parent;
             public int SiblingIndex;
+            public Vector3 LocalPosition;
+            public Vector3 LocalRotation;
+            public Vector3 LocalScale;
         }
 
-        private Maybe<OldLocation> _stats;
+        private Maybe<OldStatsT> _stats;
 
-        private OldLocation Stats => _stats.Lazy(() => new OldLocation
+        private OldStatsT OldStats => _stats.Lazy(() =>
         {
-            Parent = mutable.gameObject.transform.parent,
-            SiblingIndex = mutable.gameObject.transform.GetSiblingIndex()
+            var t = mutable.gameObject.transform;
+            return new OldStatsT
+            {
+                Parent = t.parent,
+                SiblingIndex = t.GetSiblingIndex(),
+                LocalPosition = t.localPosition,
+                LocalRotation = t.localEulerAngles,
+                LocalScale = t.localScale
+            };
         });
 
         public T CopyToReplace(T template)
@@ -30,17 +40,22 @@ namespace MAVLinkAPI.UI
             return MoveToReplace(newInstance);
         }
 
-        public T MoveToReplace(T newInstance)
+        public T MoveToReplace(T instance)
         {
-            var oldGameObject = mutable.gameObject;
-            UnityEngine.Object.Destroy(oldGameObject);
+            var oldStats = OldStats;
+            UnityEngine.Object.Destroy(mutable.gameObject);
 
-            var newTransform = newInstance.transform;
-            newTransform.SetParent(Stats.Parent);
-            newTransform.SetSiblingIndex(Stats.SiblingIndex);
+            var newTransform = instance.transform;
+            newTransform.SetParent(oldStats.Parent);
+            newTransform.SetSiblingIndex(oldStats.SiblingIndex);
 
-            mutable = newInstance;
-            return newInstance;
+            newTransform.localPosition = oldStats.LocalPosition;
+            newTransform.localEulerAngles = oldStats.LocalRotation;
+            newTransform.localScale = oldStats.LocalScale;
+
+
+            mutable = instance;
+            return instance;
         }
     }
 }
