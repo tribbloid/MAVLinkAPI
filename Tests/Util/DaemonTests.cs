@@ -27,7 +27,6 @@ namespace MAVLinkAPI.Tests.Util
                 try
                 {
                     while (!cancelSignal.IsCancellationRequested)
-                    {
                         try
                         {
                             // Simulate work
@@ -37,7 +36,6 @@ namespace MAVLinkAPI.Tests.Util
                         {
                             // Ignore cancellation, the loop condition will handle it
                         }
-                    }
                 }
                 finally
                 {

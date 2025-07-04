@@ -87,24 +87,15 @@ namespace MAVLinkAPI.Routing.Relay
                 public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object? container)
                 {
                     var properties = _innerTypeDescriptor.GetProperties(type, container);
-                    if (container == null)
-                    {
-                        return properties;
-                    }
+                    if (container == null) return properties;
 
                     return properties.Where(p =>
                     {
                         var valueDescriptor = (IObjectDescriptor)p.Read(container);
 
-                        if (valueDescriptor == null || valueDescriptor.Value == null)
-                        {
-                            return false;
-                        }
+                        if (valueDescriptor == null || valueDescriptor.Value == null) return false;
 
-                        if (valueDescriptor.Value is string stringValue)
-                        {
-                            return !string.IsNullOrWhiteSpace(stringValue);
-                        }
+                        if (valueDescriptor.Value is string stringValue) return !string.IsNullOrWhiteSpace(stringValue);
 
                         return true;
                     });
