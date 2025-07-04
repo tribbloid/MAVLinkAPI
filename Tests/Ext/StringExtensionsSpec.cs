@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MAVLinkAPI.Util.Text;
 using NUnit.Framework;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MAVLinkAPI.Tests.Util.Resource;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;

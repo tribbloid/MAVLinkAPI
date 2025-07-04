@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MAVLinkAPI.Util;
 using NUnit.Framework;
 
