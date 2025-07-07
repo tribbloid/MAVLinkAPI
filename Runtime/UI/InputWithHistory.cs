@@ -6,8 +6,6 @@ using Autofill;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using TMPro;
-using UnityEditor.Search;
-using UnityEngine.Assertions;
 
 namespace MAVLinkAPI.UI
 {
@@ -22,17 +20,9 @@ namespace MAVLinkAPI.UI
         public bool isPersisted = true;
         public string? persistedIDOvrd;
 
-        public string PersistedID
-        {
-            get
-            {
-                var v = persistedIDOvrd;
-                if (string.IsNullOrWhiteSpace(v))
-                    v = SearchUtils.GetHierarchyPath(gameObject, true);
-                Assert.IsFalse(string.IsNullOrEmpty(v), "persistentID cannot be null or empty");
-                return v!;
-            }
-        }
+        private Maybe<string> _persistedID;
+
+        public string PersistedID => _persistedID.Lazy(() => gameObject.GetScenePath());
 
         public int maxHistorySize = 30;
 

@@ -139,7 +139,14 @@ namespace MAVLinkAPI.Routing
 
         public int BytesToRead => Comm.BytesToRead;
 
-        public double Metric_BufferPressure => (double)BytesToRead / Comm.ReadBufferSize;
+        public double Metric_BufferPressure
+        {
+            get
+            {
+                if (Comm.ReadBufferSize == 0) return 0;
+                return (double)BytesToRead / Comm.ReadBufferSize;
+            }
+        }
 
         // locking to prevent multiple reads on serial port
         public readonly object ReadLock = new();
