@@ -18,7 +18,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("ac\nbd", result.ToString());
+            Assert.AreEqual("ac\nbd".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("ad\nbe\nc", result.ToString());
+            Assert.AreEqual("ad\nbe\nc".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("a\nb", result.ToString());
+            Assert.AreEqual("a\nb".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("a  d\nbb e\ncccf", result.ToString());
+            Assert.AreEqual("a  d\nbb e\ncccf".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
 
@@ -89,7 +89,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("a  d\nbb e\ncccf\n   g", result.ToString());
+            Assert.AreEqual("a  d\nbb e\ncccf\n   g".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block1.ZipRight(block2);
 
             // Assert
-            Assert.AreEqual("a  \nbb \nccc", result.ToString());
+            Assert.AreEqual("a  \nbb \nccc".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block.PadLeft();
 
             // Assert
-            Assert.AreEqual("|a\n|b", result.ToString());
+            Assert.AreEqual("|a\n|b".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace MAVLinkAPI.Tests.Util
             var result = block.PadLeft("-> ", "   ");
 
             // Assert
-            Assert.AreEqual("-> a\n   b", result.ToString());
+            Assert.AreEqual("-> a\n   b".normaliseLineBreak(), result.ToString().normaliseLineBreak());
         }
 
         [Test]
