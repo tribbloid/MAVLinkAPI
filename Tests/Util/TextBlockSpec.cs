@@ -1,6 +1,6 @@
 using MAVLinkAPI.Util.Text;
 using NUnit.Framework;
-using UnityEngine.TestTools;
+using System;
 
 namespace MAVLinkAPI.Tests.Util
 {
@@ -130,6 +130,74 @@ namespace MAVLinkAPI.Tests.Util
 
             // Assert
             Assert.AreEqual("-> a\n   b", result.ToString());
+        }
+
+        [Test]
+        public void NormaliseLineBreak_WithDosEndings_ShouldConvertToSystemDefault()
+        {
+            // Arrange
+            var input = "line1\r\nline2";
+            var expected = "line1\nline2";
+
+            // Act
+            var result = input.normaliseLineBreak();
+
+            // Assert
+            Assert.AreEqual(expected, result.Replace(Environment.NewLine, "\n"));
+        }
+
+        [Test]
+        public void NormaliseLineBreak_WithUnixEndings_ShouldConvertToSystemDefault()
+        {
+            // Arrange
+            var input = "line1\nline2";
+            var expected = "line1\nline2";
+
+            // Act
+            var result = input.normaliseLineBreak();
+
+            // Assert
+            Assert.AreEqual(expected, result.Replace(Environment.NewLine, "\n"));
+        }
+
+        [Test]
+        public void NormaliseLineBreak_WithMixedEndings_ShouldConvertToSystemDefault()
+        {
+            // Arrange
+            var input = "line1\r\nline2\nline3";
+            var expected = "line1\nline2\nline3";
+
+            // Act
+            var result = input.normaliseLineBreak();
+
+            // Assert
+            Assert.AreEqual(expected, result.Replace(Environment.NewLine, "\n"));
+        }
+
+        [Test]
+        public void NormaliseLineBreak_WithNullInput_ShouldReturnNull()
+        {
+            // Arrange
+            string input = null;
+
+            // Act
+            var result = input.normaliseLineBreak();
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void NormaliseLineBreak_WithEmptyInput_ShouldReturnEmpty()
+        {
+            // Arrange
+            var input = "";
+
+            // Act
+            var result = input.normaliseLineBreak();
+
+            // Assert
+            Assert.AreEqual("", result);
         }
     }
 }

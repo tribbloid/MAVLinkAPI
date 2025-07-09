@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofill;
+using MAVLinkAPI.Ext;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using TMPro;
@@ -22,7 +23,9 @@ namespace MAVLinkAPI.UI
 
         private Maybe<string> _persistedID;
 
-        public string PersistedID => _persistedID.Lazy(() => gameObject.GetScenePath());
+        public string PersistedID => _persistedID.Lazy(() =>
+            persistedIDOvrd ?? gameObject.GetScenePath()
+        );
 
         public int maxHistorySize = 30;
 

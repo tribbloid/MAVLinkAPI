@@ -160,9 +160,6 @@ namespace MAVLinkAPI.Tests.UI
         [UnityTest]
         public IEnumerator Persistence_IsDisabled()
         {
-            // 1. Ensure persistence is disabled by setting ID to null
-            _historyDropDown.isPersisted = false;
-
             // 2. Submit an entry
             var testInput = "this should not be saved";
             _inputField.onSubmit.Invoke(testInput);
@@ -174,9 +171,14 @@ namespace MAVLinkAPI.Tests.UI
             // 3. Simulate restart
             Object.DestroyImmediate(_historyDropDown);
             var newHistoryDropDown = _testHost.AddComponent<InputWithHistory>();
+
+            // 1. Ensure persistence is disabled by setting ID to null
+            newHistoryDropDown.isPersisted = false;
+            newHistoryDropDown.persistedIDOvrd = null; // Ensure new instance also has a null ID
+
             newHistoryDropDown.input = _inputField;
             newHistoryDropDown.dropdown = _dropdown;
-            newHistoryDropDown.persistedIDOvrd = null; // Ensure new instance also has a null ID
+
 
             yield return null; // Allow Awake/Start
 
