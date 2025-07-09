@@ -94,5 +94,11 @@ namespace MAVLinkAPI.Util.Text
         {
             return fn(Block(text)).ToString();
         }
+
+        public static string normaliseLineBreak(this string text)
+        {
+            if (text == null) return null;
+            return text.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
+        }
     }
 }
