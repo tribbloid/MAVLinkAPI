@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using MAVLinkAPI.Util;
 using NUnit.Framework;
-using UnityEngine.TestTools;
 
 namespace MAVLinkAPI.Tests.Util
 {

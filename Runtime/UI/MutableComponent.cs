@@ -7,7 +7,7 @@ namespace MAVLinkAPI.UI
     [Serializable]
     public class MutableComponent<T> where T : Component
     {
-        [Required] public volatile T mutable;
+        [Required] public T mutable;
 
         private struct OldStatsT
         {

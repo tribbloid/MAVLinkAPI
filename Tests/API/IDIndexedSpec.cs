@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MAVLinkAPI.API;
+using MAVLinkAPI.Util.Text;
 using NUnit.Framework;
 
 namespace MAVLinkAPI.Tests.API
@@ -22,7 +23,7 @@ namespace MAVLinkAPI.Tests.API
             // Assert
             var expected = "mavlink_heartbeat_t: 10\n" +
                            "mavlink_sys_status_t: 20\n";
-            Assert.AreEqual(expected, result);
+            Assert.AreEqual(expected.normaliseLineBreak(), result);
         }
     }
 }

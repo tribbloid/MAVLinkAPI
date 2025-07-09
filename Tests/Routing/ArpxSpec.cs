@@ -1,11 +1,7 @@
 using NUnit.Framework;
 using MAVLinkAPI.Routing.Relay;
 using System.Collections.Generic;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using UnityEngine;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using MAVLinkAPI.Util.Text;
 
 namespace MAVLinkAPI.Tests.Routing
 {
@@ -27,7 +23,7 @@ namespace MAVLinkAPI.Tests.Routing
 
             protected void AssertReserialized(string original, string reserialized)
             {
-                Assert.AreEqual(original.Trim(), reserialized.Trim());
+                Assert.AreEqual(original.normaliseLineBreak().Trim(), reserialized.normaliseLineBreak().Trim());
             }
 
             [Test]

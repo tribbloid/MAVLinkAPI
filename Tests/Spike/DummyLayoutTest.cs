@@ -1,6 +1,5 @@
 using System.Collections;
 using MAVLinkAPI.Spike;
-using MAVLinkAPI.UI.TableExt;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
