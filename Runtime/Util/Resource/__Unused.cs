@@ -9,7 +9,7 @@ namespace MAVLinkAPI.Util.Resource
     {
         private readonly List<Action> _pendingActions = new();
         private readonly object _lock = new();
-        private volatile bool _constructionComplete = false;
+        private bool _constructionComplete = false;
 
         public CanRunAfterConstruction()
         {
