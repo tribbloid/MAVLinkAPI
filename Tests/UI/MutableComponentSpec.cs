@@ -3,7 +3,7 @@ using MAVLinkAPI.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using TMPro;
 
 namespace MAVLinkAPI.Tests.UI
 {
@@ -16,13 +16,13 @@ namespace MAVLinkAPI.Tests.UI
             var rootObject = new GameObject("Root");
             var originalObject = new GameObject("Original");
             originalObject.transform.SetParent(rootObject.transform);
-            var originalComponent = originalObject.AddComponent<Text>();
+            var originalComponent = originalObject.AddComponent<TextMeshProUGUI>();
 
             var templateObject = new GameObject("Template");
             templateObject.SetActive(false);
-            var templateComponent = templateObject.AddComponent<Text>();
+            var templateComponent = templateObject.AddComponent<TextMeshProUGUI>();
 
-            var mutableComponent = new MutableComponent<Text> { mutable = originalComponent };
+            var mutableComponent = new MutableComponent<TextMeshProUGUI> { mutable = originalComponent };
 
             // Act
             var newComponent = mutableComponent.CopyToReplace(templateComponent);
