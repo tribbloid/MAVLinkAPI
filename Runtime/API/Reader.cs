@@ -26,7 +26,7 @@ namespace MAVLinkAPI.API
 
         private record SubReader(KeyValuePair<Uplink, MAVFunction<T>> Pair)
         {
-            public IEnumerable<List<T>> ByMessage_Mk()
+            public IEnumerable<List<T>> MkByMessage()
             {
                 return Pair.Key.RawReadSource.Select(message => Pair.Value.Process(message));
             }
@@ -38,7 +38,7 @@ namespace MAVLinkAPI.API
             {
                 var list = new List<T>();
 
-                using (var itr = ByMessage_Mk().GetEnumerator())
+                using (var itr = MkByMessage().GetEnumerator())
                 {
                     while (BytesToRead > leftover && itr.MoveNext())
                     {
@@ -53,17 +53,17 @@ namespace MAVLinkAPI.API
         }
 
         private Maybe<IEnumerable<List<T>>> _byMessage;
-        public IEnumerable<List<T>> ByMessage => _byMessage.Lazy(ByMessage_Mk);
+        public IEnumerable<List<T>> ByMessage => _byMessage.Lazy(MkByMessage);
 
-        private IEnumerable<List<T>> ByMessage_Mk()
+        private IEnumerable<List<T>> MkByMessage()
         {
-            return Sources.SelectMany(pair => new SubReader(pair).ByMessage_Mk());
+            return Sources.SelectMany(pair => new SubReader(pair).MkByMessage());
         }
 
         private Maybe<IEnumerable<T>> _byOutput;
-        public IEnumerable<T> ByOutput => _byOutput.Lazy(ByOutput_Mk);
+        public IEnumerable<T> ByOutput => _byOutput.Lazy(MkByOutput);
 
-        private IEnumerable<T> ByOutput_Mk()
+        private IEnumerable<T> MkByOutput()
         {
             return ByMessage.SelectMany(vs => vs);
         }

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MAVLinkAPI.Spike
+namespace MAVLinkAPI._Spike
 {
     /// <summary>
     /// A dummy layout component that reports fixed preferred sizes.

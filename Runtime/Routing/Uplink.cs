@@ -47,7 +47,12 @@ namespace MAVLinkAPI.Routing
             return reader;
         }
 
-        public Reader<Message<T>> On<T>() where T : struct
+        public Reader<MAVLink.MAVLinkMessage> ReadRaw()
+        {
+            return Read(MAVFunction.Raw);
+        }
+
+        public Reader<RxMessage<T>> On<T>() where T : struct
         {
             return Read(MAVFunction.On<T>());
         }

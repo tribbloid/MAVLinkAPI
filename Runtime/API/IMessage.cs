@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using MAVLinkAPI.Util.NullSafety;
 
 namespace MAVLinkAPI.API
 {
@@ -16,12 +17,19 @@ namespace MAVLinkAPI.API
 
         public static Component Gcs0 = Gcs();
 
-        public Message<T> ToMessage<T>(T data) where T : struct
+        public TxMessage<T> MkTxMessage<T>(T data)
         {
-            return new Message<T>(data, this);
+            return new TxMessage<T>(data, this);
         }
     }
 
+
+    public record Signature(
+        byte[] Blob, // referring to sig in MAVLinkMessage
+        ulong Timestamp // not a DateTime, only useful in warding off replay attacks
+    )
+    {
+    }
 
     // mavlink msg id is automatically inferred by reflection
     public interface IMessage<out T>
@@ -29,21 +37,38 @@ namespace MAVLinkAPI.API
         T Data { get; }
         Component Sender { get; }
 
-        DateTime RxTime { get; }
-
         MAVLink.message_info Info { get; }
 
         public MAVLink.MAVLINK_MSG_ID TypeID => (MAVLink.MAVLINK_MSG_ID)Info.msgid;
     }
 
-    public record Message<T>(
-        T Data,
-        Component Sender,
-        DateTime? RxTimeOrNull = null
-    ) : IMessage<T> where T : struct
-    {
-        public DateTime RxTime => RxTimeOrNull ?? DateTime.UtcNow;
 
+    public record RxMessage<T>(
+        MAVLink.MAVLinkMessage Raw
+    ) : IMessage<T>
+    {
+        public DateTime RxTime { get; } = Raw?.rxtime ?? DateTime.MinValue;
+
+        private Maybe<T> _data;
+        public T Data => _data.Lazy(() => Raw.ToStructure<T>());
+
+        private Maybe<Component> _sender;
+        public Component Sender => _sender.Lazy(() => new Component(Raw.sysid, Raw.compid));
+
+        private Maybe<Signature> _signature;
+
+        public Signature Signature =>
+            _signature.Lazy(() => new Signature(Raw.sig ?? Array.Empty<byte>(), Raw.sigTimestamp));
+
+        private Maybe<MAVLink.message_info> _info;
+        public MAVLink.message_info Info => _info.Lazy(() => IDLookup.Global.ByID[Raw.msgid]);
+    }
+
+    public record TxMessage<T>(
+        T Data,
+        Component Sender
+    ) : IMessage<T>
+    {
         public MAVLink.message_info Info
         {
             get
@@ -52,14 +77,6 @@ namespace MAVLinkAPI.API
 
                 return id1; // TODO: add verified info that also run the lookup by 
             }
-        }
-
-
-        public static Message<T> FromRaw(MAVLink.MAVLinkMessage msg)
-        {
-            var sender = new Component(msg.sysid, msg.compid);
-
-            return new Message<T>((T)msg.data, sender, msg.rxtime);
         }
     }
 }

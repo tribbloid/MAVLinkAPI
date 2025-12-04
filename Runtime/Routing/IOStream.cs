@@ -85,9 +85,9 @@ namespace MAVLinkAPI.Routing
         private Maybe<ICommsSerial> _comm; // can only be initialised once, will be closed at the end of lifetime
 
         // TODO: generalised this to read from any () => Stream
-        public ICommsSerial Comm => _comm.Lazy(() => Comm_Mk());
+        public ICommsSerial Comm => _comm.Lazy(() => MkComm());
 
-        public ICommsSerial Comm_Mk()
+        public ICommsSerial MkComm()
         {
             ICommsSerial GetRawComm()
             {

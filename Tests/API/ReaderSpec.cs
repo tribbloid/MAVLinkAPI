@@ -8,30 +8,13 @@ namespace MAVLinkAPI.Tests.API
 {
     public class ReaderSpec
     {
-        private MAVLink.MAVLinkMessage MockHeartbeat()
-        {
-            // Create a new heartbeat message
-            var heartbeat = new MAVLink.mavlink_heartbeat_t
-            {
-                type = (byte)MAVLink.MAV_TYPE.QUADROTOR,
-                autopilot = (byte)MAVLink.MAV_AUTOPILOT.GENERIC,
-                base_mode = (byte)MAVLink.MAV_MODE_FLAG.MANUAL_INPUT_ENABLED,
-                custom_mode = 0,
-                system_status = (byte)MAVLink.MAV_STATE.STANDBY,
-                mavlink_version = 3
-            };
-
-            var parser = new MAVLink.MavlinkParse();
-            var packetBytes = parser.GenerateMAVLinkPacket20(MAVLink.MAVLINK_MSG_ID.HEARTBEAT, heartbeat);
-            return new MAVLink.MAVLinkMessage(packetBytes);
-        }
 
 
         [Test]
         public void RawReadSource_EmitsCorrectMessage()
         {
             // Arrange
-            var message = MockHeartbeat();
+            var message = MAVFunction.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
 
             // Act
@@ -47,7 +30,7 @@ namespace MAVLinkAPI.Tests.API
         public void DirectOutput()
         {
             // Arrange
-            var message = MockHeartbeat();
+            var message = MAVFunction.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
             var reader = uplink.Read(mavFunction);
@@ -63,7 +46,7 @@ namespace MAVLinkAPI.Tests.API
         public void Select_TransformsOutput()
         {
             // Arrange
-            var message = MockHeartbeat();
+            var message = MAVFunction.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
             var reader = uplink.Read(mavFunction);
@@ -81,7 +64,7 @@ namespace MAVLinkAPI.Tests.API
         public void SelectMany_TransformsAndFlattensOutput()
         {
             // Arrange
-            var message = MockHeartbeat();
+            var message = MAVFunction.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
             var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
             var reader = uplink.Read(mavFunction);

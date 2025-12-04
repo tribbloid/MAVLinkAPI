@@ -2,7 +2,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MAVLinkAPI.UI
+namespace MAVLinkAPI._Spike
 {
     public abstract class AutoUIGeneratorUGUI<T> : MonoBehaviour
     {

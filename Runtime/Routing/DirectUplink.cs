@@ -80,9 +80,9 @@ namespace MAVLinkAPI.Routing
             IO.WriteBytes(bytes);
         }
 
-        public override void WriteData<T>(T data) where T : struct
+        public override void WriteData<T>(T data)
         {
-            var msg = ThisComponent.ToMessage(data);
+            var msg = ThisComponent.MkTxMessage(data);
 
             Write(msg);
         }

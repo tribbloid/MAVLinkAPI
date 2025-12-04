@@ -85,7 +85,7 @@ namespace MAVLinkAPI.API.Feature
             {
             }
 
-            public Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog { get; init; }
+            public Reader<RxMessage<MAVLink.mavlink_heartbeat_t>> WatchDog { get; init; }
             public Reader<Quaternion> AttitudeReader { get; init; }
 
 

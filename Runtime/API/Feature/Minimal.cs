@@ -23,7 +23,7 @@ namespace MAVLinkAPI.API.Feature
 
         public static ConstT Const = new();
 
-        public static Reader<Message<MAVLink.mavlink_heartbeat_t>> WatchDog(
+        public static Reader<RxMessage<MAVLink.mavlink_heartbeat_t>> WatchDog(
             this Uplink uplink,
             bool requireReceivedBytes = true,
             bool requireHeartbeat = true

@@ -1,5 +1,5 @@
 using System.Collections;
-using MAVLinkAPI.Spike;
+using MAVLinkAPI._Spike;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
