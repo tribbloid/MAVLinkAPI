@@ -8,13 +8,11 @@ namespace MAVLinkAPI.Tests.API
 {
     public class ReaderSpec
     {
-
-
         [Test]
         public void RawReadSource_EmitsCorrectMessage()
         {
             // Arrange
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
 
             // Act
@@ -30,10 +28,10 @@ namespace MAVLinkAPI.Tests.API
         public void DirectOutput()
         {
             // Arrange
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
-            var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
-            var reader = uplink.Read(mavFunction);
+            var pipe = Pipe.On<MAVLink.mavlink_heartbeat_t>();
+            var reader = uplink.Read(pipe);
 
             var result = reader.Drain();
 
@@ -46,10 +44,10 @@ namespace MAVLinkAPI.Tests.API
         public void Select_TransformsOutput()
         {
             // Arrange
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
-            var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var reader = uplink.Read(mavFunction);
+            var pipe = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var reader = uplink.Read(pipe);
 
             // Act
             var stringReader = reader.Select((m, i) => "Transformed");
@@ -64,10 +62,10 @@ namespace MAVLinkAPI.Tests.API
         public void SelectMany_TransformsAndFlattensOutput()
         {
             // Arrange
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
-            var mavFunction = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var reader = uplink.Read(mavFunction);
+            var pipe = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var reader = uplink.Read(pipe);
 
             // Act
             var listReader = reader.SelectMany((m, i) => new List<string> { "A", "B" });
@@ -85,7 +83,7 @@ namespace MAVLinkAPI.Tests.API
             // Arrange
             var uplink1 = new Uplink.Dummy();
             var uplink2 = new Uplink.Dummy();
-            var func = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var func = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
             var reader1 = new Reader<int>(uplink1, func);
             var reader2 = new Reader<int>(uplink2, func);
 
@@ -104,7 +102,7 @@ namespace MAVLinkAPI.Tests.API
             // Arrange
             var uplink1 = new Uplink.Dummy();
             var uplink2 = new Uplink.Dummy();
-            var func = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var func = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
             var reader1 = new Reader<int>(uplink1, func);
             var reader2 = new Reader<int>(uplink2, func);
 
@@ -122,8 +120,8 @@ namespace MAVLinkAPI.Tests.API
         {
             // Arrange
             var uplink = new Uplink.Dummy();
-            var func1 = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var func2 = MAVFunction.On<MAVLink.mavlink_system_time_t>().Select((m, p) => 2);
+            var func1 = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var func2 = Pipe.On<MAVLink.mavlink_system_time_t>().Select((m, p) => 2);
             var reader1 = new Reader<int>(uplink, func1);
             var reader2 = new Reader<int>(uplink, func2);
 
@@ -139,8 +137,8 @@ namespace MAVLinkAPI.Tests.API
         {
             // Arrange
             var uplink = new Uplink.Dummy();
-            var func1 = MAVFunction.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
-            var func2 = MAVFunction.On<MAVLink.mavlink_system_time_t>().Select((m, p) => 2);
+            var func1 = Pipe.On<MAVLink.mavlink_heartbeat_t>().Select((m, p) => 1);
+            var func2 = Pipe.On<MAVLink.mavlink_system_time_t>().Select((m, p) => 2);
             var reader1 = new Reader<int>(uplink, func1);
             var reader2 = new Reader<int>(uplink, func2);
 

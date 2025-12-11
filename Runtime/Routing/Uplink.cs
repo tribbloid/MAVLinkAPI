@@ -40,21 +40,21 @@ namespace MAVLinkAPI.Routing
         // having multiple readers polling at the same time is dangerous, but we won't give a warning or error
         //  the burden is on the user
 
-        public Reader<T> Read<T>(MAVFunction<T> mavFunction)
+        public Reader<T> Read<T>(Pipe<T> pipe)
         {
-            var reader = new Reader<T>(this, mavFunction);
+            var reader = new Reader<T>(this, pipe);
             SubscribedReaders.Add(reader);
             return reader;
         }
 
         public Reader<MAVLink.MAVLinkMessage> ReadRaw()
         {
-            return Read(MAVFunction.Raw);
+            return Read(Pipe.Raw);
         }
 
         public Reader<RxMessage<T>> On<T>() where T : struct
         {
-            return Read(MAVFunction.On<T>());
+            return Read(Pipe.On<T>());
         }
 
         // Mock Uplink that can provide a stream of messages for testing

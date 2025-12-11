@@ -20,7 +20,7 @@ namespace MAVLinkAPI.API.Fn
      * - if a MsgState is not verified and passed a long deadline: it should be considered lost:
      *   Emit an error and increment the error count, MsgState is removed from the cache queue
      */
-    public class HighAvailabilityT<T> : MAVFunction<RxMessage<T>>.LeftAndRight
+    public class HighAvailabilityT<T> : Pipe<RxMessage<T>>.LeftAndRight
     {
         public record MsgKey(
             Signature Sig,

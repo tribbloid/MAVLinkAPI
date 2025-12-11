@@ -5,11 +5,11 @@ using MAVLinkAPI.API;
 
 namespace MAVLinkAPI.API.Fn
 {
-    public class OnT<T> : MAVFunction<RxMessage<T>> where T : struct
+    public class OnT<T> : Pipe<RxMessage<T>> where T : struct
     {
-        public readonly MAVFunction<MAVLink.MAVLinkMessage> Prev;
+        public readonly Pipe<MAVLink.MAVLinkMessage> Prev;
 
-        public OnT(MAVFunction<MAVLink.MAVLinkMessage> prev)
+        public OnT(Pipe<MAVLink.MAVLinkMessage> prev)
         {
             Prev = prev;
         }

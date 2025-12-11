@@ -8,7 +8,7 @@ using MAVLinkAPI.Util.NullSafety;
 
 namespace MAVLinkAPI.API
 {
-    public static class MAVFunction
+    public static class Pipe
     {
         /// <summary>
         /// Test utility method to create a mock MAVLink heartbeat message
@@ -33,19 +33,17 @@ namespace MAVLinkAPI.API
 
         public static readonly RawT Raw = new();
 
-        public static OnT<T> On<T>(MAVFunction<MAVLink.MAVLinkMessage>? prev = null)
+        public static OnT<T> On<T>(Pipe<MAVLink.MAVLinkMessage>? prev = null)
             where T : struct // TODO: this should be a shortcut on Uplink
         {
             prev ??= Raw;
 
             return new OnT<T>(prev);
         }
-
-
     }
 
 
-    public abstract class MAVFunction<T>
+    public abstract class Pipe<T>
     {
         public delegate List<T>? CaseFn(MAVLink.MAVLinkMessage message);
 
@@ -68,15 +66,15 @@ namespace MAVLinkAPI.API
             return ProcessOrNull(message) ?? new List<T>();
         }
 
-        public static implicit operator Func<MAVLink.MAVLinkMessage, List<T>?>(MAVFunction<T> function)
+        public static implicit operator Func<MAVLink.MAVLinkMessage, List<T>?>(Pipe<T> function)
         {
             return function.Process;
         }
 
-        public abstract class LeftAndRight : MAVFunction<T>
+        public abstract class LeftAndRight : Pipe<T>
         {
-            public MAVFunction<T> Left = null!;
-            public MAVFunction<T> Right = null!;
+            public Pipe<T> Left = null!;
+            public Pipe<T> Right = null!;
         }
 
         public class UnionT : LeftAndRight
@@ -94,7 +92,7 @@ namespace MAVLinkAPI.API
                 Left.OtherCase(m).UnionNullSafe(Right.OtherCase(m))?.ToList();
         }
 
-        public UnionT Union(MAVFunction<T> that)
+        public UnionT Union(Pipe<T> that)
         {
             return new UnionT
             {
@@ -119,7 +117,7 @@ namespace MAVLinkAPI.API
             protected override CaseFn OtherCase => m => Left.OtherCase(m) ?? Right.OtherCase(m);
         }
 
-        public OrElseT OrElse(MAVFunction<T> that)
+        public OrElseT OrElse(Pipe<T> that)
         {
             return new OrElseT
             {
@@ -128,9 +126,9 @@ namespace MAVLinkAPI.API
             };
         }
 
-        public class CutElimination<T2> : MAVFunction<T2>
+        public class CutElimination<T2> : Pipe<T2>
         {
-            public MAVFunction<T> Prev = null!;
+            public Pipe<T> Prev = null!;
             public Func<MAVLink.MAVLinkMessage, T, List<T2>> Fn = null!;
 
             protected override IDIndexed<CaseFn> MkTopics()
@@ -186,8 +184,8 @@ namespace MAVLinkAPI.API
 
     public static class ProcessorExtensions
     {
-        // TODO: will be redundant if MAVFunction<T> => IMAVFunction<out T>
-        public static MAVFunction<T> Upcast<T, T1>(this MAVFunction<T1> left) where T1 : T
+        // TODO: will be redundant if Pipe<T> => Pipe<out T>
+        public static Pipe<T> Upcast<T, T1>(this Pipe<T1> left) where T1 : T
         {
             return left.Select((_, t) => (T)t);
         }

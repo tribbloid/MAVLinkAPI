@@ -8,7 +8,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
     [TestFixture]
     public class HighAvailabilitySpec
     {
-        private class SilentFunction : MAVFunction<RxMessage<MAVLink.mavlink_heartbeat_t>>
+        private class SilentFunction : Pipe<RxMessage<MAVLink.mavlink_heartbeat_t>>
         {
             protected override IDIndexed<CaseFn> MkTopics()
             {
@@ -20,7 +20,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
 
         private static HighAvailabilityT<MAVLink.mavlink_heartbeat_t> CreateHaLeftOnly()
         {
-            var left = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
+            var left = Pipe.On<MAVLink.mavlink_heartbeat_t>();
             var right = new SilentFunction();
             return new HighAvailabilityT<MAVLink.mavlink_heartbeat_t>
             {
@@ -31,8 +31,8 @@ namespace MAVLinkAPI.Tests.API.Pipes
 
         private static HighAvailabilityT<MAVLink.mavlink_heartbeat_t> CreateHaBothChannels()
         {
-            var left = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
-            var right = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
+            var left = Pipe.On<MAVLink.mavlink_heartbeat_t>();
+            var right = Pipe.On<MAVLink.mavlink_heartbeat_t>();
             return new HighAvailabilityT<MAVLink.mavlink_heartbeat_t>
             {
                 Left = left,
@@ -44,7 +44,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
         public void FirstMessage_FromSingleChannel_IsForwarded_WithNoWarningsOrErrors()
         {
             var ha = CreateHaLeftOnly();
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
 
             var result = ha.Process(message);
 
@@ -60,10 +60,10 @@ namespace MAVLinkAPI.Tests.API.Pipes
             var ha = CreateHaLeftOnly();
             var baseTime = DateTime.UtcNow;
 
-            var message1 = MAVFunction.MockHeartbeat();
+            var message1 = Pipe.MockHeartbeat();
             message1.rxtime = baseTime;
 
-            var message2 = MAVFunction.MockHeartbeat();
+            var message2 = Pipe.MockHeartbeat();
             message2.rxtime = baseTime;
 
             var first = ha.Process(message1);
@@ -81,7 +81,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
         public void Message_SeenOnBothChannels_IsVerifiedWithoutErrors()
         {
             var ha = CreateHaBothChannels();
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
 
             var result = ha.Process(message);
 
@@ -97,11 +97,11 @@ namespace MAVLinkAPI.Tests.API.Pipes
             var ha = CreateHaLeftOnly();
             var baseTime = DateTime.UtcNow;
 
-            var message1 = MAVFunction.MockHeartbeat();
+            var message1 = Pipe.MockHeartbeat();
             message1.rxtime = baseTime;
 
             var deltaTicks = (ha.LostThreshold - ha.StaleThreshold).Ticks / 2;
-            var message2 = MAVFunction.MockHeartbeat();
+            var message2 = Pipe.MockHeartbeat();
             message2.rxtime = baseTime + ha.StaleThreshold + TimeSpan.FromTicks(deltaTicks);
 
             var first = ha.Process(message1);
@@ -121,10 +121,10 @@ namespace MAVLinkAPI.Tests.API.Pipes
             var ha = CreateHaLeftOnly();
             var baseTime = DateTime.UtcNow;
 
-            var message1 = MAVFunction.MockHeartbeat();
+            var message1 = Pipe.MockHeartbeat();
             message1.rxtime = baseTime;
 
-            var message2 = MAVFunction.MockHeartbeat();
+            var message2 = Pipe.MockHeartbeat();
             message2.rxtime = baseTime + ha.LostThreshold + TimeSpan.FromSeconds(1);
 
             var first = ha.Process(message1);

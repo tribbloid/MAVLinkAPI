@@ -11,8 +11,8 @@ namespace MAVLinkAPI.Tests.API.Pipes
         [Test]
         public void Process_WrapsRawMessageAsRxMessage()
         {
-            var on = MAVFunction.On<MAVLink.mavlink_heartbeat_t>();
-            var message = MAVFunction.MockHeartbeat();
+            var on = Pipe.On<MAVLink.mavlink_heartbeat_t>();
+            var message = Pipe.MockHeartbeat();
 
             var result = on.Process(message);
 
@@ -28,10 +28,10 @@ namespace MAVLinkAPI.Tests.API.Pipes
         [Test]
         public void Process_RespectsPreviousFunction()
         {
-            var prev = MAVFunction.Raw.SelectMany((m, raw) =>
+            var prev = Pipe.Raw.SelectMany((m, raw) =>
                 new List<MAVLink.MAVLinkMessage> { raw, raw });
-            var on = MAVFunction.On<MAVLink.mavlink_heartbeat_t>(prev);
-            var message = MAVFunction.MockHeartbeat();
+            var on = Pipe.On<MAVLink.mavlink_heartbeat_t>(prev);
+            var message = Pipe.MockHeartbeat();
 
             var result = on.Process(message);
 

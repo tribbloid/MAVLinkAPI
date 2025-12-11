@@ -4,7 +4,7 @@ using MAVLinkAPI.API;
 
 namespace MAVLinkAPI.API.Fn
 {
-    public class RawT : MAVFunction<MAVLink.MAVLinkMessage>
+    public class RawT : Pipe<MAVLink.MAVLinkMessage>
     {
         protected override IDIndexed<CaseFn> MkTopics()
         {

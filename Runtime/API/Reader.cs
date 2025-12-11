@@ -12,19 +12,19 @@ namespace MAVLinkAPI.API
      */
     public class Reader<T>
     {
-        public readonly IDictionary<Uplink, MAVFunction<T>> Sources;
+        public readonly IDictionary<Uplink, Pipe<T>> Sources;
 
-        public Reader(IDictionary<Uplink, MAVFunction<T>> sources)
+        public Reader(IDictionary<Uplink, Pipe<T>> sources)
         {
             Sources = sources;
         }
 
-        public Reader(Uplink uplink, MAVFunction<T> mavFunction) : this(
-            new Dictionary<Uplink, MAVFunction<T>> { { uplink, mavFunction } })
+        public Reader(Uplink uplink, Pipe<T> pipe) : this(
+            new Dictionary<Uplink, Pipe<T>> { { uplink, pipe } })
         {
         }
 
-        private record SubReader(KeyValuePair<Uplink, MAVFunction<T>> Pair)
+        private record SubReader(KeyValuePair<Uplink, Pipe<T>> Pair)
         {
             public IEnumerable<List<T>> MkByMessage()
             {
@@ -72,7 +72,7 @@ namespace MAVLinkAPI.API
         {
             var newSources = Sources.ToDictionary(
                 pair => pair.Key,
-                pair => (MAVFunction<T2>)pair.Value.SelectMany<T2>((m, v) => new List<T2>()));
+                pair => (Pipe<T2>)pair.Value.SelectMany<T2>((m, v) => new List<T2>()));
             return new Reader<T2>(newSources);
         }
 
@@ -89,7 +89,7 @@ namespace MAVLinkAPI.API
         {
             var newSources = Sources.ToDictionary(
                 pair => pair.Key,
-                pair => (MAVFunction<T2>)pair.Value.SelectMany(fn));
+                pair => (Pipe<T2>)pair.Value.SelectMany(fn));
             return new Reader<T2>(newSources);
         }
 
@@ -97,7 +97,7 @@ namespace MAVLinkAPI.API
         {
             var newSources = Sources.ToDictionary(
                 pair => pair.Key,
-                pair => (MAVFunction<T2>)pair.Value.Select(fn));
+                pair => (Pipe<T2>)pair.Value.Select(fn));
             return new Reader<T2>(newSources);
         }
 
@@ -105,7 +105,7 @@ namespace MAVLinkAPI.API
         // { TODO:// need a better name
         //     var newSources = Sources.ToDictionary(
         //         pair => pair.Key,
-        //         pair => (MAVFunction<object>)pair.Value.SelectMany((x, y) => ac(x, y); ));
+        //         pair => (Pipe<object>)pair.Value.SelectMany((x, y) => ac(x, y); ));
         //     return new Reader<object>(newSources);
         // }
 
@@ -119,14 +119,14 @@ namespace MAVLinkAPI.API
             return Combine(that, (f1, f2) => f1.Union(f2));
         }
 
-        private Reader<T> Combine(Reader<T> that, Func<MAVFunction<T>, MAVFunction<T>, MAVFunction<T>> combineFn)
+        private Reader<T> Combine(Reader<T> that, Func<Pipe<T>, Pipe<T>, Pipe<T>> combineFn)
         {
-            var newSources = new Dictionary<Uplink, MAVFunction<T>>(Sources);
-            foreach (var (uplink, mavFunction) in that.Sources)
-                if (newSources.TryGetValue(uplink, out var existingMavFunction))
-                    newSources[uplink] = combineFn(existingMavFunction, mavFunction);
+            var newSources = new Dictionary<Uplink, Pipe<T>>(Sources);
+            foreach (var (uplink, pipe) in that.Sources)
+                if (newSources.TryGetValue(uplink, out var existing))
+                    newSources[uplink] = combineFn(existing, pipe);
                 else
-                    newSources[uplink] = mavFunction;
+                    newSources[uplink] = pipe;
 
             return new Reader<T>(newSources);
         }

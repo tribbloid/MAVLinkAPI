@@ -16,7 +16,7 @@ namespace MAVLinkAPI.API.Feature
             this Uplink uplink
         )
         {
-            var getAttitudeQ = MAVFunction.On<MAVLink.mavlink_attitude_t>()
+            var getAttitudeQ = Pipe.On<MAVLink.mavlink_attitude_t>()
                 .Select((_, msg) =>
                 {
                     var data = msg.Data;
@@ -37,8 +37,8 @@ namespace MAVLinkAPI.API.Feature
             this Uplink uplink
         )
         {
-            // var backup = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_cov_t>(); TODO: switch to this for health check
-            var getAttitudeQ = MAVFunction.On<MAVLink.mavlink_attitude_quaternion_t>()
+            // var backup = Pipe.On<MAVLink.mavlink_attitude_quaternion_cov_t>(); TODO: switch to this for health check
+            var getAttitudeQ = Pipe.On<MAVLink.mavlink_attitude_quaternion_t>()
                 .Select((_, msg) =>
                 {
                     var data = msg.Data;

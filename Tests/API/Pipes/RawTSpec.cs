@@ -14,7 +14,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
         public void Process_EmitsInputMessage()
         {
             var raw = new RawT();
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
 
             var result = raw.Process(message);
 
@@ -26,7 +26,7 @@ namespace MAVLinkAPI.Tests.API.Pipes
         [Test]
         public void ReadRaw_UsesRawTPipe()
         {
-            var message = MAVFunction.MockHeartbeat();
+            var message = Pipe.MockHeartbeat();
             var uplink = new Uplink.Dummy(new List<MAVLink.MAVLinkMessage> { message });
 
             var reader = uplink.ReadRaw();
