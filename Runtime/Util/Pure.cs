@@ -25,10 +25,6 @@ namespace MAVLinkAPI.Util
 
             public class ToClass<T> : Unary<T> where T : class
             {
-                public T AsLazy(ref T sym)
-                {
-                    return LazyHelper.EnsureInitialized(ref sym, Self);
-                }
             }
         }
 

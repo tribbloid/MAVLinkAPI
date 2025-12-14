@@ -8,11 +8,11 @@ namespace MAVLinkAPI.Util
     {
         // TODO: too verbose, should move to Maybe<T>.Lazy after testing
 
-        public static T EnsureInitialized<T>(ref T? sym, Func<T> fn) where T : class
-        {
-            var result = LazyInitializer.EnsureInitialized(ref sym, fn);
-            return result!;
-        }
+        // public static T EnsureInitialized<T>(ref T? sym, Func<T> fn) where T : class
+        // {
+        //     var result = LazyInitializer.EnsureInitialized(ref sym, fn);
+        //     return result!;
+        // }
 
         public static T EnsureInitialized<T>(ref Box<T>? sym, Func<T> fn) where T : struct
         {
