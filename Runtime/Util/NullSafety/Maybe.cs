@@ -35,7 +35,11 @@ namespace MAVLinkAPI.Util.NullSafety
         public bool HasValue => _value != null;
 
 
-        public T? ValueOrNull => (T?)_value;
+        public T? ValueOrNull
+        {
+            get => (T?)_value;
+            set => _value = value;
+        }
 
         public T Value
         {
@@ -47,6 +51,9 @@ namespace MAVLinkAPI.Util.NullSafety
         {
             return _value != null ? (T)_value! : defaultValue;
         }
+
+        public bool IsNone => _value == null;
+        public bool IsSome => _value != null;
 
 
         public Maybe<TResult> Select<TResult>(Func<T, TResult> map)

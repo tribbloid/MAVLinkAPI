@@ -14,13 +14,13 @@ namespace MAVLinkAPI.Util
         //     return result!;
         // }
 
-        public static T EnsureInitialized<T>(ref Box<T>? sym, Func<T> fn) where T : struct
-        {
-            var boxed = LazyInitializer.EnsureInitialized(ref sym, () => new Box<T>(fn()));
-            var result = boxed!.Value;
-
-            return result;
-        }
+        // public static T EnsureInitialized<T>(ref Box<T>? sym, Func<T> fn) where T : struct
+        // {
+        //     var boxed = LazyInitializer.EnsureInitialized(ref sym, () => new Box<T>(fn()));
+        //     var result = boxed!.Value;
+        //
+        //     return result;
+        // }
     }
 
     // public static class LazyExtensions

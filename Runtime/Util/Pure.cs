@@ -17,10 +17,6 @@ namespace MAVLinkAPI.Util
         {
             public class ToStruct<T> : Unary<T> where T : struct
             {
-                public T AsLazy(ref Box<T> sym)
-                {
-                    return LazyHelper.EnsureInitialized(ref sym, Self);
-                }
             }
 
             public class ToClass<T> : Unary<T> where T : class
