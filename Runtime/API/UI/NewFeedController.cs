@@ -80,7 +80,7 @@ namespace MAVLinkAPI.API.UI
 
             foreach (var uplink in uplinks)
             {
-                var info = uplink.ToString() + "\n" + uplink.Metric.Histogram.ToString();
+                var info = uplink + "\n" + uplink.Metric.Histogram;
 
                 Debug.Log(info);
             }
