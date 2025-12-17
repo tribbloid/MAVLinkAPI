@@ -60,7 +60,6 @@ namespace MAVLinkAPI.Util
         {
             if (IsMainThread())
             {
-                if (_dispatcher == null) Initialize();
                 return Task.FromResult(UnityEngine.Object.Instantiate(original, position, rotation, parent));
             }
 
@@ -85,7 +84,6 @@ namespace MAVLinkAPI.Util
         {
             if (IsMainThread())
             {
-                if (_dispatcher == null) Initialize();
                 UnityEngine.Object.Destroy(obj);
                 return Task.CompletedTask;
             }
