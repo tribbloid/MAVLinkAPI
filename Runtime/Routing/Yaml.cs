@@ -9,6 +9,7 @@ namespace MAVLinkAPI.Routing
 
         public readonly IDeserializer Deserializer = new DeserializerBuilder()
             .WithNamingConvention(convention)
+            .IgnoreUnmatchedProperties()
             .Build();
 
         public readonly ISerializer Serializer = new SerializerBuilder()
