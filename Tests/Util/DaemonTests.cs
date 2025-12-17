@@ -97,8 +97,8 @@ namespace MAVLinkAPI.Tests.Util
             daemon.StopBlocking();
 
             // Assert
-            Assert.Throws<InvalidOperationException>(daemon.Start);
-            Assert.AreEqual(1, daemon.ExecuteCount);
+            Assert.That(() => daemon.Start(), Throws.TypeOf<InvalidOperationException>());
+            Assert.That(daemon.ExecuteCount, Is.EqualTo(1), $"Expected ExecuteCount: 1; Actual ExecuteCount: {daemon.ExecuteCount}");
         }
 
         [Test]

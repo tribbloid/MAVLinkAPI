@@ -21,6 +21,8 @@ namespace MAVLinkAPI.API.UI
          */
         [Required] public LifetimeBinding lifetimeBinding = null!;
 
+        private Lifetime Lifetime => lifetimeBinding.Lifetime;
+
         [Required] public NavPoseProvider poseProvider = null!;
 
         [Required] public TMP_InputField addressInput = null!;
@@ -28,7 +30,6 @@ namespace MAVLinkAPI.API.UI
         [Autofill(AutofillType.Children)] public TMP_Dropdown baudRateInput = null!;
         [Autofill(AutofillType.Children)] public Button newFeedButton = null!;
 
-        private Lifetime Lifetime => lifetimeBinding.Lifetime;
 
         private void Start()
         {
