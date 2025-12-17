@@ -8,9 +8,10 @@ namespace MAVLinkAPI.Util
 {
     public static class FromAnyThread
     {
-        // the following functions are safe to be used in any thread, not just Unity main thread
-        // if calling from the main thread, will execute immediately
-        // if calling from any other thread, will execute on the main thread and return a task that will complete when the operation is finished
+        private readonly struct Unit
+        {
+            public static readonly Unit Value = new();
+        }
 
         private static int? _mainThreadId;
         private static MainThreadDispatcher _dispatcher;
@@ -51,16 +52,16 @@ namespace MAVLinkAPI.Util
             _queue.Enqueue(action);
         }
 
-        public static Task<T> Instantiate<T>(
-            T original,
-            Vector3 position,
-            Quaternion rotation,
-            Transform parent)
-            where T : UnityEngine.Object
+        // the following functions are safe to be used in any thread, not just Unity main thread
+        // if calling from the main thread, will execute immediately
+        // if calling from any other thread, will execute on the main thread and return a task that will complete when the operation is finished
+        public static Task<T> Queue<T>(Func<T> fn)
         {
+            if (fn == null) throw new ArgumentNullException(nameof(fn));
+
             if (IsMainThread())
             {
-                return Task.FromResult(UnityEngine.Object.Instantiate(original, position, rotation, parent));
+                return Task.FromResult(fn());
             }
 
             var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -68,8 +69,7 @@ namespace MAVLinkAPI.Util
             {
                 try
                 {
-                    var instance = UnityEngine.Object.Instantiate(original, position, rotation, parent);
-                    tcs.TrySetResult(instance);
+                    tcs.TrySetResult(fn());
                 }
                 catch (Exception e)
                 {
@@ -80,29 +80,30 @@ namespace MAVLinkAPI.Util
             return tcs.Task;
         }
 
+        public static Task Queue(Action fn)
+        {
+            if (fn == null) throw new ArgumentNullException(nameof(fn));
+
+            return Queue(() =>
+            {
+                fn();
+                return Unit.Value;
+            });
+        }
+
+        public static Task<T> Instantiate<T>(
+            T original,
+            Vector3 position,
+            Quaternion rotation,
+            Transform parent)
+            where T : UnityEngine.Object
+        {
+            return Queue(() => UnityEngine.Object.Instantiate(original, position, rotation, parent));
+        }
+
         public static Task Destroy(UnityEngine.Object obj)
         {
-            if (IsMainThread())
-            {
-                UnityEngine.Object.Destroy(obj);
-                return Task.CompletedTask;
-            }
-
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Enqueue(() =>
-            {
-                try
-                {
-                    UnityEngine.Object.Destroy(obj);
-                    tcs.TrySetResult(null);
-                }
-                catch (Exception e)
-                {
-                    tcs.TrySetException(e);
-                }
-            });
-
-            return tcs.Task;
+            return Queue(() => UnityEngine.Object.Destroy(obj));
         }
 
         private sealed class MainThreadDispatcher : MonoBehaviour

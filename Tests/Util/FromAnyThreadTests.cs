@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,87 @@ namespace MAVLinkAPI.Tests.Util
             FromAnyThread.Initialize();
         }
 
+        [Test]
+        public void Queue_OnMainThread_CompletesImmediately()
+        {
+            var task = FromAnyThread.Queue(() => 42);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsFalse(task.IsFaulted);
+            Assert.AreEqual(42, task.Result);
+        }
+
+        [Test]
+        public void QueueAction_OnMainThread_CompletesImmediately()
+        {
+            var called = false;
+            var task = FromAnyThread.Queue(() => { called = true; });
+            Assert.IsTrue(called);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsFalse(task.IsFaulted);
+        }
+
+        [UnityTest]
+        public IEnumerator QueueAction_FromWorkerThread_CompletesAfterMainThreadUpdate()
+        {
+            var called = false;
+
+            Task task = null;
+            var worker = new Thread(() => { task = FromAnyThread.Queue(() => { called = true; }); });
+
+            worker.Start();
+            worker.Join();
+
+            Assert.IsNotNull(task);
+            Assert.IsFalse(task.IsCompleted);
+            Assert.IsFalse(called);
+
+            yield return null;
+
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsFalse(task.IsFaulted);
+            Assert.IsTrue(called);
+        }
+
+        [UnityTest]
+        public IEnumerator Queue_FromWorkerThread_CompletesAfterMainThreadUpdate()
+        {
+            Task<int> task = null;
+            var worker = new Thread(() => { task = FromAnyThread.Queue(() => 123); });
+
+            worker.Start();
+            worker.Join();
+
+            Assert.IsNotNull(task);
+            Assert.IsFalse(task.IsCompleted);
+
+            yield return null;
+
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsFalse(task.IsFaulted);
+            Assert.AreEqual(123, task.Result);
+        }
+
+        [UnityTest]
+        public IEnumerator Queue_FromWorkerThread_PropagatesException()
+        {
+            Task<int> task = null;
+            var worker = new Thread(() =>
+            {
+                task = FromAnyThread.Queue<int>(() => throw new InvalidOperationException("boom"));
+            });
+
+            worker.Start();
+            worker.Join();
+
+            Assert.IsNotNull(task);
+            Assert.IsFalse(task.IsCompleted);
+
+            yield return null;
+
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsTrue(task.IsFaulted);
+        }
+
         [UnityTest]
         public IEnumerator Instantiate_OnMainThread_CompletesImmediately()
         {
@@ -32,11 +114,11 @@ namespace MAVLinkAPI.Tests.Util
                 var instance = task.Result;
                 Assert.IsNotNull(instance);
 
-                Object.DestroyImmediate(instance);
+                UnityEngine.Object.DestroyImmediate(instance);
             }
             finally
             {
-                Object.DestroyImmediate(prefab);
+                UnityEngine.Object.DestroyImmediate(prefab);
             }
 
             yield return null;
@@ -70,11 +152,11 @@ namespace MAVLinkAPI.Tests.Util
                 var instance = task.Result;
                 Assert.IsNotNull(instance);
 
-                Object.DestroyImmediate(instance);
+                UnityEngine.Object.DestroyImmediate(instance);
             }
             finally
             {
-                Object.DestroyImmediate(prefab);
+                UnityEngine.Object.DestroyImmediate(prefab);
             }
         }
 
